@@ -1,7 +1,9 @@
 # MAGIC Web Map Inventory
 
-Proof of concept inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information 
-Centre (MAGIC), visualised in Airtable.
+Inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information Centre (MAGIC), 
+visualised in Airtable.
+
+[View inventory in Airtable](https://airtable.com/tblr6gwKOLQelMXDv/viwp8xVwcRRJnoIo0?blocks=hide) (internal).
 
 See [Data model](#data-model) for more about the information this inventory holds.
 
@@ -270,9 +272,52 @@ Checks are also ran automatically in [Continuous Integration](#continuous-integr
 
 All commits will trigger a Continuous Integration process using GitLab's CI/CD platform, configured in `.gitlab-ci.yml`.
 
+## Distribution
+
+This service is distributed as a Python package hosted on [PyPi](https://pypi.org/project/bas-web-map-inventory).
+
+Source and binary packages are built automatically through [Continuous Deployment](#continuous-deployment).
+
+To build them manually:
+
+```shell
+$ docker-compose run app ash
+# build package to /build, /dist and /bas-web-map-inventory.egg-info
+$ python setup.py sdist bdist_wheel
+# quit and remove container
+$ exit
+$ docker-compose down
+``` 
+
+To manually publish a pre-release version to [PyPi Testing](https://test.pypi.org/project/bas-web-map-inventory):
+
+**Note:** Before publishing, ensure you set `version` in `setup.py` to a suitable version, e.g. `1.2.3-rc1`.
+
+```shell
+$ docker-compose run app ash
+$ python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+# quit and remove container
+$ exit
+$ docker-compose down
+```
+
+To manually publish a release version to [PyPi](https://pypi.org/project/bas-web-map-inventory):
+
+**Note:** Before publishing, ensure you set `version` in `setup.py` to a suitable version, e.g. `1.2.3`.
+
+```
+$ docker-compose run app ash
+$ python -m twine upload --repository-url https://pypi.org/legacy/ dist/*
+# quit and remove container
+$ exit
+$ docker-compose down
+```
+
 ## Deployment
 
 ### Continuous Deployment
+
+All commits will trigger a Continuous Deployment process using GitLab's CI/CD platform, configured in `.gitlab-ci.yml`.
 
 ...
 
@@ -284,10 +329,17 @@ For all releases:
 
 1. create a release branch
 2. if needed, build & push the Docker image
-3. close release in `CHANGELOG.md`
-4. push changes, merge the release branch into `master` and tag with version
+3. check the `version` in `setup.py` is set to a suitable semver version, e.g. `1.2.3-rc1`
+4. close release in `CHANGELOG.md`
+5. push changes, merge the release branch into `master` and tag with version
 
-The application will be automatically deployed into production using [Continuous Deployment](#continuous-deployment).
+The application will be built and pushed to PyPi using [Continuous Deployment](#continuous-deployment).
+
+### After release
+
+For all releases:
+
+1. update the version number in `setup.py` as appropriate
 
 ## Feedback
 

@@ -12,5 +12,3 @@ services:
       - FLASK_ENV=development
       - FLASK_SKIP_DOTENV=True
       - FLASK_DEBUG=True
-    ports:
-      - 9000:9000
