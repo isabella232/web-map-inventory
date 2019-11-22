@@ -1,0 +1,6 @@
+__pycache__
+.env
+/resources/data.json
+/resources/sources.json
+/tests/resources/data.json
+/tests/resources/sources.json

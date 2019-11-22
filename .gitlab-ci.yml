@@ -1,0 +1,40 @@
+---
+
+# == Notes ==
+
+# - GitLab automatically passes artifacts from previous stages by default
+
+# == Global settings ==
+
+stages:
+  - test
+  - lint
+
+variables:
+  APP_NAME: magic-map-layers-airflow
+
+image:
+  name: docker-registry.data.bas.ac.uk/magic/web-map-inventory:latest
+  entrypoint: [""]
+
+# == Jobs ==
+
+test-app:
+  stage: test
+  variables:
+    FLASK_ENV: testing
+  script:
+    - "pytest -o junit_family=xunit2 --junitxml=test-results.xml"
+  artifacts:
+    reports:
+      junit: test-results.xml
+
+pep8-app:
+  stage: lint
+  script:
+    - "flake8 ."
+
+bandit-app:
+  stage: lint
+  script:
+    - "bandit -r ."
