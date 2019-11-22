@@ -1,7 +1,9 @@
 # MAGIC Web Map Inventory
 
-Proof of concept inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information 
-Centre (MAGIC), visualised in Airtable.
+Inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information Centre (MAGIC), 
+visualised in Airtable.
+
+[View inventory in Airtable](https://airtable.com/tblr6gwKOLQelMXDv/viwp8xVwcRRJnoIo0?blocks=hide) (internal).
 
 See [Data model](#data-model) for more about the information this inventory holds.
 
