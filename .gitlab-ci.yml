@@ -23,6 +23,8 @@ test-app:
   stage: test
   variables:
     FLASK_ENV: testing
+  before_script:
+    - "touch .env"
   script:
     - "pytest -o junit_family=xunit2 --junitxml=test-results.xml"
   artifacts:
