@@ -4,3 +4,8 @@
 
 ## Flask CLI options
 FLASK_APP=manage.py
+
+## Feature flags
+
+FLASK
+APP_ENABLE_SENTRY=True

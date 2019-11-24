@@ -1,5 +1,7 @@
 import os
 
+import sentry_sdk
+
 from flask import Flask
 from flask.cli import AppGroup
 # noinspection PyPackageRequirements
@@ -17,6 +19,9 @@ def create_app():
 
     if 'LOGGING_LEVEL' in app.config:
         app.logger.setLevel(app.config['LOGGING_LEVEL'])
+
+    if app.config['APP_ENABLE_SENTRY']:
+        sentry_sdk.init(**app.config['SENTRY_CONFIG'])
 
     data_cli_group = AppGroup('data', help='Interact with data sources.')
     app.cli.add_command(data_cli_group)
