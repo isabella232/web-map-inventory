@@ -1,5 +1,6 @@
 __pycache__
 .env
+.flaskenv
 /resources/data.json
 /resources/sources.json
 /tests/resources/data.json

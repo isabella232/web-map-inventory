@@ -11,15 +11,15 @@ See [Data model](#data-model) for more about the information this inventory hold
 
 This project runs locally in a container. See the [Setup](#setup) section for instructions.
 
+### Tasks (usage)
+
 To run tasks:
 
 ```shell
 $ docker-compose run flask [task]
 ```
 
-When finished, run `docker-compose down` to remove all running containers.
-
-### Tasks
+When finished, run `docker-compose down` to remove all the container.
 
 #### `data fetch`
 
@@ -41,12 +41,16 @@ Creates, updates or removes items in Airtable to match local items.
 
 Removes all data from Airtable.
 
-### Adding data sources
+### Data sources
+
+Each data source is represented as an object in the `server` list in `resources/sources.json`. The structure of this
+object depends on the server/source type, defined in this section.
+
+#### Adding a data source
 
 **Note:** See [Supported data sources](#supported-data-sources) for currently supported data sources.
 
-Each data source is represented as an object in the `server` list in `resources/sources.json`. The structure of this
-object depends on the server/source type, defined below. Once added use the [`data fetch` task](#data-fetch).
+Once added use the [`data fetch` task](#data-fetch).
 
 #### Adding a *GeoServer* data source
 
@@ -63,7 +67,7 @@ object depends on the server/source type, defined below. Once added use the [`da
 | `username` | Yes      | String    | Any valid GeoServer username                                        | `admin`                      | Usually the GeoServer admin user     | -                             |
 | `password` | Yes      | String    | Password for GeoServer user                                         | `password`                   | Usually the GeoServer admin user     | -                             |
 
-**Note:** Visit [ulidgenerator.com](http://ulidgenerator.com) to generate ULIDs manually.
+**Note:** Use [ulidgenerator.com](http://ulidgenerator.com) to generate ULIDs manually.
 
 Example:
 
@@ -84,12 +88,14 @@ Example:
 
 ## Implementation
 
-Simple Flask application using the [airtable-python-wrapper](https://airtable-python-wrapper.readthedocs.io) library to 
+Flask application using the [airtable-python-wrapper](https://airtable-python-wrapper.readthedocs.io) library to 
 interact with the Airtable API.
+
+### Airtable
 
 Data is synced to the 
 [MAGIC Maps and Layers Inventory](https://airtable.com/tblCoGkVssEe6cs0B/viwjb9FAq2FLx5BL9?blocks=hide) Base in the
-[BAS MAGIC](https://airtable.com/wspXVL8SsiS5hPhob/workspace/billing) Airtable Workspace.
+[BAS MAGIC](https://airtable.com/wspXVL8SsiS5hPhob/workspace/billing) Workspace.
 
 ### Data model
 
@@ -108,9 +114,16 @@ This data model consists of:
 
 It can be visualised as:
 
-![data model visualisation](assets/img/data-model.png)
+![data model visualisation](https://raw.githubusercontent.com/antarctica/web-map-inventory/master/assets/img/data-model.png)
 
-### Supported data sources
+### Data sources
+
+Data sources are *servers* in the project [Data model](#data-model) and define connection details for APIs and services
+each server type provides for fetching information about components they contain (e.g. listing *layers*).
+
+A data sources file, `resources/sources.json`, is used for recording these details.
+
+#### Supported data sources
 
 * GeoServer
     * Using a combination of its admin API and WMS/WFS OGC endpoints
@@ -188,17 +201,12 @@ $ cp .env.example .env
 $ cp .flaskenv.example .flaskenv
 ```
 
-**Note:** You will need an Airtable API token with permission to modify the relevant 
-[Base](https://airtable.com/tblCoGkVssEe6cs0B).
-
-A data sources file, `resources/sources.json`, is used for setting servers to fetch data (layers, etc.) from. 
-`resources/sources.example.json` acts as a guide to copy and be updated as needed.
+A [Data sources file](#data-sources), `resources/sources.json`, is used for configure where/what to fetch data from. 
+This file should be created by copying `resources/sources.example.json` and updating it as needed:
 
 ```shell
 $ cp resources/sources.example.json resources/sources.json
 ```
-
-**Note:** You will need suitable credentials for the APIs of each server (e.g. an admin user for GeoServer server).
 
 See the [Usage](#usage) section for how to use the application.
 
