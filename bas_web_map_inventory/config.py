@@ -25,7 +25,7 @@ class Config:
     @property
     def SENTRY_CONFIG(self) -> Dict:
         _config = {
-            'dsn': os.environ['SENTEY_DSN'],
+            'dsn': os.environ.get('SENTEY_DSN') or None,
             'integrations': [FlaskIntegration()],
             'environment': self.ENV
         }
