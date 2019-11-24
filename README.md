@@ -11,15 +11,15 @@ See [Data model](#data-model) for more about the information this inventory hold
 
 This project runs locally in a container. See the [Setup](#setup) section for instructions.
 
+### Tasks (usage)
+
 To run tasks:
 
 ```shell
 $ docker-compose run flask [task]
 ```
 
-When finished, run `docker-compose down` to remove all running containers.
-
-### Tasks
+When finished, run `docker-compose down` to remove all the container.
 
 #### `data fetch`
 
@@ -41,12 +41,16 @@ Creates, updates or removes items in Airtable to match local items.
 
 Removes all data from Airtable.
 
-### Adding data sources
+### Data sources
+
+Each data source is represented as an object in the `server` list in `resources/sources.json`. The structure of this
+object depends on the server/source type, defined in this section.
+
+#### Adding a data source
 
 **Note:** See [Supported data sources](#supported-data-sources) for currently supported data sources.
 
-Each data source is represented as an object in the `server` list in `resources/sources.json`. The structure of this
-object depends on the server/source type, defined below. Once added use the [`data fetch` task](#data-fetch).
+Once added use the [`data fetch` task](#data-fetch).
 
 #### Adding a *GeoServer* data source
 
@@ -63,7 +67,7 @@ object depends on the server/source type, defined below. Once added use the [`da
 | `username` | Yes      | String    | Any valid GeoServer username                                        | `admin`                      | Usually the GeoServer admin user     | -                             |
 | `password` | Yes      | String    | Password for GeoServer user                                         | `password`                   | Usually the GeoServer admin user     | -                             |
 
-**Note:** Visit [ulidgenerator.com](http://ulidgenerator.com) to generate ULIDs manually.
+**Note:** Use [ulidgenerator.com](http://ulidgenerator.com) to generate ULIDs manually.
 
 Example:
 
@@ -84,22 +88,14 @@ Example:
 
 ## Implementation
 
-Simple Flask application using the [airtable-python-wrapper](https://airtable-python-wrapper.readthedocs.io) library to 
+Flask application using the [airtable-python-wrapper](https://airtable-python-wrapper.readthedocs.io) library to 
 interact with the Airtable API.
+
+### Airtable
 
 Data is synced to the 
 [MAGIC Maps and Layers Inventory](https://airtable.com/tblCoGkVssEe6cs0B/viwjb9FAq2FLx5BL9?blocks=hide) Base in the
-[BAS MAGIC](https://airtable.com/wspXVL8SsiS5hPhob/workspace/billing) Airtable Workspace.
-
-### Configuration
-
-Configuration options are set within `map_layer_index/config.py`. Variable options are set using 
-[Environment variables](#environment-variables).
-
-#### Environment variables
-
-Variable configuration options should be set using environment variables. These can be real environment variables or 
-defined in a `.env` file, for which `.env.example` acts as an example.
+[BAS MAGIC](https://airtable.com/wspXVL8SsiS5hPhob/workspace/billing) Workspace.
 
 ### Data model
 
@@ -118,12 +114,65 @@ This data model consists of:
 
 It can be visualised as:
 
-![data model visualisation](assets/img/data-model.png)
+![data model visualisation](https://raw.githubusercontent.com/antarctica/web-map-inventory/master/assets/img/data-model.png)
 
-### Supported data sources
+### Data sources
+
+Data sources are *servers* in the project [Data model](#data-model) and define connection details for APIs and services
+each server type provides for fetching information about components they contain (e.g. listing *layers*).
+
+A data sources file, `resources/sources.json`, is used for recording these details.
+
+#### Supported data sources
 
 * GeoServer
     * Using a combination of its admin API and WMS/WFS OGC endpoints
+
+### Configuration
+
+Configuration options are set within `map_layer_index/config.py`. 
+
+All [Options](#configuration-options) are defined in a `Config` base class, with per-environment sub-classes overriding 
+and extending these options as needed. The active configuration is set using the `FLASK_ENV` environment variable.
+
+Where options are configurable, values are read from environment variables 
+[Environment variables](#environment-variables).
+
+#### Configuration options
+
+| Option              | Required | Environments | Data Type (Cast) | Source      |  Allowed Values                                                                                             | Default Value                                                              | Example Value                                                | Description                                                                                                     | Notes |
+| ------------------- | -------- | ------------ | ---------------- | ----------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ----- |
+| `FLASK_APP`         | Yes      | All          | String           | `.flaskenv` | Valid [`FLASK_APP`](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery) value            | `manage.py`                                                                | *See default value*                                          | See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery)                | -     |
+| `APP_ENABLE_SENTRY` | Yes      | All          | Boolean          | `.flaskenv` | `True`/`False`                                                                                              | `False` (for *development*/*testing*), *True* (for *staging*/*production*) | `True`                                                       | Feature flag for [Error reporting](#error-reporting)                                                            | -     |
+| `SENTEY_DSN`        | Yes      | Yes          | String           | `.env`      | Valid [Sentry DSN](https://docs.sentry.io/error-reporting/quickstart/?platform=python#configure-the-sdk)    | -                                                                          | `https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@sentry.io/xxxxxxx` | Sentry [Data Source Name](https://docs.sentry.io/error-reporting/quickstart/?platform=python#configure-the-sdk) | -     |  
+| `AIRTABLE_API_KEY`  | Yes      | All          | String           | `.env`      | Valid [AirTable API key](https://support.airtable.com/hc/en-us/articles/219046777-How-do-I-get-my-API-key-) | -                                                                          | `keyxxxxxxxxxxxxxx`                                          | AirTable API Key                                                                                                | -     |
+| `AIRTABLE_BASE_ID`  | Yes      | All          | String           | `.env`      | Valid [AirTable Base ID](https://airtable.com/api)                                                          | -                                                                          | `appxxxxxxxxxxxxxx`                                          | ID of the AirTable Base to populate/use                                                                         | -     |
+
+Options are set as strings and then cast to the data type listed above. See 
+[Environment variables](#environment-variables) for information about an options 'Source'.
+
+Flask also has a number of 
+[builtin configuration options](https://flask.palletsprojects.com/en/1.1.x/config/#builtin-configuration-values).
+
+#### Environment variables
+
+Variable configuration options should be set using environment variables taken from a combination of sources:
+
+| Source                   | Priority | Purpose                     | Notes                                   |
+| ------------------------ | -------- | --------------------------- | --------------------------------------- |
+| OS environment variables | 1st      | General/Runtime             | -                                       |
+| `.env`                   | 2nd      | Secret/private variables    | Generate by copying `.env.example`      |
+| `.flaskenv`              | 3rd      | Non-secret/public variables | Generate by copying `.flaskenv.example` |
+
+**Note:** these sources are a
+[Flask convention](https://flask.palletsprojects.com/en/1.1.x/cli/#environment-variables-from-dotenv).
+
+### Error tracking
+
+Errors in this service are tracked with Sentry:
+
+* [Sentry dashboard](https://sentry.io/antarctica/web-map-inventory/)
+* [GitLab dashboard](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/error_tracking)
 
 ## Setup
 
@@ -143,24 +192,21 @@ $ docker login docker-registry.data.bas.ac.uk
 $ docker-compose pull
 ```
 
-An environment file, `.env`, is used for setting secret variables. `.env.example` acts as a guide to copy and be updated 
-as needed.
+Two [Environment files](#environment-variables), `.env` and `.flaskenv` are used for setting 
+[Configuration options](#configuration-options). These files should be created by copying their examples and updating 
+them as needed:
 
 ```shell
 $ cp .env.example .env
+$ cp .flaskenv.example .flaskenv
 ```
 
-**Note:** You will need an Airtable API token with permission to modify the relevant 
-[Base](https://airtable.com/tblCoGkVssEe6cs0B).
-
-A data sources file, `resources/sources.json`, is used for setting servers to fetch data (layers, etc.) from. 
-`resources/sources.example.json` acts as a guide to copy and be updated as needed.
+A [Data sources file](#data-sources), `resources/sources.json`, is used for configure where/what to fetch data from. 
+This file should be created by copying `resources/sources.example.json` and updating it as needed:
 
 ```shell
 $ cp resources/sources.example.json resources/sources.json
 ```
-
-**Note:** You will need suitable credentials for the APIs of each server (e.g. an admin user for GeoServer server).
 
 See the [Usage](#usage) section for how to use the application.
 
