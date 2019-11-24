@@ -54,7 +54,7 @@ class DevelopmentConfig(Config):
         self.APP_ENABLE_SENTRY = str2bool(os.environ.get('APP_ENABLE_SENTRY')) or False
 
 
-class TestConfig(Config):
+class TestingConfig(Config):
     DEBUG = True
     TESTING = True
 
