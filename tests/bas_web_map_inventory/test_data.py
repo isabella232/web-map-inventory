@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 @pytest.mark.usefixtures('app', 'app_runner', 'geoserver_catalogue', 'wms_client', 'wfs_client')
 def test_data_fetch_command(app, app_runner, geoserver_catalogue, wms_client, wfs_client):
-    with patch('map_layer_index.Catalogue') as mock_geoserver_catalogue, \
-            patch('map_layer_index.WebMapService') as mock_wms_client, \
-            patch('map_layer_index.WebFeatureService') as mock_wfs_client:
+    with patch('bas_web_map_inventory.components.geoserver.Catalogue') as mock_geoserver_catalogue, \
+            patch('bas_web_map_inventory.components.geoserver.WebMapService') as mock_wms_client, \
+            patch('bas_web_map_inventory.components.geoserver.WebFeatureService') as mock_wfs_client:
         mock_geoserver_catalogue.return_value = geoserver_catalogue
         mock_wms_client.return_value = wms_client
         mock_wfs_client.return_value = wfs_client

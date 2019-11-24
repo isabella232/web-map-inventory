@@ -2,11 +2,14 @@ import pytest
 
 from unittest.mock import patch
 
-from map_layer_index import Server, Namespace, Repository, Style, Layer, GeoServer, LayerGroup, Servers, Namespaces, \
-    Repositories, Styles, Layers, LayerGroups
-from tests.conftest import test_server_data, test_namespace_data, test_repository_data, test_style_data, \
-    test_layer_data, test_layer_group_data, test_geoserver_data, test_server, test_namespace, test_repository, \
-    test_style, test_layer, test_layer_group
+from bas_web_map_inventory.components import Server, Namespace, Repository, Style, Layer, LayerGroup, Servers, \
+    Namespaces, Repositories, Styles, Layers, LayerGroups
+from bas_web_map_inventory.components.geoserver import GeoServer
+
+from tests.bas_web_map_inventory.conftest.components import test_server_data, test_server, test_namespace_data, \
+    test_namespace, test_repository_data, test_repository, test_style_data, test_style, test_layer_data, test_layer, \
+    test_layer_group_data, test_layer_group
+from tests.bas_web_map_inventory.conftest.geoserver import test_geoserver_data
 
 
 @pytest.mark.parametrize(
@@ -45,9 +48,9 @@ def test_generic_components(component, component_item):
 
 @pytest.mark.usefixtures('geoserver_catalogue', 'wms_client', 'wfs_client')
 def test_geoserver_component(geoserver_catalogue, wms_client, wfs_client):
-    with patch('map_layer_index.Catalogue') as mock_geoserver_catalogue, \
-            patch('map_layer_index.WebMapService') as mock_wms_client, \
-            patch('map_layer_index.WebFeatureService') as mock_wfs_client:
+    with patch('bas_web_map_inventory.components.geoserver.Catalogue') as mock_geoserver_catalogue, \
+            patch('bas_web_map_inventory.components.geoserver.WebMapService') as mock_wms_client, \
+            patch('bas_web_map_inventory.components.geoserver.WebFeatureService') as mock_wfs_client:
         mock_geoserver_catalogue.return_value = geoserver_catalogue
         mock_wms_client.return_value = wms_client
         mock_wfs_client.return_value = wfs_client

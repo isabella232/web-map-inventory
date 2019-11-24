@@ -16,10 +16,11 @@ setup(
     version=version,
     author="British Antarctic Survey",
     author_email="webapps@bas.ac.uk",
-    description="Inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information Centre (MAGIC), visualised in Airtable.",
+    description="Inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information "
+                "Centre (MAGIC), visualised in Airtable.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/antarctica/flask-azure-oauth",
+    url="https://github.com/antarctica/web-map-inventory",
     license='Open Government Licence v3.0',
     install_requires=['airtable-python-wrapper', 'Flask', 'flask-DotEnv', 'geoserver-restconfig', 'OWSlib', 'ulid-py'],
     packages=find_packages(exclude=['tests']),

@@ -1,13 +1,15 @@
 import pytest
 
-from map_layer_index import ServerAirtable, NamespaceAirtable, RepositoryAirtable, StyleAirtable, LayerAirtable, \
-    LayerGroupAirtable, ServersAirtable, NamespacesAirtable, RepositoriesAirtable, StylesAirtable, LayersAirtable, \
-    LayerGroupsAirtable
+from bas_web_map_inventory.components.airtable import ServerAirtable, ServersAirtable, NamespaceAirtable, \
+    NamespacesAirtable, RepositoryAirtable, RepositoriesAirtable, StyleAirtable, StylesAirtable, LayerAirtable, \
+    LayersAirtable, LayerGroupAirtable, LayerGroupsAirtable
 
-from tests.conftest import test_server, test_namespace, test_repository, test_style, test_layer, test_layer_group, \
-    test_servers, test_namespaces, test_repositories, test_styles, test_layers, test_layer_groups, MockAirtable, \
-    test_servers_airtable, test_namespaces_airtable, test_repositories_airtable, test_styles_airtable, \
-    test_layers_airtable, test_layer_groups_airtable
+from tests.bas_web_map_inventory.conftest.components import test_server, test_servers, test_namespace, \
+    test_namespaces, test_repository, test_repositories, test_style, test_styles, test_layer, test_layers, \
+    test_layer_group, test_layer_groups
+from tests.bas_web_map_inventory.conftest.airtable import MockAirtable, test_servers_airtable, \
+    test_namespaces_airtable, test_repositories_airtable, test_styles_airtable, test_layers_airtable, \
+    test_layer_groups_airtable
 
 
 @pytest.mark.parametrize(

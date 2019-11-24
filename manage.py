@@ -1,3 +1,3 @@
-from map_layer_index import create_app
+from bas_web_map_inventory import create_app
 
 app = create_app()
