@@ -6,7 +6,6 @@ LABEL maintainer = "Felix Fennell <felnne@bas.ac.uk>"
 WORKDIR /usr/src/app
 
 ENV PYTHONPATH /usr/src/app
-ENV FLASK_APP manage.py
 ENV FLASK_ENV production
 
 # Setup project dependencies

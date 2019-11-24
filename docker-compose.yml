@@ -5,10 +5,8 @@ services:
   app:
     build: .
     image: docker-registry.data.bas.ac.uk/magic/web-map-inventory:latest
-    command: flask run --host 0.0.0.0 --port 9000
+    command: flask
     volumes:
       - .:/usr/src/app
     environment:
       - FLASK_ENV=development
-      - FLASK_SKIP_DOTENV=True
-      - FLASK_DEBUG=True

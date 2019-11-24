@@ -91,16 +91,6 @@ Data is synced to the
 [MAGIC Maps and Layers Inventory](https://airtable.com/tblCoGkVssEe6cs0B/viwjb9FAq2FLx5BL9?blocks=hide) Base in the
 [BAS MAGIC](https://airtable.com/wspXVL8SsiS5hPhob/workspace/billing) Airtable Workspace.
 
-### Configuration
-
-Configuration options are set within `map_layer_index/config.py`. Variable options are set using 
-[Environment variables](#environment-variables).
-
-#### Environment variables
-
-Variable configuration options should be set using environment variables. These can be real environment variables or 
-defined in a `.env` file, for which `.env.example` acts as an example.
-
 ### Data model
 
 This project, an inventory, consists of information held in geospatial services. The data model is intended to be 
@@ -125,6 +115,43 @@ It can be visualised as:
 * GeoServer
     * Using a combination of its admin API and WMS/WFS OGC endpoints
 
+### Configuration
+
+Configuration options are set within `map_layer_index/config.py`. 
+
+All [Options](#configuration-options) are defined in a `Config` base class, with per-environment sub-classes overriding 
+and extending these options as needed. The active configuration is set using the `FLASK_ENV` environment variable.
+
+Where options are configurable, values are read from environment variables 
+[Environment variables](#environment-variables).
+
+#### Configuration options
+
+| Option              | Required | Environments | Data Type (Cast) | Source      |  Allowed Values                                                                                             | Default Value                                                              | Example Value                                                | Description                                                                                                     | Notes |
+| ------------------- | -------- | ------------ | ---------------- | ----------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ----- |
+| `FLASK_APP`         | Yes      | All          | String           | `.flaskenv` | Valid [`FLASK_APP`](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery) value            | `manage.py`                                                                | *See default value*                                          | See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery)                | -     |
+| `AIRTABLE_API_KEY`  | Yes      | All          | String           | `.env`      | Valid [AirTable API key](https://support.airtable.com/hc/en-us/articles/219046777-How-do-I-get-my-API-key-) | -                                                                          | `keyxxxxxxxxxxxxxx`                                          | AirTable API Key                                                                                                | -     |
+| `AIRTABLE_BASE_ID`  | Yes      | All          | String           | `.env`      | Valid [AirTable Base ID](https://airtable.com/api)                                                          | -                                                                          | `appxxxxxxxxxxxxxx`                                          | ID of the AirTable Base to populate/use                                                                         | -     |
+
+Options are set as strings and then cast to the data type listed above. See 
+[Environment variables](#environment-variables) for information about an options 'Source'.
+
+Flask also has a number of 
+[builtin configuration options](https://flask.palletsprojects.com/en/1.1.x/config/#builtin-configuration-values).
+
+#### Environment variables
+
+Variable configuration options should be set using environment variables taken from a combination of sources:
+
+| Source                   | Priority | Purpose                     | Notes                                   |
+| ------------------------ | -------- | --------------------------- | --------------------------------------- |
+| OS environment variables | 1st      | General/Runtime             | -                                       |
+| `.env`                   | 2nd      | Secret/private variables    | Generate by copying `.env.example`      |
+| `.flaskenv`              | 3rd      | Non-secret/public variables | Generate by copying `.flaskenv.example` |
+
+**Note:** these sources are a
+[Flask convention](https://flask.palletsprojects.com/en/1.1.x/cli/#environment-variables-from-dotenv).
+
 ## Setup
 
 ```shell
@@ -143,11 +170,13 @@ $ docker login docker-registry.data.bas.ac.uk
 $ docker-compose pull
 ```
 
-An environment file, `.env`, is used for setting secret variables. `.env.example` acts as a guide to copy and be updated 
-as needed.
+Two [Environment files](#environment-variables), `.env` and `.flaskenv` are used for setting 
+[Configuration options](#configuration-options). These files should be created by copying their examples and updating 
+them as needed:
 
 ```shell
 $ cp .env.example .env
+$ cp .flaskenv.example .flaskenv
 ```
 
 **Note:** You will need an Airtable API token with permission to modify the relevant 
