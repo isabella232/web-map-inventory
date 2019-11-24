@@ -1,0 +1,33 @@
+import os
+
+from flask import Flask
+from flask.cli import AppGroup
+
+from bas_web_map_inventory.config import config
+from bas_web_map_inventory.cli import fetch as data_fetch_cmd, status as airtable_status_cmd, \
+    sync as airtable_sync_cmd, reset as airtable_reset_cmd
+
+
+def create_app(env: str = None):
+    app = Flask(__name__)
+
+    if env is None:
+        env = os.getenv('FLASK_ENV') or 'default'
+    _config = config[env]
+    app.config.from_object(_config)
+    _config.init_app(app)
+
+    if 'LOGGING_LEVEL' in app.config:
+        app.logger.setLevel(app.config['LOGGING_LEVEL'])
+
+    data_cli_group = AppGroup('data', help='Interact with data sources.')
+    app.cli.add_command(data_cli_group)
+    data_cli_group.add_command(data_fetch_cmd, 'fetch')
+
+    airtable_cli_group = AppGroup('airtable', help='Interact with Airtable service.')
+    app.cli.add_command(airtable_cli_group)
+    airtable_cli_group.add_command(airtable_status_cmd, 'status')
+    airtable_cli_group.add_command(airtable_sync_cmd, 'sync')
+    airtable_cli_group.add_command(airtable_reset_cmd, 'reset')
+
+    return app
