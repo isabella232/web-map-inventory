@@ -375,17 +375,10 @@ For all releases:
 
 1. create a release branch
 2. if needed, build & push the Docker image
-3. check the `version` in `setup.py` is set to a suitable semver version, e.g. `1.2.3-rc1`
-4. close release in `CHANGELOG.md`
-5. push changes, merge the release branch into `master` and tag with version
+3. close release in `CHANGELOG.md`
+4. push changes, merge the release branch into `master` and tag with version
 
 The application will be built and pushed to PyPi using [Continuous Deployment](#continuous-deployment).
-
-### After release
-
-For all releases:
-
-1. update the version number in `setup.py` as appropriate
 
 ## Feedback
 

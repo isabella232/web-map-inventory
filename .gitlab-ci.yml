@@ -14,6 +14,10 @@
 #
 # - PyPi (staging)
 # > PYPI_TEST_PASSWORD: "[Sensitive]"
+#
+# - Sentry
+# > SENTRY_AUTH_TOKEN: "[Sensetive]"
+# > SENTRY_DSN: "[Sensetive]"
 
 
 # == Global settings ==
@@ -23,12 +27,14 @@ stages:
   - lint
   - build
   - publish
-
+  - deploy
 
 variables:
   APP_NAME: magic-map-layers-airflow
   PYPI_USERNAME: british-antarctic-survey
   PYPI_TEST_USERNAME: british-antarctic-survey
+  SENTRY_ORG: antarctica
+  SENTRY_PROJECT: web-map-inventory
 
 image:
   name: docker-registry.data.bas.ac.uk/magic/web-map-inventory:latest
@@ -79,5 +85,27 @@ publish-app-prod:
   stage: publish
   script:
     - "python -m twine upload --username $PYPI_USERNAME --password $PYPI_PASSWORD --disable-progress-bar --verbose dist/*"
+  only:
+    - tags
+
+sentry-stage:
+  stage: deploy
+  image:
+    name: getsentry/sentry-cli
+    entrypoint: [""]
+  script:
+    - "sentry-cli releases new --finalize $CI_COMMIT_SHA"
+    - "sentry-cli releases deploys $CI_COMMIT_SHA new -e staging"
+  only:
+    - master
+
+sentry-prod:
+  stage: deploy
+  image:
+    name: getsentry/sentry-cli
+    entrypoint: [""]
+  script:
+    - "sentry-cli releases new --finalize $CI_COMMIT_SHA"
+    - "sentry-cli releases deploys $CI_COMMIT_SHA new -e production"
   only:
     - tags
