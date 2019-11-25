@@ -5,6 +5,7 @@ from typing import Dict
 from flask.cli import load_dotenv
 from sentry_sdk.integrations.flask import FlaskIntegration
 from str2bool import str2bool
+from better_setuptools_git_version import get_version
 
 
 class Config:
@@ -27,7 +28,8 @@ class Config:
         _config = {
             'dsn': os.environ.get('SENTEY_DSN') or None,
             'integrations': [FlaskIntegration()],
-            'environment': self.ENV
+            'environment': self.ENV,
+            'release': get_version()
         }
         if 'APP_RELEASE' in os.environ:
             _config['release'] = os.environ.get('APP_RELEASE')
