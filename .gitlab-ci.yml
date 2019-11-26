@@ -105,7 +105,7 @@ sentry-stage:
     name: getsentry/sentry-cli
     entrypoint: [""]
   script:
-    - "sentry-cli releases new --finalize $CI_COMMIT_SHA"
+    - "sentry-cli releases new --finalize $(cat APP_RELEASE.txt)"
     - "sentry-cli releases deploys $CI_COMMIT_SHA new -e staging"
   only:
     - master
@@ -116,7 +116,7 @@ sentry-prod:
     name: getsentry/sentry-cli
     entrypoint: [""]
   script:
-    - "sentry-cli releases new --finalize $CI_COMMIT_SHA"
+    - "sentry-cli releases new --finalize $(cat APP_RELEASE.txt)"
     - "sentry-cli releases deploys $CI_COMMIT_SHA new -e production"
   only:
     - tags
