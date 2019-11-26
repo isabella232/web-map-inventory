@@ -106,7 +106,8 @@ sentry-stage:
     entrypoint: [""]
   script:
     - "sentry-cli releases new --finalize $(cat APP_RELEASE.txt)"
-    - "sentry-cli releases deploys $CI_COMMIT_SHA new -e staging"
+    - "sentry-cli releases set-commits $(cat APP_RELEASE.txt) --auto"
+    - "sentry-cli releases deploys $(cat APP_RELEASE.txt) new -e staging"
   only:
     - master
 
@@ -117,6 +118,7 @@ sentry-prod:
     entrypoint: [""]
   script:
     - "sentry-cli releases new --finalize $(cat APP_RELEASE.txt)"
-    - "sentry-cli releases deploys $CI_COMMIT_SHA new -e production"
+    - "sentry-cli releases set-commits $(cat APP_RELEASE.txt) --auto"
+    - "sentry-cli releases deploys $(cat APP_RELEASE.txt) new -e production"
   only:
     - tags
