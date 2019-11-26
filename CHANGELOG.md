@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-* Python package versioning [#7](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/7)
+* Pinning package dependencies in `setup.py` [#9](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/9) 
+* Python package versioning 
+  [#7](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/7) 
+  [#8](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/8)
 
 ## [0.1.0] - 2019-11-25
 

@@ -235,15 +235,16 @@ Checks are ran automatically in [Continuous Integration](#continuous-integration
 ### Dependencies
 
 Python dependencies should be defined using Pip through the `requirements.txt` file. The Docker image is configured to
-install these dependencies into the application image for consistency across different environments. Dependencies should
-be periodically reviewed and updated as new versions are released.
+install these dependencies into the application image for consistency across different environments.
+
+**Note:** Dependencies should be pinned to specific versions, then periodically reviewed and updated as needed.
 
 To add a new dependency:
 
 ```shell
 $ docker-compose run app ash
 $ pip install [dependency]==
-# this will display a list of available versions, add the latest to `requirements.txt`
+# this will display a list of available versions, add the latest to `requirements.txt` and if a run-time dependency `setup.py`
 $ exit
 $ docker-compose down
 $ docker-compose build
