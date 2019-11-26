@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+* Python package versioning [#7](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/7)
+
+## [0.1.0] - 2019-11-25
+
 ### Added
 
 * Initial project

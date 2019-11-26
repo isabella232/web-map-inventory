@@ -24,6 +24,8 @@ def create_app():
         app.logger.info('Sentry error reporting enabled')
         sentry_sdk.init(**app.config['SENTRY_CONFIG'])
 
+    app.logger.info(f"{app.config['NAME']} ({app.config['VERSION']}) [{app.config['ENV']}]")
+
     data_cli_group = AppGroup('data', help='Interact with data sources.')
     app.cli.add_command(data_cli_group)
     data_cli_group.add_command(data_fetch_cmd, 'fetch')
