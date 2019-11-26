@@ -324,7 +324,7 @@ This service is distributed as a Python package hosted on [PyPi](https://pypi.or
 
 Source and binary packages are built automatically through [Continuous Deployment](#continuous-deployment).
 
-To build them manually:
+To build them manually you will need to define a version in `APP_RELEASE.txt`, then run:
 
 ```shell
 $ docker-compose run app ash
@@ -337,8 +337,6 @@ $ docker-compose down
 
 To manually publish a pre-release version to [PyPi Testing](https://test.pypi.org/project/bas-web-map-inventory):
 
-**Note:** Before publishing, ensure you set `version` in `setup.py` to a suitable version, e.g. `1.2.3-rc1`.
-
 ```shell
 $ docker-compose run app ash
 $ python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
@@ -348,8 +346,6 @@ $ docker-compose down
 ```
 
 To manually publish a release version to [PyPi](https://pypi.org/project/bas-web-map-inventory):
-
-**Note:** Before publishing, ensure you set `version` in `setup.py` to a suitable version, e.g. `1.2.3`.
 
 ```
 $ docker-compose run app ash

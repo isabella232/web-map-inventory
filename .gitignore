@@ -1,6 +1,7 @@
 __pycache__
 .env
 .flaskenv
+APP_RELEASE.txt
 /resources/data.json
 /resources/sources.json
 /tests/resources/data.json

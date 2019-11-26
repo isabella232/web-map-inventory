@@ -23,9 +23,10 @@
 # == Global settings ==
 
 stages:
+  - build
   - test
   - lint
-  - build
+  - package
   - publish
   - deploy
 
@@ -41,6 +42,16 @@ image:
   entrypoint: [""]
 
 # == Jobs ==
+
+build-app:
+  stage: build
+  script:
+    - "python support/python-packaging/parse_version.py $(git describe --tags) > APP_RELEASE.txt"
+  artifacts:
+    name: "$CI_BUILD_TOKEN-release"
+    paths:
+      - APP_RELEASE.txt
+    expire_in: 1 month
 
 test-app:
   stage: test
@@ -64,8 +75,8 @@ bandit-app:
   script:
     - "bandit -r ."
 
-build-app:
-  stage: build
+package-app:
+  stage: package
   script:
     - "python setup.py sdist bdist_wheel"
   artifacts:

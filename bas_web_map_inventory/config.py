@@ -1,17 +1,21 @@
 import logging
 import os
+
+import pkg_resources
+
 from typing import Dict
 
 from flask.cli import load_dotenv
 from sentry_sdk.integrations.flask import FlaskIntegration
 from str2bool import str2bool
-from better_setuptools_git_version import get_version
 
 
 class Config:
-    ENV = os.getenv('FLASK_ENV')
+    ENV = os.environ.get('FLASK_ENV')
     DEBUG = False
     TESTING = False
+
+    NAME = 'bas-web-map-inventory'
 
     LOGGING_LEVEL = logging.WARNING
 
@@ -24,21 +28,25 @@ class Config:
 
     # noinspection PyPep8Naming
     @property
+    def VERSION(self) -> str:
+        return os.environ.get('APP_RELEASE') or 'unknown'
+
+    # noinspection PyPep8Naming
+    @property
     def SENTRY_CONFIG(self) -> Dict:
-        _config = {
+        return {
             'dsn': os.environ.get('SENTEY_DSN') or None,
             'integrations': [FlaskIntegration()],
             'environment': self.ENV,
-            'release': get_version()
+            'release': self.VERSION
         }
-        if 'APP_RELEASE' in os.environ:
-            _config['release'] = os.environ.get('APP_RELEASE')
-
-        return _config
 
 
 class ProductionConfig(Config):
-    pass
+    # noinspection PyPep8Naming
+    @property
+    def VERSION(self) -> str:
+        return pkg_resources.require("bas-web-map-inventory")[0].version
 
 
 class DevelopmentConfig(Config):
@@ -55,6 +63,11 @@ class DevelopmentConfig(Config):
         super().__init__()
         self.APP_ENABLE_SENTRY = str2bool(os.environ.get('APP_ENABLE_SENTRY')) or False
 
+    # noinspection PyPep8Naming
+    @property
+    def VERSION(self) -> str:
+        return 'N/A'
+
 
 class TestingConfig(Config):
     DEBUG = True
@@ -65,3 +78,8 @@ class TestingConfig(Config):
     def __init__(self):
         super().__init__()
         self.APP_ENABLE_SENTRY = False
+
+    # noinspection PyPep8Naming
+    @property
+    def VERSION(self) -> str:
+        return 'N/A'
