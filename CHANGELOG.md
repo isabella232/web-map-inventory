@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [#7](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/7) 
   [#8](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/8)
 
+### Changed
+
+* Docker image changed to run as a non-privileged user 
+  [#11](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/11)
+
 ## [0.1.0] - 2019-11-25
 
 ### Added
