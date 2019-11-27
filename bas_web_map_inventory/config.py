@@ -4,6 +4,7 @@ import os
 import pkg_resources
 
 from typing import Dict
+from pathlib import Path
 
 from flask.cli import load_dotenv
 from sentry_sdk.integrations.flask import FlaskIntegration
@@ -22,7 +23,12 @@ class Config:
     def __init__(self):
         load_dotenv()
 
+        self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get('APP_ENABLE_FILE_LOGGING')) or False
         self.APP_ENABLE_SENTRY = str2bool(os.environ.get('APP_ENABLE_SENTRY')) or True
+
+        self.LOG_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s'
+        self.LOG_FILE_PATH = Path(os.environ.get('LOG_FILE_PATH') or '/var/log/app/app.log')
+
         self.AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY')
         self.AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID')
 
@@ -43,6 +49,10 @@ class Config:
 
 
 class ProductionConfig(Config):
+    def __init__(self):
+        super().__init__()
+        self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get('APP_ENABLE_FILE_LOGGING')) or True
+
     # noinspection PyPep8Naming
     @property
     def VERSION(self) -> str:

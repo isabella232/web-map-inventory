@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+* Rotating log file support [#10](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/10)
+
 ### Fixed
 
 * Pinning package dependencies in `setup.py` [#9](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/9) 

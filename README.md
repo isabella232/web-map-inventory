@@ -174,6 +174,16 @@ Errors in this service are tracked with Sentry:
 * [Sentry dashboard](https://sentry.io/antarctica/web-map-inventory/)
 * [GitLab dashboard](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/error_tracking)
 
+Error tracking will be enabled or disabled depending on the environment. It can be manually controlled by setting the
+`APP_ENABLE_SENTRY` variable in `.flaskenv`.
+
+### Logging
+
+Logs for this service are written to *stdout* and a log file, `/var/log/app/app.py`, depending on the environment. 
+
+File based logging can be manually controlled by setting the `APP_ENABLE_FILE_LOGGING` and `LOG_FILE_PATH` variables in
+`.flaskenv`.
+
 ## Setup
 
 ```shell
