@@ -184,6 +184,8 @@ Logs for this service are written to *stdout* and a log file, `/var/log/app/app.
 File based logging can be manually controlled by setting the `APP_ENABLE_FILE_LOGGING` and `LOG_FILE_PATH` variables in
 `.flaskenv`.
 
+**Note:** If `LOG_FILE_PATH` is changed, the `app` user in the project container must be granted suitable permissions. 
+
 ## Setup
 
 ```shell

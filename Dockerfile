@@ -2,7 +2,6 @@ FROM python:3.7-alpine
 
 LABEL maintainer = "Felix Fennell <felnne@bas.ac.uk>"
 
-# Setup project
 WORKDIR /usr/src/app
 ENV PYTHONPATH /usr/src/app
 
@@ -16,5 +15,11 @@ RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev && \
     apk --purge del .build-deps
 
 # Setup runtime
-ENTRYPOINT []
+RUN adduser -D app && \
+    mkdir -p /var/log/app && \
+    chown app:root /var/log/app
+
 ENV FLASK_ENV production
+
+USER app
+ENTRYPOINT []
