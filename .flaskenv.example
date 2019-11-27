@@ -2,10 +2,12 @@
 ## This file is for public environment variables - see `.env` for private variables
 ## Entries prefixed by a '#' (commented out) have a default value that can, but does not need to, be changed
 
-## Flask CLI options
+## Global Flask CLI options
 FLASK_APP=manage.py
 
 ## Feature flags
+# APP_ENABLE_FILE_LOGGING=True
+# APP_ENABLE_SENTRY=True
 
-FLASK
-APP_ENABLE_SENTRY=True
+# Settings
+# LOG_FILE_PATH=/var/log/app/app.log
