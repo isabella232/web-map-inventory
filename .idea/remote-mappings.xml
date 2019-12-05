@@ -3,7 +3,7 @@
   <component name="RemoteMappingsManager">
     <list>
       <list>
-        <remote-mappings server-id="python@docker-compose://[/Users/felix/Projects/cosmos-airtable/docker-compose.yml]:app/python">
+        <remote-mappings server-id="python@docker-compose://[/Users/felix/Projects/web-map-inventory/docker-compose.yml]:app/python">
           <settings>
             <list>
               <mapping local-root="$PROJECT_DIR$" remote-root="/usr/src/app" />
