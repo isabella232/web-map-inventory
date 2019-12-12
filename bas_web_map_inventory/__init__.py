@@ -10,8 +10,8 @@ from flask.cli import AppGroup
 # noinspection PyPackageRequirements
 from werkzeug.utils import import_string
 
-from bas_web_map_inventory.cli import fetch as data_fetch_cmd, status as airtable_status_cmd, \
-    sync as airtable_sync_cmd, reset as airtable_reset_cmd
+from bas_web_map_inventory.cli import fetch as data_fetch_cmd, validate as data_validate_cmd, \
+    status as airtable_status_cmd, sync as airtable_sync_cmd, reset as airtable_reset_cmd
 
 
 def create_app():
@@ -38,6 +38,7 @@ def create_app():
     data_cli_group = AppGroup('data', help='Interact with data sources.')
     app.cli.add_command(data_cli_group)
     data_cli_group.add_command(data_fetch_cmd, 'fetch')
+    data_cli_group.add_command(data_validate_cmd, 'validate')
 
     airtable_cli_group = AppGroup('airtable', help='Interact with Airtable service.')
     app.cli.add_command(airtable_cli_group)

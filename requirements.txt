@@ -3,11 +3,14 @@ bandit==1.6.2
 Flask==1.1.1
 flake8==3.7.9
 geoserver-restconfig==1.0.2
+inquirer==2.6.3
+jsonschema==3.2.0
+lxml==4.4.2
 OWSlib==0.19.0
 python-dotenv==0.10.3
 pytest==5.3.1
 pytest-flask==0.15.0
-sentry-sdk[flask]==0.13.4
+sentry-sdk[flask]==0.13.5
 setuptools==42.0.2
 str2bool==1.1
 twine==3.1.1

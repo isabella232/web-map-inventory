@@ -6,6 +6,7 @@ from owslib.wfs import WebFeatureService
 from owslib.wms import WebMapService
 
 from bas_web_map_inventory.components import Server, ServerType, LayerService, LayerGeometry
+from bas_web_map_inventory.utils import build_base_data_source_endpoint
 
 
 class GeoServer(Server):
@@ -21,23 +22,21 @@ class GeoServer(Server):
             username: str,
             password: str
     ):
-        protocol = 'http'
-        if port == '443':
-            protocol = 'https'
+        endpoint = build_base_data_source_endpoint(data_source={'hostname': hostname, 'port': port})
 
         self.client = Catalogue(
-            service_url=f"{protocol}://{hostname}:{port}{api_path}",
+            service_url=f"{endpoint}{api_path}",
             username=username,
             password=password
         )
         self.wms = WebMapService(
-            url=f"{protocol}://{hostname}:{port}{wms_path}",
+            url=f"{endpoint}{wms_path}",
             version='1.3.0',
             username=username,
             password=password
         )
         self.wfs = WebFeatureService(
-            url=f"{protocol}://{hostname}:{port}{wfs_path}",
+            url=f"{endpoint}{wfs_path}",
             version='2.0.0',
             username=username,
             password=password

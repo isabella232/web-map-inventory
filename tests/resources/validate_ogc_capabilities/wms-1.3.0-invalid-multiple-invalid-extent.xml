@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><WMS_Capabilities version="1.3.0" updateSequence="242" xmlns="http://www.opengis.net/wms" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wms http://localhost:8080/geoserver/schemas/wms/1.3.0/capabilities_1_3_0.xsd">
+  <Service>
+    <Name>WMS</Name>
+    <Title>GeoServer Web Map Service</Title>
+    <Abstract>A compliant implementation of WMS plus most of the SLD extension (dynamic styling). Can also generate PDF, SVG, KML, GeoRSS</Abstract>
+    <KeywordList>
+      <Keyword>WFS</Keyword>
+      <Keyword>WMS</Keyword>
+      <Keyword>GEOSERVER</Keyword>
+    </KeywordList>
+    <OnlineResource xlink:type="simple" xlink:href="http://geoserver.org"/>
+    <ContactInformation>
+      <ContactPersonPrimary>
+        <ContactPerson>Mapping and Geographic Information Centre</ContactPerson>
+        <ContactOrganization>British Antarctic Survey</ContactOrganization>
+      </ContactPersonPrimary>
+      <ContactPosition/>
+      <ContactAddress>
+        <AddressType>Work</AddressType>
+        <Address>British Antarctic Survey</Address>
+        <City>Cambridge</City>
+        <StateOrProvince>Cambridgeshire</StateOrProvince>
+        <PostCode>CB30ET</PostCode>
+        <Country>United Kingdom</Country>
+      </ContactAddress>
+      <ContactVoiceTelephone/>
+      <ContactFacsimileTelephone/>
+      <ContactElectronicMailAddress>servicedesk@bas.ac.uk</ContactElectronicMailAddress>
+    </ContactInformation>
+    <Fees>NONE</Fees>
+    <AccessConstraints>NONE</AccessConstraints>
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>text/xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:type="simple" xlink:href="http://localhost:8080/geoserver/ows?SERVICE=WMS&amp;"/>
+            </Get>
+            <Post>
+              <OnlineResource xlink:type="simple" xlink:href="http://localhost:8080/geoserver/ows?SERVICE=WMS&amp;"/>
+            </Post>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <Format>application/atom+xml</Format>
+        <Format>application/json;type=utfgrid</Format>
+        <Format>application/pdf</Format>
+        <Format>application/rss+xml</Format>
+        <Format>application/vnd.google-earth.kml+xml</Format>
+        <Format>application/vnd.google-earth.kml+xml;mode=networklink</Format>
+        <Format>application/vnd.google-earth.kmz</Format>
+        <Format>image/geotiff</Format>
+        <Format>image/geotiff8</Format>
+        <Format>image/gif</Format>
+        <Format>image/jpeg</Format>
+        <Format>image/png; mode=8bit</Format>
+        <Format>image/svg+xml</Format>
+        <Format>image/tiff</Format>
+        <Format>image/tiff8</Format>
+        <Format>image/vnd.jpeg-png</Format>
+        <Format>image/vnd.jpeg-png8</Format>
+        <Format>text/html; subtype=openlayers</Format>
+        <Format>text/html; subtype=openlayers2</Format>
+        <Format>text/html; subtype=openlayers3</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:type="simple" xlink:href="http://localhost:8080/geoserver/ows?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+      <GetFeatureInfo>
+        <Format>text/plain</Format>
+        <Format>application/vnd.ogc.gml</Format>
+        <Format>text/xml</Format>
+        <Format>application/vnd.ogc.gml/3.1.1</Format>
+        <Format>text/xml; subtype=gml/3.1.1</Format>
+        <Format>text/html</Format>
+        <Format>application/json</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:type="simple" xlink:href="http://localhost:8080/geoserver/ows?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetFeatureInfo>
+    </Request>
+    <Exception>
+      <Format>XML</Format>
+      <Format>INIMAGE</Format>
+      <Format>BLANK</Format>
+      <Format>JSON</Format>
+    </Exception>
+    <Layer>
+      <Title>GeoServer Web Map Service</Title>
+      <Abstract>A compliant implementation of WMS plus most of the SLD extension (dynamic styling). Can also generate PDF, SVG, KML, GeoRSS</Abstract>
+      <!--Limited list of EPSG projections:-->
+      <CRS>EPSG:3031</CRS>
+      <CRS>EPSG:4326</CRS>
+      <CRS>CRS:84</CRS>
+      <EX_GeographicBoundingBox>
+        <!-- ## Validation test case: Intentionally invalid longitude (less than -180) as derived from inner layer ## -->
+        <westBoundLongitude>-190</westBoundLongitude>
+        <!-- ## Validation test case: Intentionally invalid longitude (less than -180) as derived from inner layer ## -->
+        <eastBoundLongitude>-190</eastBoundLongitude>
+        <southBoundLatitude>0.1436125748502993</southBoundLatitude>
+        <northBoundLatitude>0.1438125748502993</northBoundLatitude>
+      </EX_GeographicBoundingBox>
+      <BoundingBox CRS="CRS:84" minx="-1.0974053892215567" miny="0.1436125748502993" maxx="-1.0972053892215567" maxy="0.1438125748502993"/>
+      <BoundingBox CRS="EPSG:3031" minx="-237453.71096783454" miny="1.239595204840458E7" maxx="-237409.617608712" maxy="1.2395995857779771E7"/>
+      <BoundingBox CRS="EPSG:4326" minx="0.1436125748502993" miny="-1.0974053892215567" maxx="0.1438125748502993" maxy="-1.0972053892215567"/>
+      <Layer queryable="1" opaque="0">
+        <Name>sample:sample-layer</Name>
+        <Title>sample-layer</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>features</Keyword>
+          <Keyword>sample-layer</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <!-- ## Validation test case: Intentionally invalid longitude (less than -180) ## -->
+          <westBoundLongitude>-190</westBoundLongitude>
+          <eastBoundLongitude>-1.0972053892215567</eastBoundLongitude>
+          <!-- ## Validation test case: Intentionally invalid longitude (less than -180) ## -->
+          <southBoundLatitude>-190</southBoundLatitude>
+          <northBoundLatitude>0.1438125748502993</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-1.0974053892215567" miny="0.1436125748502993" maxx="-1.0972053892215567" maxy="0.1438125748502993"/>
+        <BoundingBox CRS="EPSG:4326" minx="0.1436125748502993" miny="-1.0974053892215567" maxx="0.1438125748502993" maxy="-1.0972053892215567"/>
+        <BoundingBox CRS="EPSG:3031" minx="-237453.71096783454" miny="1.239595204840458E7" maxx="-237409.617608712" maxy="1.2395995857779771E7"/>
+        <Style>
+          <Name>sample-style</Name>
+          <Title>sample-style</Title>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://localhost:8080/geoserver/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=sample%3Asample-layer"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+    </Layer>
+  </Capability>
+</WMS_Capabilities>

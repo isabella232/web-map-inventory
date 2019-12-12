@@ -6,8 +6,9 @@ WORKDIR /usr/src/app
 ENV PYTHONPATH /usr/src/app
 
 # Setup project dependencies
+COPY support/xml-schemas/catalogue.xml /etc/xml/catalog
 COPY requirements.txt /usr/src/app/
-RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev && \
+RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils && \
     apk add --no-cache --virtual .build-deps --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing --repository http://dl-cdn.alpinelinux.org/alpine/edge/main build-base && \
     apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community --repository http://dl-cdn.alpinelinux.org/alpine/edge/main proj-dev proj-util git && \
     pip install --upgrade pip && \
@@ -21,5 +22,5 @@ RUN adduser -D app && \
 
 ENV FLASK_ENV production
 
-USER app
+# USER app  -- Disabled until catalog.xml can be linked by a non-privileged user (#14)
 ENTRYPOINT []

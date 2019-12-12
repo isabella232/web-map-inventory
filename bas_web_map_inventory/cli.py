@@ -1,10 +1,14 @@
 import json
+
+import inquirer
+
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 from flask.cli import current_app as app, with_appcontext
 # noinspection PyPackageRequirements
-from click import command, option, echo, confirm, style as click_style, Path as ClickPath
+from click import command, option, echo, confirm, style as click_style, Path as ClickPath, Choice
+from jsonschema import validate as jsonschema_validate
 # noinspection PyPackageRequirements
 import ulid
 # noinspection PyPackageRequirements
@@ -15,9 +19,29 @@ from bas_web_map_inventory.components import Server, Servers, Namespaces, Namesp
 from bas_web_map_inventory.components.geoserver import GeoServer
 from bas_web_map_inventory.components.airtable import ServersAirtable, NamespacesAirtable, RepositoriesAirtable, \
     StylesAirtable, LayersAirtable, LayerGroupsAirtable
+from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities, build_base_data_source_endpoint
 
 
 # Utils
+
+def _load_data_sources_interactive(
+    data_sources_file_path: Path,
+    data_sources_schema_file_path: Path = Path('resources/json-schemas/data-sources-schema.json')
+) -> List[Dict[str, str]]:
+    echo(f"Loading sources from {click_style(str(data_sources_file_path), fg='blue')}")
+    with open(Path(data_sources_file_path), 'r') as data_sources_file:
+        data_sources_data = data_sources_file.read()
+    data_sources = json.loads(data_sources_data)
+
+    with open(Path(data_sources_schema_file_path), 'r') as data_sources_schema_file:
+        data_sources_schema_data = data_sources_schema_file.read()
+    data_sources_schema = json.loads(data_sources_schema_data)
+    jsonschema_validate(instance=data_sources, schema=data_sources_schema)
+    echo(f"* data sources in {click_style(str(data_sources_file_path), fg='blue')} have "
+         f"{click_style('valid', fg='green')} syntax")
+
+    return data_sources['servers']
+
 
 def _load_data() -> None:
     app.logger.info('Loading data...')
@@ -243,19 +267,27 @@ def _process_component_airtable_status(global_status: Dict[str, int], component_
     type=ClickPath()
 )
 @with_appcontext
-def fetch(data_sources_file_path: str, data_output_file_path):
+def fetch(data_sources_file_path: str, data_output_file_path: str):
     """Fetch data from data sources into a data file"""
     app.config['data'] = {}
 
-    echo(f"loading sources from {click_style(data_sources_file_path, fg='blue')}")
+    data_sources = _load_data_sources_interactive(data_sources_file_path=Path(data_sources_file_path))
     echo("")
-    with open(Path(data_sources_file_path), 'r') as data_sources_file:
-        data_sources_data = data_sources_file.read()
-    data_sources = json.loads(data_sources_data)
 
     echo(f"Fetching {click_style('Servers', fg='cyan')}:")
     servers = Servers()
-    for server_config in data_sources['servers']:
+    for server_config in data_sources:
+        if 'wms-path' in server_config:
+            endpoint = build_base_data_source_endpoint(data_source=server_config)
+            validation_errors = validate_ogc_capabilities(
+                ogc_protocol=OGCProtocol.WMS,
+                capabilities_url=f"{endpoint}{server_config['wms-path']}",
+                multiple_errors=False
+            )
+            if len(validation_errors) > 0:
+                echo(f"* {click_style('WMS endpoint invalid', fg='yellow')}, server [{server_config['label']}] skipped")
+                continue
+
         if server_config['type'] == 'geoserver':
             server = GeoServer(
                 server_id=server_config['id'],
@@ -400,6 +432,84 @@ def fetch(data_sources_file_path: str, data_output_file_path):
     with open(Path(data_output_file_path), 'w') as data_file:
         json.dump(_data, data_file, indent=4)
     echo(click_style('Fetch complete', fg='green'))
+
+
+@command()
+@option(
+    '-s',
+    '--data-sources-file-path',
+    default='resources/sources.json',
+    show_default=True,
+    type=ClickPath(exists=True)
+)
+@option(
+    '-i',
+    '--data-source-identifier'
+)
+@option(
+    '-p',
+    '--validation-protocol',
+    type=Choice([OGCProtocol.WMS.value], case_sensitive=False)
+)
+@with_appcontext
+def validate(data_sources_file_path: str, data_source_identifier: str = None, validation_protocol: str = None):
+    """Validate a data feed for a data source defined in a data sources file"""
+
+    data_sources = _load_data_sources_interactive(data_sources_file_path=Path(data_sources_file_path))
+    echo("")
+
+    if data_source_identifier is None:
+        choices = ['All data sources']
+        for source in data_sources:
+            choices.append(f"[{source['id']}] - {source['label']}")
+        choice = inquirer.prompt([inquirer.List('source', message="Select data source", choices=choices)])
+        if choice['source'] == 'All data sources':
+            data_source_identifier = 'all'
+        else:
+            data_source_identifier = choice['source'].split('[')[1].split(']')[0]
+
+    selected_data_sources = []
+    for source in data_sources:
+        if source['id'] == data_source_identifier or data_source_identifier == 'all':
+            selected_data_sources.append(source)
+
+    if validation_protocol is None:
+        choices = [OGCProtocol.WMS]
+        choice = inquirer.prompt([inquirer.List('protocol', message="Select protocol", choices=choices)])
+        validation_protocol = choice['protocol']
+    validation_protocol = OGCProtocol(validation_protocol)
+    if validation_protocol is None:
+        raise ValueError(f"Protocol [{validation_protocol}] not found")
+
+    validation_endpoints = []
+    endpoint_path = None
+    if validation_protocol == OGCProtocol.WMS:
+        endpoint_path = 'wms-path'
+    for selected_data_source in selected_data_sources:
+        endpoint = build_base_data_source_endpoint(data_source=selected_data_source)
+        if endpoint_path not in selected_data_source:
+            raise KeyError(f"Property '{endpoint_path}' not in data source [{selected_data_source['id']}]")
+        validation_endpoints.append({
+            "endpoint": f"{endpoint}{selected_data_source[endpoint_path]}",
+            "label": selected_data_source['label']
+        })
+
+    for validation_endpoint in validation_endpoints:
+        echo(f"Validating {click_style(validation_protocol.value.upper(), fg='blue')} feed for "
+             f"{click_style(validation_endpoint['label'], fg='blue')}:")
+
+        validation_errors = validate_ogc_capabilities(
+            ogc_protocol=validation_protocol,
+            capabilities_url=validation_endpoint['endpoint'],
+            multiple_errors=True
+        )
+        if len(validation_errors) > 0:
+            echo(f"{click_style('* validation failure 😞', fg='red')} ({len(validation_errors)} errors):")
+            for validation_error in validation_errors:
+                echo(f"  * {validation_error}")
+        else:
+            echo(f"{click_style('* validation successful 🥳', fg='green')}")
+        echo("")
 
 
 @command()

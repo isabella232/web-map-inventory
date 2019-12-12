@@ -23,11 +23,38 @@ When finished, run `docker-compose down` to remove all the container.
 
 #### `data fetch`
 
-Fetches information about servers, namespaces, repositories, styles, layers and layer groups from servers configured in
-`resources/sources.json`. Fetched information is saved to an output data file, `resources/data.json`.
+Fetches information about servers, namespaces, repositories, styles, layers and layer groups from servers defined in a
+data sources file. Fetched information is saved to an output data file.
+
+Options:
+
+* `-s`, `--data-sources-file-path`:
+    * path to a data sources file
+    * default: `resources/sources.json`
+* `-d`, `--data-output-file-path`:
+    * path to a data sources file
+    * default: `resources/data.json`
 
 **Note:** Currently this task results in new IDs being generated for each resource, even if it already exists. This will
 lead to resources being removed and re-added unnecessarily but will always remain internally consistent.
+
+#### `data validate`
+
+Validates protocols offered by servers defined in a data sources file (by default `resources/sources.json`). 
+
+Options:
+
+* `-s`, `--data-sources-file-path`:
+    * path to a data sources file
+    * default: `resources/sources.json`
+* `-i`, `--data-source-identifier`:
+    * identifier of a server in the data sources file
+    * use special value `all` to select all data sources
+* `-p`, `--validation-protocol`:
+    * protocol to validate
+    * default: `wms`
+
+**Note:** Currently this task is limited to the WMS (OGC Web Map Service) protocol.
 
 #### `airtable status`
 
@@ -122,6 +149,8 @@ Data sources are *servers* in the project [Data model](#data-model) and define c
 each server type provides for fetching information about components they contain (e.g. listing *layers*).
 
 A data sources file, `resources/sources.json`, is used for recording these details.
+
+A JSON Schema, `resources/json_schemas/data-sources-schema.json`, is used for validating these files.
 
 #### Supported data sources
 
@@ -304,6 +333,21 @@ from flask import current_app
 
 current_app.logger.info('Log message')
 ```
+
+### XML Catalogue
+
+An [XML Catalog](https://en.wikipedia.org/wiki/XML_catalog), `support/xml-schemas/catalogue.xml`, is available to 
+cache XML files (such as schemas used for validation) locally. This drastically speeds up XML parsing and reduces our 
+dependency on others.
+
+This catalogue is included in the project Docker image (at the conventional path, `/etc/xml/catalog`) and will be used 
+automatically by most XML libraries and tools (including `lxml` for example).
+
+If new functionality is added that depends on XML schemas, it is *strongly* recommended to add them to this catalogue,
+especially where they are used in tests. Typically local copies of schemas are stored in `resources/xml-schemas/`.
+
+Once added, you will need to rebuild and push the project Docker image (see the [Dependencies](#dependencies) section
+for more information).
 
 ### Editor support
 
