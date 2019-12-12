@@ -37,7 +37,14 @@ setup(
         'ulid-py==0.0.9',
     ],
     packages=find_packages(exclude=['tests']),
-    package_data={'bas_web_map_inventory': ['../APP_RELEASE.txt']},
+    package_data={
+        'bas_web_map_inventory': [
+            '../APP_RELEASE.txt',
+            '../resources/xml-schemas/wms-1.3.0.xsd',
+            '../resources/xml-schemas/xlink.xsd',
+            '../resources/xml-schemas/xml.xsd'
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Framework :: Flask",

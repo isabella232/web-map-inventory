@@ -59,6 +59,8 @@ test-app:
     FLASK_ENV: testing
   before_script:
     - "touch .env"
+    - "mkdir -p /usr/src/app/resources/xml-schemas"
+    - "cp -a resources/xml-schemas/. /usr/src/app/resources/xml-schemas/"
   script:
     - "pytest -o junit_family=xunit2 --junitxml=test-results.xml"
   artifacts:

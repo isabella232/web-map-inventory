@@ -6,6 +6,8 @@
       <w>geoserver</w>
       <w>geospatial</w>
       <w>hillshade</w>
+      <w>jsonschema</w>
+      <w>nosec</w>
       <w>symbology</w>
       <w>webmapengine</w>
     </words>
