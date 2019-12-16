@@ -2,6 +2,9 @@ __pycache__
 .env
 .flaskenv
 APP_RELEASE.txt
+build
+dist
+*.egg-info
 /resources/data.json
 /resources/sources.json
 /tests/resources/data.json

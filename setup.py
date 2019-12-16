@@ -39,15 +39,30 @@ setup(
         'str2bool==1.1',
         'ulid-py==0.0.9',
     ],
-    packages=find_packages(exclude=['tests']),
-    package_data={
-        'bas_web_map_inventory': [
-            '../APP_RELEASE.txt',
-            '../resources/xml-schemas/wms-1.3.0.xsd',
-            '../resources/xml-schemas/xlink.xsd',
-            '../resources/xml-schemas/xml.xsd'
-        ]
-    },
+    packages=find_packages(exclude=['tests.*', 'tests']),
+    data_files=[
+        (
+            '',
+            [
+                'CHANGELOG.md',
+                'CONTRIBUTING.md',
+                'LICENSE.md',
+                'APP_RELEASE.txt'
+            ]
+        ),
+        (
+            'resources/json-schemas',
+            ['resources/json-schemas/data-sources-schema.json']
+        ),
+        (
+            'resources/xml-schemas',
+            [
+                'resources/xml-schemas/wms-1.3.0.xsd',
+                'resources/xml-schemas/xlink.xsd',
+                'resources/xml-schemas/xml.xsd'
+            ]
+        )
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Framework :: Flask",
