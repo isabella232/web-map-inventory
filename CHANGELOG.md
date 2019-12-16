@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Python package versioning 
   [#7](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/7) 
   [#8](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/8)
+* Incorrect spelling of 'sentry' in config option [#16](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/16) 
 
 ### Changed
 

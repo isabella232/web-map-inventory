@@ -29,6 +29,8 @@ class Config:
         self.LOG_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s'
         self.LOG_FILE_PATH = Path(os.environ.get('LOG_FILE_PATH') or '/var/log/app/app.log')
 
+        self.SENTRY_DSN = os.environ.get('SENTRY_DSN') or None
+
         self.AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY')
         self.AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID')
 
@@ -41,7 +43,7 @@ class Config:
     @property
     def SENTRY_CONFIG(self) -> Dict:
         return {
-            'dsn': os.environ.get('SENTEY_DSN') or None,
+            'dsn': self.SENTRY_DSN,
             'integrations': [FlaskIntegration()],
             'environment': self.ENV,
             'release': self.VERSION
