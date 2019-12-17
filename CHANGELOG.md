@@ -14,8 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+* Correctly using JSON and XML schemas included in package with `importlib.resources`
+  [#17](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/17) 
+  [#18](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/18) 
 * Excluding `tests` module in package [#17](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/17) 
-* Including data files in package [#17](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/17) 
 * Pinning package dependencies in `setup.py` [#9](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/9) 
 * Python package versioning 
   [#7](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/7) 

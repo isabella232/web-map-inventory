@@ -5,6 +5,7 @@ import subprocess  # nosec
 
 from enum import Enum
 from tempfile import NamedTemporaryFile
+from importlib import resources
 from typing import List
 
 # Exempting Bandit security issue (Using lxml.etree.parse to parse untrusted XML data)
@@ -41,9 +42,9 @@ def validate_ogc_capabilities(
     it's more useful to return all the errors to the user so they can judge what to do next. Otherwise they have to keep
     validating until they run out of errors, which can't be predicted.
 
-    In 'first error' mode, `lxml` is used for validation. In 'all errors' mode the `xmllint` command line utility is used
-    instead as lxml cannot capture multiple errors (due the implementation of underlying libxml library). In both modes
-    endpoints are checked against XML Schemas from http://schemas.opengis.net (and so ultimately should agree).
+    In 'first error' mode, `lxml` is used for validation. In 'all errors' mode the `xmllint` command line utility is
+    used instead as lxml cannot capture multiple errors (due the implementation of underlying libxml library). In both
+    modes endpoints are checked against XML Schemas from http://schemas.opengis.net (and so ultimately should agree).
 
     Currently errors from both modes are returned as is structured as a list. The format of errors does vary between
     modes and is not currently abstracted by this method due to the range and complexity of the validation errors that
@@ -69,11 +70,12 @@ def validate_ogc_capabilities(
     :rtype list
     """
     if ogc_protocol == OGCProtocol.WMS:
-        schema_file = './resources/xml-schemas/wms-1.3.0.xsd'
+        schema_file = 'wms-1.3.0.xsd'
     else:
         raise ValueError('Invalid or unsupported OGC protocol')
 
-    schema = etree.parse(schema_file).getroot()
+    with resources.path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
+        schema = etree.parse(str(schema_file_path)).getroot()
     validator = etree.XMLSchema(schema)
 
     # Exempting Bandit security issue (Using lxml.etree.parse to parse untrusted XML data)
@@ -94,17 +96,20 @@ def validate_ogc_capabilities(
             capabilities_instance_file.write(etree.tostring(capabilities_instance, pretty_print=True))
 
             try:
-                # Exempting Bandit security issue (subprocess call with shell=True identified)
-                #
-                # The file passed to this method is taken from the URL given, which will be for a data source we have
-                # added. It is assumed such data sources will either be operated by us or otherwise trusted enough to
-                # added to this inventory, therefore there should be a low risk of them containing a vulnerability.
-                result = subprocess.run([f"xmllint --noout --schema {schema_file} {capabilities_instance_file.name}"],
-                                        shell=True, check=True, capture_output=True)  # nosec
-                if result.stderr.decode() != f"{capabilities_instance_file.name} validates\n":
-                    raise RuntimeError('xmllint error - output is not recognised (no final validation status)')
+                with resources.path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
+                    # Exempting Bandit security issue (subprocess call with shell=True identified)
+                    #
+                    # The file passed to this method is taken from the URL given, which will be for a data source we
+                    # have added. It is assumed such data sources will either be operated by us or otherwise trusted
+                    # enough to added to this inventory, therefore there should be a low risk of them containing a
+                    # vulnerability.
+                    result = subprocess.run([
+                        f"xmllint --noout --schema {str(schema_file_path)} {capabilities_instance_file.name}"],
+                        shell=True, check=True, capture_output=True)  # nosec
+                    if result.stderr.decode() != f"{capabilities_instance_file.name} validates\n":
+                        raise RuntimeError('xmllint error - output is not recognised (no final validation status)')
 
-                return list()
+                    return list()
             except subprocess.CalledProcessError as e:
                 error_lines = e.stderr.decode().split('\n')
                 if error_lines[len(error_lines) - 1] != '':
