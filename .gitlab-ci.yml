@@ -59,8 +59,8 @@ test-app:
     FLASK_ENV: testing
   before_script:
     - "touch .env"
-    - "mkdir -p /usr/src/app/resources/xml-schemas"
-    - "cp -a --no-preserve=mode,ownership resources/xml-schemas/. /usr/src/app/resources/xml-schemas/"
+    - "mkdir -p /usr/src/app/bas_web_map_inventory/resources/xml_schemas/"
+    - "cp -a --no-preserve=mode,ownership bas_web_map_inventory/resources/xml_schemas/*.xsd /usr/src/app/bas_web_map_inventory/resources/xml_schemas/"
   script:
     - "pytest -o junit_family=xunit2 --junitxml=test-results.xml"
   artifacts:

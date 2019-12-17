@@ -2,6 +2,7 @@ import json
 
 import inquirer
 
+from importlib import resources
 from pathlib import Path
 from typing import Dict, List
 
@@ -24,21 +25,20 @@ from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities, 
 
 # Utils
 
-def _load_data_sources_interactive(
-    data_sources_file_path: Path,
-    data_sources_schema_file_path: Path = Path('resources/json-schemas/data-sources-schema.json')
-) -> List[Dict[str, str]]:
+def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[str, str]]:
     echo(f"Loading sources from {click_style(str(data_sources_file_path), fg='blue')}")
     with open(Path(data_sources_file_path), 'r') as data_sources_file:
         data_sources_data = data_sources_file.read()
     data_sources = json.loads(data_sources_data)
 
-    with open(Path(data_sources_schema_file_path), 'r') as data_sources_schema_file:
-        data_sources_schema_data = data_sources_schema_file.read()
-    data_sources_schema = json.loads(data_sources_schema_data)
-    jsonschema_validate(instance=data_sources, schema=data_sources_schema)
-    echo(f"* data sources in {click_style(str(data_sources_file_path), fg='blue')} have "
-         f"{click_style('valid', fg='green')} syntax")
+    with resources.path('bas_web_map_inventory.resources.json_schemas', 'data-sources-schema.json') as \
+            data_sources_schema_file_path:
+        with open(data_sources_schema_file_path, 'r') as data_sources_schema_file:
+            data_sources_schema_data = data_sources_schema_file.read()
+        data_sources_schema = json.loads(data_sources_schema_data)
+        jsonschema_validate(instance=data_sources, schema=data_sources_schema)
+        echo(f"* data sources in {click_style(str(data_sources_file_path), fg='blue')} have "
+             f"{click_style('valid', fg='green')} syntax")
 
     return data_sources['servers']
 
@@ -46,7 +46,7 @@ def _load_data_sources_interactive(
 def _load_data() -> None:
     app.logger.info('Loading data...')
 
-    with open(Path('resources/data.json'), 'r') as data_file:
+    with open(Path('data/data.json'), 'r') as data_file:
         _data = data_file.read()
     data = json.loads(_data)
 
@@ -255,14 +255,14 @@ def _process_component_airtable_status(global_status: Dict[str, int], component_
 @option(
     '-s',
     '--data-sources-file-path',
-    default='resources/sources.json',
+    default='data/sources.json',
     show_default=True,
     type=ClickPath(exists=True)
 )
 @option(
     '-d',
     '--data-output-file-path',
-    default='resources/data.json',
+    default='data/data.json',
     show_default=True,
     type=ClickPath()
 )
@@ -438,7 +438,7 @@ def fetch(data_sources_file_path: str, data_output_file_path: str):
 @option(
     '-s',
     '--data-sources-file-path',
-    default='resources/sources.json',
+    default='data/sources.json',
     show_default=True,
     type=ClickPath(exists=True)
 )

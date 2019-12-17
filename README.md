@@ -30,23 +30,23 @@ Options:
 
 * `-s`, `--data-sources-file-path`:
     * path to a data sources file
-    * default: `resources/sources.json`
+    * default: `data/sources.json`
 * `-d`, `--data-output-file-path`:
     * path to a data sources file
-    * default: `resources/data.json`
+    * default: `data/data.json`
 
 **Note:** Currently this task results in new IDs being generated for each resource, even if it already exists. This will
 lead to resources being removed and re-added unnecessarily but will always remain internally consistent.
 
 #### `data validate`
 
-Validates protocols offered by servers defined in a data sources file (by default `resources/sources.json`). 
+Validates protocols offered by servers defined in a data sources file (by default `data/sources.json`). 
 
 Options:
 
 * `-s`, `--data-sources-file-path`:
     * path to a data sources file
-    * default: `resources/sources.json`
+    * default: `data/sources.json`
 * `-i`, `--data-source-identifier`:
     * identifier of a server in the data sources file
     * use special value `all` to select all data sources
@@ -70,7 +70,7 @@ Removes all data from Airtable.
 
 ### Data sources
 
-Each data source is represented as an object in the `server` list in `resources/sources.json`. The structure of this
+Each data source is represented as an object in the `server` list in `data/sources.json`. The structure of this
 object depends on the server/source type, defined in this section.
 
 #### Adding a data source
@@ -148,9 +148,9 @@ It can be visualised as:
 Data sources are *servers* in the project [Data model](#data-model) and define connection details for APIs and services
 each server type provides for fetching information about components they contain (e.g. listing *layers*).
 
-A data sources file, `resources/sources.json`, is used for recording these details.
+A data sources file, `data/sources.json`, is used for recording these details.
 
-A JSON Schema, `resources/json_schemas/data-sources-schema.json`, is used for validating these files.
+A JSON Schema, `bas_web_map_inventory/resources/json_schemas/data-sources-schema.json`, validates this file.
 
 #### Supported data sources
 
@@ -242,11 +242,11 @@ $ cp .env.example .env
 $ cp .flaskenv.example .flaskenv
 ```
 
-A [Data sources file](#data-sources), `resources/sources.json`, is used for configure where/what to fetch data from.
-This file should be created by copying `resources/sources.example.json` and updating it as needed:
+A [Data sources file](#data-sources), `data/sources.json`, is used for configure where/what to fetch data from.
+This file should be created by copying `data/sources.example.json` and updating it as needed:
 
 ```shell
-$ cp resources/sources.example.json resources/sources.json
+$ cp data/sources.example.json data/sources.json
 ```
 
 See the [Usage](#usage) section for how to use the application.
@@ -344,7 +344,8 @@ This catalogue is included in the project Docker image (at the conventional path
 automatically by most XML libraries and tools (including `lxml` for example).
 
 If new functionality is added that depends on XML schemas, it is *strongly* recommended to add them to this catalogue,
-especially where they are used in tests. Typically local copies of schemas are stored in `resources/xml-schemas/`.
+especially where they are used in tests. Typically local copies of schemas are stored in 
+`bas_web_map_inventory/resources/xml_schemas/`.
 
 Once added, you will need to rebuild and push the project Docker image (see the [Dependencies](#dependencies) section
 for more information).
