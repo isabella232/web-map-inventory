@@ -18,7 +18,6 @@ test_namespace_data = {
     'label': 'test-namespace-1',
     'title': 'Test Namespace 1',
     'namespace': 'https://example.com/test-namespace-1',
-    'isolated': False,
     'server': test_server
 }
 test_namespace = Namespace(**test_namespace_data)
@@ -70,6 +69,7 @@ test_layer_group_data = {
     'layer_group_id': '01DRS53XAH7TB65G8BBQZGMHYB',
     'label': 'test-layer-group-1',
     'title': 'Test Layer Group 1',
+    'services': ['wfs'],
     'namespace': test_namespace,
     'layers': [test_layer],
     'styles': [test_style]

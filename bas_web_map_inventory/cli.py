@@ -2,10 +2,10 @@ import json
 
 import inquirer
 
-from importlib import resources
 from pathlib import Path
 from typing import Dict, List
 
+from importlib_resources import path as resource_path
 from flask.cli import current_app as app, with_appcontext
 # noinspection PyPackageRequirements
 from click import command, option, echo, confirm, style as click_style, Path as ClickPath, Choice
@@ -31,7 +31,7 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
         data_sources_data = data_sources_file.read()
     data_sources = json.loads(data_sources_data)
 
-    with resources.path('bas_web_map_inventory.resources.json_schemas', 'data-sources-schema.json') as \
+    with resource_path('bas_web_map_inventory.resources.json_schemas', 'data-sources-schema.json') as \
             data_sources_schema_file_path:
         with open(data_sources_schema_file_path, 'r') as data_sources_schema_file:
             data_sources_schema_data = data_sources_schema_file.read()
@@ -43,10 +43,10 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
     return data_sources['servers']
 
 
-def _load_data() -> None:
+def _load_data(data_file_path: Path) -> None:
     app.logger.info('Loading data...')
 
-    with open(Path('data/data.json'), 'r') as data_file:
+    with open(Path(data_file_path), 'r') as data_file:
         _data = data_file.read()
     data = json.loads(_data)
 
@@ -68,7 +68,6 @@ def _load_data() -> None:
             label=namespace['label'],
             title=namespace['title'],
             namespace=namespace['namespace'],
-            isolated=namespace['isolated'],
             server=servers[namespace['relationships']['servers']]
         )
         namespaces[namespace.id] = namespace
@@ -152,79 +151,77 @@ def _load_data() -> None:
     }
 
 
-def _setup_airtable() -> None:
-    app.logger.info('Loading Airtable data...')
-
+def _setup_airtable(config: dict) -> dict:  # pragma: no cover
     _servers_airtable = _Airtable(
-        base_key=app.config['AIRTABLE_BASE_ID'],
-        api_key=app.config['AIRTABLE_API_KEY'],
+        base_key=config['AIRTABLE_BASE_ID'],
+        api_key=config['AIRTABLE_API_KEY'],
         table_name='Servers'
     )
     servers_airtable = ServersAirtable(
         airtable=_servers_airtable,
-        servers=app.config['data']['servers']
+        servers=config['data']['servers']
     )
 
     _namespaces_airtable = _Airtable(
-        base_key=app.config['AIRTABLE_BASE_ID'],
-        api_key=app.config['AIRTABLE_API_KEY'],
+        base_key=config['AIRTABLE_BASE_ID'],
+        api_key=config['AIRTABLE_API_KEY'],
         table_name='Workspaces'
     )
     namespaces_airtable = NamespacesAirtable(
         airtable=_namespaces_airtable,
-        namespaces=app.config['data']['namespaces'],
+        namespaces=config['data']['namespaces'],
         servers_airtable=servers_airtable
     )
 
     _repositories_airtable = _Airtable(
-        base_key=app.config['AIRTABLE_BASE_ID'],
-        api_key=app.config['AIRTABLE_API_KEY'],
+        base_key=config['AIRTABLE_BASE_ID'],
+        api_key=config['AIRTABLE_API_KEY'],
         table_name='Stores'
     )
     repositories_airtable = RepositoriesAirtable(
         airtable=_repositories_airtable,
-        repositories=app.config['data']['repositories'],
+        repositories=config['data']['repositories'],
         namespaces_airtable=namespaces_airtable
     )
 
     _styles_airtable = _Airtable(
-        base_key=app.config['AIRTABLE_BASE_ID'],
-        api_key=app.config['AIRTABLE_API_KEY'],
+        base_key=config['AIRTABLE_BASE_ID'],
+        api_key=config['AIRTABLE_API_KEY'],
         table_name='Styles'
     )
     styles_airtable = StylesAirtable(
         airtable=_styles_airtable,
-        styles=app.config['data']['styles'],
+        styles=config['data']['styles'],
         namespaces_airtable=namespaces_airtable
     )
 
     _layers_airtable = _Airtable(
-        base_key=app.config['AIRTABLE_BASE_ID'],
-        api_key=app.config['AIRTABLE_API_KEY'],
+        base_key=config['AIRTABLE_BASE_ID'],
+        api_key=config['AIRTABLE_API_KEY'],
         table_name='Layers'
     )
     layers_airtable = LayersAirtable(
         airtable=_layers_airtable,
-        layers=app.config['data']['layers'],
+        layers=config['data']['layers'],
         namespaces_airtable=namespaces_airtable,
         repositories_airtable=repositories_airtable,
         styles_airtable=styles_airtable
     )
 
     _layer_groups_airtable = _Airtable(
-        base_key=app.config['AIRTABLE_BASE_ID'],
-        api_key=app.config['AIRTABLE_API_KEY'],
+        base_key=config['AIRTABLE_BASE_ID'],
+        api_key=config['AIRTABLE_API_KEY'],
         table_name='Layer Groups'
     )
     layer_groups_airtable = LayerGroupsAirtable(
         airtable=_layer_groups_airtable,
-        layer_groups=app.config['data']['layer_groups'],
+        layer_groups=config['data']['layer_groups'],
         namespaces_airtable=namespaces_airtable,
         styles_airtable=styles_airtable,
         layers_airtable=layers_airtable
     )
 
-    app.config['airtable'] = {
+    return {
         'servers': servers_airtable,
         'namespaces': namespaces_airtable,
         'repositories': repositories_airtable,
@@ -246,6 +243,20 @@ def _process_component_airtable_status(global_status: Dict[str, int], component_
     echo(f"* missing: {click_style(str(len(_status['missing'])), fg='blue')}")
     echo(f"* orphaned: {click_style(str(len(_status['orphaned'])), fg='blue')}")
     echo(_status)
+
+
+def _make_geoserver_server(server_config: Dict[str, str]):
+    return GeoServer(
+        server_id=server_config['id'],
+        label=server_config['label'],
+        hostname=server_config['hostname'],
+        port=server_config['port'],
+        api_path=server_config['api-path'],
+        wfs_path=server_config['wfs-path'],
+        wms_path=server_config['wms-path'],
+        username=server_config['username'],
+        password=server_config['password']
+    )
 
 
 # Commands
@@ -289,18 +300,7 @@ def fetch(data_sources_file_path: str, data_output_file_path: str):
                 continue
 
         if server_config['type'] == 'geoserver':
-            server = GeoServer(
-                server_id=server_config['id'],
-                label=server_config['label'],
-                hostname=server_config['hostname'],
-                port=server_config['port'],
-                api_path=server_config['api-path'],
-                wfs_path=server_config['wfs-path'],
-                wms_path=server_config['wms-path'],
-                username=server_config['username'],
-                password=server_config['password']
-            )
-            servers[server.id] = server
+            servers[server_config['id']] = _make_geoserver_server(server_config=server_config)
     app.config['data']['servers'] = servers
     echo(f"* fetched {click_style(str(len(servers)), fg='blue')} servers (total)")
 
@@ -321,7 +321,6 @@ def fetch(data_sources_file_path: str, data_output_file_path: str):
                 label=namespace['label'],
                 title=namespace['title'],
                 namespace=namespace['namespace'],
-                isolated=False,
                 server=servers[server_id]
             )
             namespaces[namespace.id] = namespace
@@ -462,7 +461,8 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
         choices = ['All data sources']
         for source in data_sources:
             choices.append(f"[{source['id']}] - {source['label']}")
-        choice = inquirer.prompt([inquirer.List('source', message="Select data source", choices=choices)])
+        questions = [inquirer.List('source', message="Select data source", choices=choices)]
+        choice = inquirer.prompt(questions=questions)
         if choice['source'] == 'All data sources':
             data_source_identifier = 'all'
         else:
@@ -477,8 +477,9 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
         choices = [OGCProtocol.WMS]
         choice = inquirer.prompt([inquirer.List('protocol', message="Select protocol", choices=choices)])
         validation_protocol = choice['protocol']
-    validation_protocol = OGCProtocol(validation_protocol)
-    if validation_protocol is None:
+    try:
+        validation_protocol = OGCProtocol(validation_protocol)
+    except ValueError:
         raise ValueError(f"Protocol [{validation_protocol}] not found")
 
     validation_endpoints = []
@@ -513,13 +514,20 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
 
 
 @command()
+@option(
+    '-d',
+    '--data-input-file-path',
+    default='data/data.json',
+    show_default=True,
+    type=ClickPath()
+)
 @with_appcontext
-def status():
+def status(data_input_file_path: str):
     """Get status of all components in Airtable."""
     if 'data' not in app.config:
-        _load_data()
+        _load_data(data_file_path=Path(data_input_file_path))
     if 'airtable' not in app.config:
-        _setup_airtable()
+        app.config['airtable'] = _setup_airtable(config=app.config)
 
     _global_status = {
         'current': 0,
@@ -545,13 +553,20 @@ def status():
 
 
 @command()
+@option(
+    '-d',
+    '--data-input-file-path',
+    default='data/data.json',
+    show_default=True,
+    type=ClickPath()
+)
 @with_appcontext
-def sync():
+def sync(data_input_file_path: str):
     """Sync all components with Airtable."""
     if 'data' not in app.config:
-        _load_data()
+        _load_data(data_file_path=Path(data_input_file_path))
     if 'airtable' not in app.config:
-        _setup_airtable()
+        app.config['airtable'] = _setup_airtable(config=app.config)
 
     echo(f"Syncing {click_style('Servers', fg='yellow')}:")
     echo(app.config['airtable']['servers'].status())
@@ -580,31 +595,38 @@ def sync():
 
 
 @command()
+@option(
+    '-d',
+    '--data-input-file-path',
+    default='data/data.json',
+    show_default=True,
+    type=ClickPath()
+)
 @with_appcontext
-def reset():
+def reset(data_input_file_path: str):
     """Reset all Airtable data."""
     confirm('Do you really want to continue? All Airtable data will be reset', abort=True)
 
     if 'data' not in app.config:
-        _load_data()
+        _load_data(data_file_path=Path(data_input_file_path))
     if 'airtable' not in app.config:
-        _setup_airtable()
+        app.config['airtable'] = _setup_airtable(config=app.config)
 
     echo(f"Resetting {click_style('Servers', fg='red')}:")
     app.config['airtable']['servers'].reset()
-    echo(app.config['airtable']['servers_airtable'].status())
+    echo(app.config['airtable']['servers'].status())
     echo(f"Resetting {click_style('Namespaces (Workspaces)', fg='red')}:")
     app.config['airtable']['namespaces'].reset()
-    echo(app.config['airtable']['namespaces_airtable'].status())
+    echo(app.config['airtable']['namespaces'].status())
     echo(f"Resetting {click_style('Repositories (Stores)', fg='red')}:")
     app.config['airtable']['repositories'].reset()
-    echo(app.config['airtable']['repositories_airtable'].status())
+    echo(app.config['airtable']['repositories'].status())
     echo(f"Resetting {click_style('Styles', fg='red')}:")
     app.config['airtable']['styles'].reset()
-    echo(app.config['airtable']['styles_airtable'].status())
+    echo(app.config['airtable']['styles'].status())
     echo(f"Resetting {click_style('Layers', fg='red')}:")
     app.config['airtable']['layers'].reset()
-    echo(app.config['airtable']['layers_airtable'].status())
+    echo(app.config['airtable']['layers'].status())
     echo(f"Resetting {click_style('Layer Groups', fg='red')}:")
     app.config['airtable']['layer_groups'].reset()
-    echo(app.config['airtable']['layer_groups_airtable'].status())
+    echo(app.config['airtable']['layer_groups'].status())

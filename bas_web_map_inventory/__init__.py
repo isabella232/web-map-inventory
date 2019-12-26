@@ -4,6 +4,7 @@ import sentry_sdk
 
 from logging import Formatter
 from logging.handlers import RotatingFileHandler
+from typing import Dict, Any
 
 from flask import Flask, logging as flask_logging
 from flask.cli import AppGroup
@@ -14,11 +15,14 @@ from bas_web_map_inventory.cli import fetch as data_fetch_cmd, validate as data_
     status as airtable_status_cmd, sync as airtable_sync_cmd, reset as airtable_reset_cmd
 
 
+def _create_app_config() -> Dict[str, Any]:
+    return import_string(f"bas_web_map_inventory.config.{str(os.environ['FLASK_ENV']).capitalize()}Config")()
+
+
 def create_app():
     app = Flask(__name__)
 
-    config = import_string(f"bas_web_map_inventory.config.{str(os.environ['FLASK_ENV']).capitalize()}Config")()
-    app.config.from_object(config)
+    app.config.from_object(_create_app_config())
 
     if 'LOGGING_LEVEL' in app.config:
         app.logger.setLevel(app.config['LOGGING_LEVEL'])

@@ -1,0 +1,5 @@
+[run]
+omit =
+    bas_web_map_inventory/resources/__init__.py
+    bas_web_map_inventory/resources/json_schemas/__init__.py
+    bas_web_map_inventory/resources/xml_schemas/__init__.py

@@ -62,10 +62,27 @@ test-app:
     - "mkdir -p /usr/src/app/bas_web_map_inventory/resources/xml_schemas/"
     - "cp -a --no-preserve=mode,ownership bas_web_map_inventory/resources/xml_schemas/*.xsd /usr/src/app/bas_web_map_inventory/resources/xml_schemas/"
   script:
-    - "pytest -o junit_family=xunit2 --junitxml=test-results.xml"
+    - "pytest -o junit_family=xunit2 --junitxml=test-results.xml --random-order"
   artifacts:
     reports:
       junit: test-results.xml
+
+coverage-app:
+  stage: test
+  variables:
+    FLASK_ENV: testing
+  before_script:
+    - "touch .env"
+    - "mkdir -p /usr/src/app/bas_web_map_inventory/resources/xml_schemas/"
+    - "cp -a --no-preserve=mode,ownership bas_web_map_inventory/resources/xml_schemas/*.xsd /usr/src/app/bas_web_map_inventory/resources/xml_schemas/"
+  script:
+    - "pytest --cov=bas_web_map_inventory --cov-fail-under=100 ."
+    - "coverage html"
+  artifacts:
+    name: "$CI_BUILD_TOKEN-coverage"
+    paths:
+      - htmlcov
+    expire_in: 1 month
 
 pep8-app:
   stage: lint

@@ -134,14 +134,12 @@ class Namespace:
         label: str,
         title: str,
         namespace: str,
-        isolated: bool,
         server: Server = None
     ):
         self.id = namespace_id
         self.label = label
         self.title = title
         self.namespace = namespace
-        self.isolated = isolated
         self.relationships = {
             'servers': None
         }
@@ -155,7 +153,6 @@ class Namespace:
             'label': self.label,
             'title': self.title,
             'namespace': self.namespace,
-            'isolated': self.isolated,
             'relationships': {
                 'servers': self.relationships['servers'].id
             }
@@ -221,7 +218,7 @@ class Repository:
         return _repository
 
     def __repr__(self):
-        return f"Namespace <id={self.id}, label={self.label}, type={self.type}>"
+        return f"Repository <id={self.id}, label={self.label}, type={self.type}>"
 
 
 class Style:
@@ -382,6 +379,7 @@ class LayerGroup:
         layer_group_id: str,
         label: str,
         title: str,
+        geometry_type: str = None,
         services: List[str] = None,
         namespace: Namespace = None,
         layers: List[Layer] = None,
@@ -396,6 +394,10 @@ class LayerGroup:
             "layers": [],
             "styles": []
         }
+
+        self.geometry_type = None
+        if geometry_type is not None:
+            self.geometry_type = LayerGeometry(geometry_type)
 
         if services is not None and isinstance(services, list):
             for service in services:
@@ -413,6 +415,7 @@ class LayerGroup:
             'id': self.id,
             'label': self.label,
             'title': self.title,
+            'geometry': None,
             'services': [],
             'relationships': {
                 'namespaces': None,
@@ -421,6 +424,8 @@ class LayerGroup:
             }
         }
 
+        if self.geometry_type is not None:
+            _layer_group['geometry'] = self.geometry_type.value
         for service in self.services:
             _layer_group['services'].append(service.value)
 
@@ -552,9 +557,3 @@ class LayerGroups(dict):
 
     def __init__(self, *args, **kwargs):
         super(LayerGroups, self).__init__(*args, **kwargs)
-
-    def to_list(self) -> List[Dict]:
-        _layer_groups = []
-        for layer_group in self.values():
-            _layer_groups.append(layer_group.to_dict())
-        return _layer_groups

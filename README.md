@@ -358,20 +358,38 @@ A run/debug configuration, *App*, is included in the project.
 
 ## Testing
 
+All files in the `bas_web_map_inventory` module must be covered by tests.
+
 ### PyTest
 
 This project uses [PyTest](https://docs.pytest.org/en/latest/) for unit/integration testing. Tests are defined in
-`tests/`.
+`tests/` and should be ran in a random order using [pytest-random-order](https://pypi.org/project/pytest-random-order/).
 
-To run tests manually:
+To run tests manually from the command line:
 
 ```shell
-$ docker-compose run app pytest
+$ docker-compose run -e FLASK_ENV=testing app pytest --random-order
 ```
 
-Tests can also be ran manually in PyCharm using the included *App (Integration)* run/debug configuration.
+To run tests manually using PyCharm:
 
-Checks are also ran automatically in [Continuous Integration](#continuous-integration).
+* use the included *App (Integration)* run/debug configuration
+
+Tests are ran automatically in [Continuous Integration](#continuous-integration) and fail if any do not pass.
+
+### Test coverage
+
+[pytest-cov](https://pypi.org/project/pytest-cov/) is used to measure test coverage.
+
+To prevent noise, `.coveragerc` is used to omit empty `__init__.py` files from reports.
+
+To measure coverage manually:
+
+```shell
+$ docker-compose run -e FLASK_ENV=testing app pytest --cov=bas_web_map_inventory --cov-fail-under=100 --cov-report=html .
+```
+
+[Continuous Integration](#continuous-integration) will check coverage automatically and fail if less than 100%.
 
 ### Continuous Integration
 

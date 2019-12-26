@@ -86,7 +86,7 @@ class GeoServer(Server):
             'repository_type': str(_store.type).lower(),
             'namespace_label': _store.workspace.name
         }
-        if hasattr(store, 'description'):
+        if hasattr(_store, 'description') and _store.description is not None:
             store['title'] = _store.description
         if store['repository_type'] == 'postgis':
             store['hostname'] = _store.connection_parameters['host']
@@ -158,9 +158,6 @@ class GeoServer(Server):
         if str(_layer.resource.store.type).lower() == 'postgis':
             layer['table_view'] = _layer.resource.native_name
 
-        for style in _layer.styles:
-            layer['style_labels'].append((style.name, style.workspace))
-
         return layer
 
     def get_layer_groups(self) -> List[Tuple[str, Optional[str]]]:
@@ -196,7 +193,7 @@ class GeoServer(Server):
         if f"{namespace_reference}:{layer_group_reference}" in list(self.wfs.contents):
             # noinspection PyTypeChecker
             layer_group['services'].append(LayerService.WFS.value)
-            _properties = self.wfs.get_schema(layer_group_reference)
+            _properties = self.wfs.get_schema(f"{namespace_reference}:{layer_group_reference}")
             if _properties['geometry'].lower() == 'point':
                 layer_group['geometry_type'] = LayerGeometry.POINT.value
             else:

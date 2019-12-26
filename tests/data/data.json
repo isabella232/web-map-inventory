@@ -1,0 +1,89 @@
+{
+    "servers": [
+        {
+            "id": "01DRS53XAG5E85MJNYTA6WPTBM",
+            "label": "test-server-1",
+            "hostname": "test-server-1.example.com",
+            "type": "geoserver",
+            "version": "testing"
+        }
+    ],
+    "namespaces": [
+        {
+            "id": "01DWY9DVWWATVMETQDD5P5JN98",
+            "label": "test-namespace-1",
+            "title": "-",
+            "namespace": "-",
+            "relationships": {
+                "servers": "01DRS53XAG5E85MJNYTA6WPTBM"
+            }
+        }
+    ],
+    "repositories": [
+        {
+            "id": "01DWY9DVWWEJWQX8QCKYVD3TK5",
+            "label": "test-repository-1",
+            "title": "Test Repository 1",
+            "type": "postgis",
+            "hostname": "test-postgis-1.example.com",
+            "database": "test",
+            "schema": "test",
+            "relationships": {
+                "namespaces": "01DWY9DVWWATVMETQDD5P5JN98"
+            }
+        }
+    ],
+    "styles": [
+        {
+            "id": "01DWY9DVWW7S05WXQN6ZXY84G3",
+            "label": "test-style-1",
+            "title": "-",
+            "type": "sld",
+            "relationships": {
+                "namespaces": "01DWY9DVWWATVMETQDD5P5JN98"
+            }
+        }
+    ],
+    "layers": [
+        {
+            "id": "01DWY9DVWXQTZPYP4JYFN4Q7PS",
+            "label": "test-layer-1",
+            "title": "Test Layer 1",
+            "type": "vector",
+            "geometry": "point",
+            "services": [
+                "wms",
+                "wfs"
+            ],
+            "table_view": "test",
+            "relationships": {
+                "namespaces": "01DWY9DVWWATVMETQDD5P5JN98",
+                "repositories": "01DWY9DVWWEJWQX8QCKYVD3TK5",
+                "styles": [
+                    "01DWY9DVWW7S05WXQN6ZXY84G3"
+                ]
+            }
+        }
+    ],
+    "layer-groups": [
+        {
+            "id": "01DWY9DVWX0F7Y1P5DR0BRK4TZ",
+            "label": "test-layer-group-1",
+            "title": "Test Layer Group 1",
+            "geometry": "point",
+            "services": [
+                "wms",
+                "wfs"
+            ],
+            "relationships": {
+                "namespaces": "01DWY9DVWWATVMETQDD5P5JN98",
+                "layers": [
+                    "01DWY9DVWXQTZPYP4JYFN4Q7PS"
+                ],
+                "styles": [
+                    "01DWY9DVWW7S05WXQN6ZXY84G3"
+                ]
+            }
+        }
+    ]
+}
