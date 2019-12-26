@@ -50,7 +50,7 @@ class Config:
         }
 
 
-class ProductionConfig(Config):
+class ProductionConfig(Config):  # pragma: no cover
     def __init__(self):
         super().__init__()
         self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get('APP_ENABLE_FILE_LOGGING')) or True
@@ -61,7 +61,7 @@ class ProductionConfig(Config):
         return pkg_resources.require("bas-web-map-inventory")[0].version
 
 
-class DevelopmentConfig(Config):
+class DevelopmentConfig(Config):  # pragma: no cover
     @property
     def SENTRY_CONFIG(self) -> Dict:
         _config = super().SENTRY_CONFIG
@@ -89,6 +89,7 @@ class TestingConfig(Config):
 
     def __init__(self):
         super().__init__()
+        self.APP_ENABLE_FILE_LOGGING = False
         self.APP_ENABLE_SENTRY = False
 
     # noinspection PyPep8Naming

@@ -1,4 +1,7 @@
-from typing import List, Dict
+import datetime
+
+from typing import List, Dict, Any
+from random import randint
 
 from bas_web_map_inventory.components.airtable import ServerAirtable, NamespaceAirtable, RepositoryAirtable, \
     StyleAirtable, LayerAirtable, LayerGroupAirtable
@@ -11,41 +14,45 @@ from tests.bas_web_map_inventory.conftest.components import test_server, test_se
 
 
 class MockAirtable:
-    def __init__(self, base_key: str, api_key: str, table_name: str):
+    def __init__(self, base_key: str, api_key: str, table_name: str, data: List[Any]):
         self.base_key = base_key
         self.api_key = api_key
         self.table_name = table_name
 
+        self.data = data
+
     def get_all(self) -> List:
-        if self.table_name == 'Servers':
-            return [test_server_data_airtable]
-        elif self.table_name == 'Workspaces':
-            return [test_namespace_data_airtable]
-        elif self.table_name == 'Stores':
-            return [test_repository_data_airtable]
-        elif self.table_name == 'Styles':
-            return [test_style_data_airtable]
-        elif self.table_name == 'Layers':
-            return [test_layer_data_airtable]
-        elif self.table_name == 'Layer Groups':
-            return [test_layer_group_data_airtable]
-        else:
-            return []
+        return self.data
 
-    # noinspection PyUnusedLocal
-    @staticmethod
-    def batch_insert(records: List[Dict]):
-        return NotImplementedError()
+    def batch_insert(self, records: List[Dict]):
+        for fields in records:
+            self.data.append({
+                'id': f"recTest{str(randint(0, 99999)).rjust(5, '0')}",
+                'fields': fields,
+                'createdTime': datetime.datetime.utcnow().isoformat()
+            })
 
-    # noinspection PyUnusedLocal
-    @staticmethod
+    def update(self, record_id: str, fields: Dict, typecast: bool = False) -> Dict:
+        index = None
+        for _index, _record in enumerate(self.data):
+            if isinstance(_record, dict):
+                if 'id' in _record and _record['id'] == record_id:
+                    index = _index
+        if index is None:
+            raise RuntimeError(f"Record with ID [{record_id}] not found")
+
+        self.data[index]['fields'] = fields
+        return self.data[index]
+
     def batch_delete(self, record_ids: List[str]):
-        return NotImplementedError()
+        record_indexes = []
+        for _index, _record in enumerate(self.data):
+            if isinstance(_record, dict):
+                if 'id' in _record and _record['id'] in record_ids:
+                    record_indexes.append(_index)
 
-    # noinspection PyUnusedLocal
-    @staticmethod
-    def mock_update(self, record_id: str, fields: Dict):
-        return NotImplementedError()
+        for index in record_indexes:
+            self.data.pop(index)
 
 
 test_server_data_airtable = {
@@ -63,7 +70,12 @@ test_server_data_airtable = {
     "createdTime": "2019-11-05T12:22:22.000Z"
 }
 test_server_airtable = ServerAirtable(item=test_server)
-_test_servers_airtable = MockAirtable(base_key='test', api_key='test', table_name='Servers')
+_test_servers_airtable = MockAirtable(
+    base_key='test',
+    api_key='test',
+    table_name='Servers',
+    data=[test_server_data_airtable]
+)
 # noinspection PyTypeChecker
 test_servers_airtable = ServersAirtable(
     airtable=_test_servers_airtable,
@@ -95,7 +107,12 @@ test_namespace_data_airtable = {
     "createdTime": "2019-11-05T12:22:22.000Z"
 }
 test_namespace_airtable = NamespaceAirtable(item=test_namespace, servers_airtable=test_servers_airtable)
-_test_namespaces_airtable = MockAirtable(base_key='test', api_key='test', table_name='Workspaces')
+_test_namespaces_airtable = MockAirtable(
+    base_key='test',
+    api_key='test',
+    table_name='Workspaces',
+    data=[test_namespace_data_airtable]
+)
 # noinspection PyTypeChecker
 test_namespaces_airtable = NamespacesAirtable(
     airtable=_test_namespaces_airtable,
@@ -123,7 +140,12 @@ test_repository_data_airtable = {
     "createdTime": "2019-11-05T12:22:22.000Z"
 }
 test_repository_airtable = RepositoryAirtable(item=test_repository, namespaces_airtable=test_namespaces_airtable)
-_test_repositories_airtable = MockAirtable(base_key='test', api_key='test', table_name='Stores')
+_test_repositories_airtable = MockAirtable(
+    base_key='test',
+    api_key='test',
+    table_name='Stores',
+    data=[test_repository_data_airtable]
+)
 # noinspection PyTypeChecker
 test_repositories_airtable = RepositoriesAirtable(
     airtable=_test_repositories_airtable,
@@ -151,7 +173,12 @@ test_style_data_airtable = {
     "createdTime": "2019-11-05T12:22:22.000Z"
 }
 test_style_airtable = StyleAirtable(item=test_style, namespaces_airtable=test_namespaces_airtable)
-_test_styles_airtable = MockAirtable(base_key='test', api_key='test', table_name='Styles')
+_test_styles_airtable = MockAirtable(
+    base_key='test',
+    api_key='test',
+    table_name='Styles',
+    data=[test_style_data_airtable]
+)
 # noinspection PyTypeChecker
 test_styles_airtable = StylesAirtable(
     airtable=_test_styles_airtable,
@@ -192,7 +219,12 @@ test_layer_airtable = LayerAirtable(
     repositories_airtable=test_repositories_airtable,
     styles_airtable=test_styles_airtable
 )
-_test_layers_airtable = MockAirtable(base_key='test', api_key='test', table_name='Layers')
+_test_layers_airtable = MockAirtable(
+    base_key='test',
+    api_key='test',
+    table_name='Layers',
+    data=[test_layer_data_airtable]
+)
 # noinspection PyTypeChecker
 test_layers_airtable = LayersAirtable(
     airtable=_test_layers_airtable,
@@ -213,6 +245,9 @@ test_layer_group_data_airtable = {
         "Styles": [
             "recTest00000styl1"
         ],
+        "Services": [
+            "WFS"
+        ],
         "Name": "test-layer-group-1",
         "Workspace": [
             "recTest00000wksp1"
@@ -227,7 +262,12 @@ test_layer_group_airtable = LayerGroupAirtable(
     styles_airtable=test_styles_airtable,
     layers_airtable=test_layers_airtable
 )
-_test_layer_groups_airtable = MockAirtable(base_key='test', api_key='test', table_name='Layer Groups')
+_test_layer_groups_airtable = MockAirtable(
+    base_key='test',
+    api_key='test',
+    table_name='Layer Groups',
+    data=[test_layer_group_data_airtable]
+)
 # noinspection PyTypeChecker
 test_layer_groups_airtable = LayerGroupsAirtable(
     airtable=_test_layer_groups_airtable,

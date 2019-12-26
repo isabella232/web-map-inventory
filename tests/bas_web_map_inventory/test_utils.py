@@ -1,6 +1,8 @@
 import pytest
 
-from bas_web_map_inventory.utils import validate_ogc_capabilities, OGCProtocol
+# noinspection PyProtectedMember
+from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities, _process_xmllint_errors, \
+    build_base_data_source_endpoint
 
 
 @pytest.mark.parametrize(
@@ -93,3 +95,28 @@ def test_validate_ogc_capabilities(protocol, capabilities_document, mode, result
     )
     assert len(result) == len(results)
     assert result == results
+
+
+def test_validate_ogc_capabilities_invalid_protocol():
+    with pytest.raises(ValueError) as e:
+        # noinspection PyTypeChecker
+        validate_ogc_capabilities(ogc_protocol='invalid', capabilities_url=None)
+
+        assert e.value == 'Invalid or unsupported OGC protocol'
+
+
+def test_validate_ogc_capabilities__process_xmllint_errors_no_trailing_slash():
+    with pytest.raises(RuntimeError) as e:
+        _process_xmllint_errors(error="testing", file_name='testing')
+    assert 'xmllint error - error output is not recognised (no trailing new line)' in str(e.value)
+
+
+def test_validate_ogc_capabilities__process_xmllint_errors_no_final_validation_status():
+    with pytest.raises(RuntimeError) as e:
+        _process_xmllint_errors(error="testing\n", file_name='testing')
+    assert 'xmllint error - error output is not recognised (no final validation status)' in str(e.value)
+
+
+def test_build_base_data_source_endpoint_https():
+    endpoint = build_base_data_source_endpoint(data_source={'hostname': 'example.com', 'port': '443'})
+    assert endpoint == 'https://example.com:443'

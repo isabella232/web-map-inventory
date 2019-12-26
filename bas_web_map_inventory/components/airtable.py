@@ -226,7 +226,7 @@ class ServerAirtable:
             self.type = ServerTypeAirtable(item['fields']['Type'])
             self.version = item['fields']['Version']
         else:
-            TypeError("Item must be a dict or Server object")
+            raise TypeError("Item must be a dict or Server object")
 
     def airtable_fields(self) -> dict:
         return {
@@ -265,41 +265,35 @@ class NamespaceAirtable:
         self.id = None
         self.name = None
         self.title = None
-        self.isolated = None
         self.server = None
+
+        if 'servers_airtable' not in kwargs:
+            raise RuntimeError("ServersAirtable collection not included as keyword argument.")
 
         if isinstance(item, Namespace):
             self.id = item.id
             self.name = item.label
             self.title = item.title
-            self.isolated = item.isolated
             self.server = kwargs['servers_airtable'].get_by_id(item.relationships['servers'].id)
         elif isinstance(item, dict):
             self.airtable_id = item['id']
             self.id = item['fields']['ID']
             self.name = item['fields']['Name']
             self.title = item['fields']['Title']
-            self.isolated = False
-
-            if 'Isolated' in item['fields'] and item['fields']['Isolated'] is True:
-                self.isolated = True
 
             if 'Server' in item['fields']:
-                if 'servers_airtable' not in kwargs:
-                    raise RuntimeError("ServersAirtable collection not included as keyword argument.")
                 try:
                     self.server = kwargs['servers_airtable'].get_by_airtable_id(item['fields']['Server'][0])
                 except KeyError:
                     raise KeyError(f"Server with Airtable ID [{item['fields']['Server'][0]}] not found.")
         else:
-            TypeError("Item must be a dict or Namespace object")
+            raise TypeError("Item must be a dict or Namespace object")
 
     def airtable_fields(self) -> dict:
         return {
             'ID': self.id,
             'Name': self.name,
             'Title': self.title,
-            'Isolated': self.isolated,
             'Server': [self.server.airtable_id]
         }
 
@@ -308,7 +302,6 @@ class NamespaceAirtable:
             'id': self.id,
             'name': self.name,
             'title': self.title,
-            'isolated': self.isolated,
             'server': self.server
         }
 
@@ -338,6 +331,9 @@ class RepositoryAirtable:
         self.schema = None
         self.workspace = None
 
+        if 'namespaces_airtable' not in kwargs:
+            raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
+
         if isinstance(item, Repository):
             self.id = item.id
             self.name = item.label
@@ -362,14 +358,12 @@ class RepositoryAirtable:
                 self.schema = item['fields']['Schema']
 
             if 'Workspace' in item['fields']:
-                if 'namespaces_airtable' not in kwargs:
-                    raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
                 try:
                     self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
         else:
-            TypeError("Item must be a dict or Repository object")
+            raise TypeError("Item must be a dict or Repository object")
 
     def airtable_fields(self) -> dict:
         return {
@@ -418,6 +412,9 @@ class StyleAirtable:
         self.type = None
         self.workspace = None
 
+        if 'namespaces_airtable' not in kwargs:
+            raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
+
         if isinstance(item, Style):
             self.id = item.id
             self.name = item.label
@@ -433,14 +430,12 @@ class StyleAirtable:
             self.type = StyleTypeAirtable(item['fields']['Type'])
 
             if 'Workspace' in item['fields']:
-                if 'namespaces_airtable' not in kwargs:
-                    raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
                 try:
                     self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
         else:
-            TypeError("Item must be a dict or Style object")
+            raise TypeError("Item must be a dict or Style object")
 
     def airtable_fields(self) -> dict:
         _fields = {
@@ -494,6 +489,13 @@ class LayerAirtable:
         self.store = None
         self.styles = []
 
+        if 'namespaces_airtable' not in kwargs:
+            raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
+        if 'repositories_airtable' not in kwargs:
+            raise RuntimeError("RepositoriesAirtable collection not included as keyword argument.")
+        if 'styles_airtable' not in kwargs:
+            raise RuntimeError("StylesAirtable collection not included as keyword argument.")
+
         if isinstance(item, Layer):
             self.id = item.id
             self.name = item.label
@@ -525,29 +527,23 @@ class LayerAirtable:
                 self.table_view = item['fields']['Table/View']
 
             if 'Workspace' in item['fields']:
-                if 'namespaces_airtable' not in kwargs:
-                    raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
                 try:
                     self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
             if 'Store' in item['fields']:
-                if 'repositories_airtable' not in kwargs:
-                    raise RuntimeError("RepositoriesAirtable collection not included as keyword argument.")
                 try:
                     self.store = kwargs['repositories_airtable'].get_by_airtable_id(item['fields']['Store'][0])
                 except KeyError:
                     raise KeyError(f"Repository with Airtable ID [{item['fields']['Store'][0]}] not found.")
             if 'Styles' in item['fields']:
-                if 'styles_airtable' not in kwargs:
-                    raise RuntimeError("StylesAirtable collection not included as keyword argument.")
                 for style_id in item['fields']['Styles']:
                     try:
                         self.styles.append(kwargs['styles_airtable'].get_by_airtable_id(style_id))
                     except KeyError:
                         raise KeyError(f"Style with Airtable ID [{style_id}] not found.")
         else:
-            TypeError("Item must be a dict or Layer object")
+            raise TypeError("Item must be a dict or Layer object")
 
     def airtable_fields(self) -> dict:
         _services = []
@@ -622,6 +618,13 @@ class LayerGroupAirtable:
         self.layers = []
         self.styles = []
 
+        if 'namespaces_airtable' not in kwargs:
+            raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
+        if 'layers_airtable' not in kwargs:
+            raise RuntimeError("LayersAirtable collection not included as keyword argument.")
+        if 'styles_airtable' not in kwargs:
+            raise RuntimeError("StylesAirtable collection not included as keyword argument.")
+
         if isinstance(item, LayerGroup):
             self.id = item.id
             self.name = item.label
@@ -644,30 +647,24 @@ class LayerGroupAirtable:
                 for service in item['fields']['Services']:
                     self.services.append(LayerGroupServiceAirtable(service))
             if 'Workspace' in item['fields']:
-                if 'namespaces_airtable' not in kwargs:
-                    raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
                 try:
                     self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
             if 'Layers' in item['fields']:
-                if 'layers_airtable' not in kwargs:
-                    raise RuntimeError("LayersAirtable collection not included as keyword argument.")
                 for layer in item['fields']['Layers']:
                     try:
                         self.layers.append(kwargs['layers_airtable'].get_by_airtable_id(layer))
                     except KeyError:
                         raise KeyError(f"Layer with Airtable ID [{layer}] not found.")
             if 'Styles' in item['fields']:
-                if 'styles_airtable' not in kwargs:
-                    raise RuntimeError("StylesAirtable collection not included as keyword argument.")
                 for style_id in item['fields']['Styles']:
                     try:
                         self.styles.append(kwargs['styles_airtable'].get_by_airtable_id(style_id))
                     except KeyError:
                         raise KeyError(f"Style with Airtable ID [{style_id}] not found.")
         else:
-            TypeError("Item must be a dict or LayerGroup object")
+            raise TypeError("Item must be a dict or LayerGroup object")
 
     def airtable_fields(self) -> dict:
         _services = []

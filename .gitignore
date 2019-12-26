@@ -1,10 +1,20 @@
+# cache files
 __pycache__
+
+# environment / configuration files
 .env
 .flaskenv
 APP_RELEASE.txt
+/data/data.json
+/data/sources.json
+/tests/data/data-ok.json
+/tests/data/data-invalid-wms.json
+
+# packaging files
 build
 dist
 *.egg-info
-/data/data.json
-/data/sources.json
-/tests/data/data.json
+
+# test runner files
+.coverage
+htmlcov

@@ -1,0 +1,15 @@
+{
+  "servers": [
+    {
+      "id": "01DRS53XAG5E85MJNYTA6WPTBM",
+      "label": "test-server-1",
+      "hostname": "test-server-1.example.com",
+      "type": "geoserver",
+      "port": "80",
+      "api-path": "/geoserver/rest",
+      "wfs-path": "/geoserver/ows?service=wfs&version=2.0.0&request=GetCapabilities",
+      "username": "admin",
+      "password": "password"
+    }
+  ]
+}

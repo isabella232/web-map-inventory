@@ -5,9 +5,9 @@ import subprocess  # nosec
 
 from enum import Enum
 from tempfile import NamedTemporaryFile
-from importlib import resources
 from typing import List
 
+from importlib_resources import path as resource_path
 # Exempting Bandit security issue (Using lxml.etree.parse to parse untrusted XML data)
 #
 # see specific reasons below
@@ -74,7 +74,7 @@ def validate_ogc_capabilities(
     else:
         raise ValueError('Invalid or unsupported OGC protocol')
 
-    with resources.path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
+    with resource_path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
         schema = etree.parse(str(schema_file_path)).getroot()
     validator = etree.XMLSchema(schema)
 
@@ -96,34 +96,37 @@ def validate_ogc_capabilities(
             capabilities_instance_file.write(etree.tostring(capabilities_instance, pretty_print=True))
 
             try:
-                with resources.path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
+                with resource_path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
                     # Exempting Bandit security issue (subprocess call with shell=True identified)
                     #
                     # The file passed to this method is taken from the URL given, which will be for a data source we
                     # have added. It is assumed such data sources will either be operated by us or otherwise trusted
                     # enough to added to this inventory, therefore there should be a low risk of them containing a
                     # vulnerability.
-                    result = subprocess.run([
-                        f"xmllint --noout --schema {str(schema_file_path)} {capabilities_instance_file.name}"],
-                        shell=True, check=True, capture_output=True)  # nosec
-                    if result.stderr.decode() != f"{capabilities_instance_file.name} validates\n":
-                        raise RuntimeError('xmllint error - output is not recognised (no final validation status)')
+                    subprocess.run(
+                        [f"xmllint --noout --schema {str(schema_file_path)} {capabilities_instance_file.name}"],
+                        shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # nosec
 
+                    # Return empty errors list
                     return list()
             except subprocess.CalledProcessError as e:
-                error_lines = e.stderr.decode().split('\n')
-                if error_lines[len(error_lines) - 1] != '':
-                    raise RuntimeError('xmllint error - error output is not recognised (no trailing new line)')
-                error_lines.pop()
-                if error_lines[len(error_lines) - 1] != f"{capabilities_instance_file.name} fails to validate":
-                    raise RuntimeError('xmllint error - error output is not recognised (no final validation status)')
-                error_lines.pop()
+                return _process_xmllint_errors(error=e.stderr.decode(), file_name=capabilities_instance_file.name)
 
-                # Strip temporary file name from errors as this confuses tests
-                for i, error_line in enumerate(error_lines):
-                    error_lines[i] = error_line.replace(capabilities_instance_file.name, 'line')
 
-                return error_lines
+def _process_xmllint_errors(error: str, file_name: str) -> List[str]:
+    error_lines = error.split('\n')
+    if error_lines[len(error_lines) - 1] != '':
+        raise RuntimeError('xmllint error - error output is not recognised (no trailing new line)')
+    error_lines.pop()
+    if error_lines[len(error_lines) - 1] != f"{file_name} fails to validate":
+        raise RuntimeError('xmllint error - error output is not recognised (no final validation status)')
+    error_lines.pop()
+
+    # Strip temporary file name from errors as this confuses tests
+    for i, error_line in enumerate(error_lines):
+        error_lines[i] = error_line.replace(file_name, 'line')
+
+    return error_lines
 
 
 def build_base_data_source_endpoint(data_source: dict) -> str:
