@@ -6,8 +6,16 @@
 # - Set required secret variables at: https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/-/settings/ci_cd
 
 # = Secret variables
-# - Variables are grouped by section in KEY: "value" format (e.g. FOO: "bar")
+#   Variables are grouped by section in KEY: "value" format (e.g. FOO: "bar")
+#   Where a variable should be protected (only accessible to the master branch, tags, its name is appended with
+#     '(protected)' (e.g. FOO (protected)`
+#   Where a variable is a file, it's name is appended with '(file)' and the value refers to the file that should be
+#     used as it's contents (e.g. FOO (file): "[contents of ./bar]"
 #   Sensitive values are represented by "[Sensitive]"
+#
+# - App
+# > DOT_ENV (protected, file): "[contents of .env]"
+# > DOT_FLASKENV (protected, file): "[contents of .flaskenv]"
 #
 # - PyPi (production)
 # > PYPI_PASSWORD: "[Sensitive]"
@@ -23,14 +31,19 @@
 # == Global settings ==
 
 stages:
-  - build
-  - test
-  - lint
-  - package
-  - publish
-  - deploy
+  - 💥 setup
+  - 🧪 test
+  - 📦 package
+  - 🚚 publish
+  - 🐳 build
+  - 🚀 release
 
 variables:
+  DOCKER_HOST: tcp://docker:2376
+  DOCKER_CERT_PATH: /certs/client
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_VERIFY: 1
+  GITLAB_REGISTRY: docker-registry.data.bas.ac.uk
   APP_NAME: magic-map-layers-airflow
   PYPI_USERNAME: british-antarctic-survey
   PYPI_TEST_USERNAME: british-antarctic-survey
@@ -43,8 +56,8 @@ image:
 
 # == Jobs ==
 
-build-app:
-  stage: build
+setup-app:
+  stage: 💥 setup
   script:
     - "python support/python-packaging/parse_version.py $(git describe --tags) > APP_RELEASE.txt"
   artifacts:
@@ -54,7 +67,7 @@ build-app:
     expire_in: 1 month
 
 test-app:
-  stage: test
+  stage: 🧪 test
   variables:
     FLASK_ENV: testing
   before_script:
@@ -68,7 +81,7 @@ test-app:
       junit: test-results.xml
 
 coverage-app:
-  stage: test
+  stage: 🧪 test
   variables:
     FLASK_ENV: testing
   before_script:
@@ -85,17 +98,17 @@ coverage-app:
     expire_in: 1 month
 
 pep8-app:
-  stage: lint
+  stage: 🧪 test
   script:
     - "flake8 ."
 
 bandit-app:
-  stage: lint
+  stage: 🧪 test
   script:
     - "bandit -r ."
 
 package-app:
-  stage: package
+  stage: 📦 package
   script:
     - "python setup.py sdist bdist_wheel"
   artifacts:
@@ -105,21 +118,61 @@ package-app:
     expire_in: 1 month
 
 publish-app-stage:
-  stage: publish
+  stage: 🚚 publish
   script:
     - "python -m twine upload --repository-url https://test.pypi.org/legacy/ --username $PYPI_TEST_USERNAME --password $PYPI_TEST_PASSWORD --disable-progress-bar --verbose dist/*"
   only:
     - master
 
 publish-app-prod:
-  stage: publish
+  stage: 🚚 publish
   script:
     - "python -m twine upload --username $PYPI_USERNAME --password $PYPI_PASSWORD --disable-progress-bar --verbose dist/*"
   only:
     - tags
 
+build-stage:
+  stage: 🐳 build
+  image:
+    name: docker:19.03-dind
+    entrypoint: [""]
+  before_script:
+    - 'cp $DOT_ENV provisioning/docker/.env'
+    - 'cp $DOT_FLASKENV provisioning/docker/.flaskenv'
+  script:
+    - 'cd provisioning/docker'
+    - 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin'
+    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:latest'
+    - 'docker push $CI_REGISTRY_IMAGE/deploy:latest'
+  services:
+    - docker:dind
+  tags:
+    - dnd
+# skip for now
+#  only:
+#    - master
+build-prod:
+  stage: 🐳 build
+  image:
+    name: docker:19.03-dind
+    entrypoint: [""]
+  before_script:
+    - 'cp $DOT_ENV provisioning/docker/.env'
+    - 'cp $DOT_FLASKENV provisioning/docker/.flaskenv'
+  script:
+    - 'cd provisioning/docker'
+    - 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin'
+    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:$CI_COMMIT_TAG'
+    - 'docker push $CI_REGISTRY_IMAGE/deploy:$CI_COMMIT_TAG'
+  services:
+    - docker:dind
+  tags:
+    - dnd
+  only:
+    - tags
+
 sentry-stage:
-  stage: deploy
+  stage: 🚀 release
   image:
     name: getsentry/sentry-cli
     entrypoint: [""]
@@ -130,7 +183,7 @@ sentry-stage:
     - master
 
 sentry-prod:
-  stage: deploy
+  stage: 🚀 release
   image:
     name: getsentry/sentry-cli
     entrypoint: [""]

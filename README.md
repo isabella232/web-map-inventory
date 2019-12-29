@@ -3,23 +3,38 @@
 Inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information Centre (MAGIC),
 visualised in Airtable.
 
-[View inventory in Airtable](https://airtable.com/tblr6gwKOLQelMXDv/viwp8xVwcRRJnoIo0?blocks=hide) (internal).
+* [view the inventory in Airtable (Internal)](https://airtable.com/tblr6gwKOLQelMXDv/viwp8xVwcRRJnoIo0?blocks=hide)
 
-See [Data model](#data-model) for more about the information this inventory holds.
+See the [Data model](#data-model) section for more information about what this inventory holds.
+
+**Note:** This project is designed for internal use within MAGIC, but is offered to anyone with similar needs.
 
 ## Usage
 
-This project runs locally in a container. See the [Setup](#setup) section for instructions.
-
 ### Tasks (usage)
 
-To run tasks:
+These tasks run in a container. See the [Setup](#setup) section for setup instructions.
+
+**In a local development environment:**
 
 ```shell
-$ docker-compose run flask [task]
+$ docker-compose run app flask [task]
 ```
 
-When finished, run `docker-compose down` to remove all the container.
+**In a staging or production environment**:
+
+```shell
+$ podman run --rm=true --tty --interactive --user=root --volume [path to runtime directory]:/home/geoweb/apps/web-map-inventory/data/:rw docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:latest bash
+$ web-map-inventory [task]
+```
+
+Where:
+
+* `[path to runtime directory]` is the absolute path to a runtime created during [Setup](#setup), typically 
+  `~/.config/web-map-inventory/`
+* `[task]` is the name and arguments of a task
+
+Where: `[task]` is the name and arguments of a task.
 
 #### `data fetch`
 
@@ -118,6 +133,25 @@ Example:
 Flask application using the [airtable-python-wrapper](https://airtable-python-wrapper.readthedocs.io) library to
 interact with the Airtable API.
 
+### Project container
+
+This project runs as an OCI/Docker container. A Docker Compose file, `./docker-compose.yml` defines multiple  
+[images/tags](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/container_registry) hosted in the private BAS Docker 
+Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)):
+
+* `:latest`:
+    * defines a Python development environment, with all dependencies listed in `./requirements.txt` installed
+    * does not include application source code, which is instead mounted inside the container at runtime
+    * is compatible with IDEs such as PyCharm that can use a container as a remote interpreter
+    * is rebuilt manually whenever dependencies change
+
+* `/deploy:latest`:
+    * is a self-contained container with Python installed as an OS package
+    * contains the latest PyPi release of this application as a Pip package
+    * includes some support files, such as a [XML Catalogue](#xml-catalogue), and a Flask CLI wrapper for performance 
+      and ease of use
+    * is rebuilt automatically through [Continuous Deployment](#continuous-deployment)
+
 ### Airtable
 
 Data is synced to the
@@ -213,43 +247,79 @@ Logs for this service are written to *stdout* and a log file, `/var/log/app/app.
 File based logging can be manually controlled by setting the `APP_ENABLE_FILE_LOGGING` and `LOG_FILE_PATH` variables in
 `.flaskenv`.
 
-**Note:** If `LOG_FILE_PATH` is changed, the `app` user in the project container must be granted suitable permissions.
+**Note:** If `LOG_FILE_PATH` is changed, the user in the relevant [Project container](#project-container) must be 
+granted suitable permissions to write to it.
+
+### XML Catalogue
+  
+An [XML Catalog](https://en.wikipedia.org/wiki/XML_catalog) is used to cache XML files locally (typically XSD's for 
+schemas). This drastically speeds up XML parsing and removes a dependency on remote endpoints.
+
+XML files in the catalogue are typically stored in `bas_web_map_inventory/resources/xml_schemas/`.
+
+Different catalogues are used for different variants of the [Project container](#project-container) due to differences
+in where the application is located:
+
+* `:latest`: `./support/xml-schemas/catalogue.xml`
+* `/deploy:latest`: `provisioning/docker/catalog.xml`
+
+In either case, the catalogue is available within the container at the conventional path, `/etc/xml/catalog`) and will 
+be used automatically by most XML libraries and tools (such as `lxml` and `xmllint`).
 
 ## Setup
+
+### Development
 
 ```shell
 $ git clone https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory
 $ cd map-layer-index
 ```
 
-Docker and Docker Compose are required to setup a local development environment of this app.
-
-This project depends on private images from the BAS Docker Registry
-(part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
+The `:latest` tag/image of the [Project container](#project-container) [1] is intended for developing this project. It
+can be ran using Docker and Docker Compose:
 
 ```shell
-# login if this is the first time you've used this registry
 $ docker login docker-registry.data.bas.ac.uk
-$ docker-compose pull
+$ docker-compose pull app
 ```
+
+[1] You will need access to the private BAS Docker Registry (part of 
+[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)) to pull this image. If you don't, you can build the relevant 
+image/tag locally instead.
+
+### Staging/Production
+
+The `/deploy:latest` tag/image of the [Project container](#project-container) [1] is intended for running this project 
+in staging or production. It can be ran using Podman on the BAS central worksations. 
+
+**Note:** Podman support in BAS is currently experimental, it is only available on certain workstations and you will 
+need to ask the IT Service Desk to enable your user account to use it. 
+
+```shell
+$ podman login docker-registry.data.bas.ac.uk
+$ podman pull docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:latest
+```
+
+You will also need to create a directory to contain runtime files (such as the data sources file):
+
+```shell
+$ mkdir -p ~/.config/web-map-inventory
+```
+
+[1] You will need access to the private BAS Docker Registry (part of 
+[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)) to pull this image. If you don't, you can build the relevant 
+image/tag locally instead.
+
+### Configuration setup
+
+**Note:** This step applies to both development and staging/production environments.
 
 Two [Environment files](#environment-variables), `.env` and `.flaskenv` are used for setting
-[Configuration options](#configuration-options). These files should be created by copying their examples and updating
-them as needed:
-
-```shell
-$ cp .env.example .env
-$ cp .flaskenv.example .flaskenv
-```
+[Configuration options](#configuration-options). These files should be created by copying their examples, `.env.example`
+`.flaskenv.example`, and updating them as needed.
 
 A [Data sources file](#data-sources), `data/sources.json`, is used for configure where/what to fetch data from.
-This file should be created by copying `data/sources.example.json` and updating it as needed:
-
-```shell
-$ cp data/sources.example.json data/sources.json
-```
-
-See the [Usage](#usage) section for how to use the application.
+This file should be created by copying `data/sources.example.json` and updating it as needed.
 
 ## Development
 
@@ -258,7 +328,7 @@ This project is developed as a Flask application.
 Ensure `bas_web_map_inventory/config.py` and related environment files are kept up-to-date if any
 [configuration options](#configuration-options) are added or changed.
 
-Ensure all 1st party code has [unit/integration tests](#testing) as appropriate.
+Ensure all 1st party code has [test coverage](#test-coverage) with suitable [unit/integration tests](#testing).
 
 ### Code Style
 
@@ -334,18 +404,10 @@ from flask import current_app
 current_app.logger.info('Log message')
 ```
 
-### XML Catalogue
+### XML Catalogue additions
 
-An [XML Catalog](https://en.wikipedia.org/wiki/XML_catalog), `support/xml-schemas/catalogue.xml`, is available to 
-cache XML files (such as schemas used for validation) locally. This drastically speeds up XML parsing and reduces our 
-dependency on others.
-
-This catalogue is included in the project Docker image (at the conventional path, `/etc/xml/catalog`) and will be used 
-automatically by most XML libraries and tools (including `lxml` for example).
-
-If new functionality is added that depends on XML schemas, it is *strongly* recommended to add them to this catalogue,
-especially where they are used in tests. Typically local copies of schemas are stored in 
-`bas_web_map_inventory/resources/xml_schemas/`.
+If new functionality is added that depends on XML files, such as XSDs, it is *strongly* recommended to add them to the
+[XML catalogue](#xml-catalogue), especially where they are used in tests.
 
 Once added, you will need to rebuild and push the project Docker image (see the [Dependencies](#dependencies) section
 for more information).
@@ -368,7 +430,7 @@ This project uses [PyTest](https://docs.pytest.org/en/latest/) for unit/integrat
 To run tests manually from the command line:
 
 ```shell
-$ docker-compose run -e FLASK_ENV=testing app pytest --random-order
+$ docker-compose run app -e FLASK_ENV=testing app pytest --random-order
 ```
 
 To run tests manually using PyCharm:
@@ -386,7 +448,7 @@ To prevent noise, `.coveragerc` is used to omit empty `__init__.py` files from r
 To measure coverage manually:
 
 ```shell
-$ docker-compose run -e FLASK_ENV=testing app pytest --cov=bas_web_map_inventory --cov-fail-under=100 --cov-report=html .
+$ docker-compose run app -e FLASK_ENV=testing app pytest --cov=bas_web_map_inventory --cov-fail-under=100 --cov-report=html .
 ```
 
 [Continuous Integration](#continuous-integration) will check coverage automatically and fail if less than 100%.

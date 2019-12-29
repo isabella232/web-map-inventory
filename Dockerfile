@@ -20,7 +20,7 @@ RUN adduser -D app && \
     mkdir -p /var/log/app && \
     chown app:root /usr/src/app /var/log/app
 
-ENV FLASK_ENV production
+ENV FLASK_ENV development
 
 USER app
 ENTRYPOINT []

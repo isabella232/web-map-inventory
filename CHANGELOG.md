@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+* Deployment container [#2](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/2)
 * Test coverage [#15](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/15)
 * WMS validation [#13](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/13)
 * Rotating log file support [#10](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/10)

@@ -9,6 +9,7 @@ APP_RELEASE.txt
 /data/sources.json
 /tests/data/data-ok.json
 /tests/data/data-invalid-wms.json
+/provisioning/docker/sources.json
 
 # packaging files
 build

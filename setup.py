@@ -30,6 +30,7 @@ setup(
         'airtable-python-wrapper==0.12.0',
         'Flask==1.1.1',
         'geoserver-restconfig==1.0.2',
+        'importlib_resources==1.0.2',
         'inquirer==2.6.3',
         'jsonschema==3.2.0',
         'lxml==4.4.2',
@@ -37,7 +38,7 @@ setup(
         'python-dotenv==0.10.3',
         'sentry-sdk[flask]==0.13.5',
         'str2bool==1.1',
-        'ulid-py==0.0.9',
+        'ulid-py==0.0.12'
     ],
     packages=find_packages(exclude=['tests.*', 'tests']),
     package_data={
