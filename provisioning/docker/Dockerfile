@@ -13,9 +13,6 @@ ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
 
 RUN pip install --upgrade pip
 RUN pip install -i https://test.pypi.org/simple/ --extra-index-url=https://pypi.org/simple/ bas-web-map-inventory==0.1.0.post32.dev0
-# This command can be removed when #2 is merged into master
-RUN pip install importlib_resources==1.0.2
-
 
 FROM base as deploy
 

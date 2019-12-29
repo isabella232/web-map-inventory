@@ -148,9 +148,9 @@ build-stage:
     - docker:dind
   tags:
     - dnd
-# skip for now
-#  only:
-#    - master
+  only:
+    - master
+
 build-prod:
   stage: 🐳 build
   image:
