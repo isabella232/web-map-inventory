@@ -8,5 +8,8 @@ services:
     command: flask
     volumes:
       - .:/usr/src/app
-    environment:
-      - FLASK_ENV=development
+
+  deploy-latest:
+    build: ./provisioning/docker
+    image: docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:latest
+    command: bash
