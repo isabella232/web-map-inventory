@@ -100,7 +100,7 @@ coverage-app:
 pep8-app:
   stage: 🧪 test
   script:
-    - "flake8 ."
+    - "black --check bas_web_map_inventory/"
 
 bandit-app:
   stage: 🧪 test

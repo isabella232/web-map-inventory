@@ -334,12 +334,18 @@ Ensure all 1st party code has [test coverage](#test-coverage) with suitable [uni
 
 PEP-8 style and formatting guidelines must be used for this project, with the exception of the 80 character line limit.
 
-[Flake8](http://flake8.pycqa.org/) is used to ensure compliance, configured in `.flake8`.
+[Black](https://github.com/psf/black) is used to ensure compliance, configured in `pyproject.toml`.
 
-To run checks manually:
+To apply formatting manually:
 
 ```shell
-$ docker-compose run app flake8 .
+$ docker-compose run app black bas_web_map_inventory/
+```
+
+To check compliance manually:
+
+```shell
+$ docker-compose run app black --check bas_web_map_inventory/
 ```
 
 Checks are ran automatically in [Continuous Integration](#continuous-integration).
