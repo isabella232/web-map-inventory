@@ -4,8 +4,20 @@ from typing import Dict, List, Union
 # noinspection PyPackageRequirements
 from airtable import Airtable as _Airtable
 
-from bas_web_map_inventory.components import Server, Namespace, Repository, Style, Layer, LayerGroup, Servers, \
-    Namespaces, Repositories, Styles, Layers, LayerGroups
+from bas_web_map_inventory.components import (
+    Server,
+    Namespace,
+    Repository,
+    Style,
+    Layer,
+    LayerGroup,
+    Servers,
+    Namespaces,
+    Repositories,
+    Styles,
+    Layers,
+    LayerGroups,
+)
 
 
 class Airtable:
@@ -27,6 +39,7 @@ class Airtable:
     * which items are out of date or missing in Airtable
     * which items are now orphaned as they've been removed locally
     """
+
     ItemClass = None
     ItemClassAirtable = None
 
@@ -74,7 +87,7 @@ class Airtable:
         self.orphaned = []
 
         for airtable_item in self.airtable.get_all():
-            item_id = airtable_item['fields']['ID']
+            item_id = airtable_item["fields"]["ID"]
             try:
                 item = self.ItemClassAirtable(item=airtable_item, **self.kwargs)
                 self.items_airtable[item.id] = item
@@ -171,78 +184,80 @@ class Airtable:
         """
         self.stat()
 
-        return {
-            'current': self.current,
-            'outdated': self.outdated,
-            'missing': self.missing,
-            'orphaned': self.orphaned
-        }
+        return {"current": self.current, "outdated": self.outdated, "missing": self.missing, "orphaned": self.orphaned}
 
 
 class ServerTypeAirtable(Enum):
     """
     Represents the technology/product a server uses in Airtable.
     """
-    GEOSERVER = 'GeoServer'
+
+    GEOSERVER = "GeoServer"
 
 
 class RepositoryTypeAirtable(Enum):
     """
     Represents the technology/product a repository uses in Airtable.
     """
-    POSTGIS = 'PostGIS'
-    GEOTIFF = 'GeoTiff'
-    ECW = 'ECW'
-    JPEG2000 = 'JPEG2000'
-    IMAGEMOSAIC = 'Image Mosaic'
-    WORLDIMAGE = 'World Image'
+
+    POSTGIS = "PostGIS"
+    GEOTIFF = "GeoTiff"
+    ECW = "ECW"
+    JPEG2000 = "JPEG2000"
+    IMAGEMOSAIC = "Image Mosaic"
+    WORLDIMAGE = "World Image"
 
 
 class StyleTypeAirtable(Enum):
     """
     Represents the format a style is written in, in Airtable.
     """
-    SLD = 'SLD'
+
+    SLD = "SLD"
 
 
 class LayerTypeAirtable(Enum):
     """
     Represents a layer's fundamental data type (raster or vector) in Airtable.
     """
-    RASTER = 'Raster'
-    VECTOR = 'Vector'
+
+    RASTER = "Raster"
+    VECTOR = "Vector"
 
 
 class LayerGeometryAirtable(Enum):
     """
     Represents a (vector) layer's geometry in Airtable.
     """
-    POINT = 'Point'
-    LINESTRING = 'Linestring'
-    POLYGON = 'Polygon'
-    MULTIPOINT = 'Multi-Point'
-    MULTILINESTRING = 'Multi-Linestring'
-    MULTIPOLYGON = 'Multi-Polygon'
+
+    POINT = "Point"
+    LINESTRING = "Linestring"
+    POLYGON = "Polygon"
+    MULTIPOINT = "Multi-Point"
+    MULTILINESTRING = "Multi-Linestring"
+    MULTIPOLYGON = "Multi-Polygon"
 
 
 class LayerServiceAirtable(Enum):
     """
     Represents which OGC services a layer can be accessed with in Airtable.
     """
-    WMS = 'WMS'
-    WMTS = 'WMTS'
-    WCS = 'WCS'
-    WFS = 'WFS'
+
+    WMS = "WMS"
+    WMTS = "WMTS"
+    WCS = "WCS"
+    WFS = "WFS"
 
 
 class LayerGroupServiceAirtable(Enum):
     """
     Represents which OGC services a layer group can be accessed with in Airtable.
     """
-    WMS = 'WMS'
-    WMTS = 'WMTS'
-    WCS = 'WCS'
-    WFS = 'WFS'
+
+    WMS = "WMS"
+    WMTS = "WMTS"
+    WCS = "WCS"
+    WFS = "WFS"
 
 
 class ServerAirtable:
@@ -251,6 +266,7 @@ class ServerAirtable:
 
     See 'Airtable' class for general information.
     """
+
     # noinspection PyUnusedLocal
     def __init__(self, item: Union[Server, dict], **kwargs):
         """
@@ -270,12 +286,12 @@ class ServerAirtable:
             self.type = ServerTypeAirtable[item.type.name]
             self.version = item.version
         elif isinstance(item, dict):
-            self.airtable_id = item['id']
-            self.id = item['fields']['ID']
-            self.name = item['fields']['Name']
-            self.hostname = item['fields']['Hostname']
-            self.type = ServerTypeAirtable(item['fields']['Type'])
-            self.version = item['fields']['Version']
+            self.airtable_id = item["id"]
+            self.id = item["fields"]["ID"]
+            self.name = item["fields"]["Name"]
+            self.hostname = item["fields"]["Hostname"]
+            self.type = ServerTypeAirtable(item["fields"]["Type"])
+            self.version = item["fields"]["Version"]
         else:
             raise TypeError("Item must be a dict or Server object")
 
@@ -288,11 +304,11 @@ class ServerAirtable:
         :return: a Server as Airtable fields
         """
         return {
-            'ID': self.id,
-            'Name': self.name,
-            'Hostname': self.hostname,
-            'Type': self.type.value,
-            'Version': self.version
+            "ID": self.id,
+            "Name": self.name,
+            "Hostname": self.hostname,
+            "Type": self.type.value,
+            "Version": self.version,
         }
 
     def _dict(self) -> Dict[str, str]:
@@ -306,13 +322,7 @@ class ServerAirtable:
 
         :return: a Server's internal properties
         """
-        return {
-            'id': self.id,
-            'name': self.name,
-            'hostname': self.hostname,
-            'type': self.type,
-            'version': self.version
-        }
+        return {"id": self.id, "name": self.name, "hostname": self.hostname, "type": self.type, "version": self.version}
 
     def __repr__(self) -> str:
         """
@@ -338,6 +348,7 @@ class NamespaceAirtable:
 
     See 'Airtable' class for general information.
     """
+
     def __init__(self, item: Union[Namespace, dict], **kwargs):
         """
         :param item: a (local) Namespace object or a (remote) Airtable representation of a Namespace object
@@ -348,23 +359,23 @@ class NamespaceAirtable:
         self.title = None
         self.server = None
 
-        if 'servers_airtable' not in kwargs:
+        if "servers_airtable" not in kwargs:
             raise RuntimeError("ServersAirtable collection not included as keyword argument.")
 
         if isinstance(item, Namespace):
             self.id = item.id
             self.name = item.label
             self.title = item.title
-            self.server = kwargs['servers_airtable'].get_by_id(item.relationships['servers'].id)
+            self.server = kwargs["servers_airtable"].get_by_id(item.relationships["servers"].id)
         elif isinstance(item, dict):
-            self.airtable_id = item['id']
-            self.id = item['fields']['ID']
-            self.name = item['fields']['Name']
-            self.title = item['fields']['Title']
+            self.airtable_id = item["id"]
+            self.id = item["fields"]["ID"]
+            self.name = item["fields"]["Name"]
+            self.title = item["fields"]["Title"]
 
-            if 'Server' in item['fields']:
+            if "Server" in item["fields"]:
                 try:
-                    self.server = kwargs['servers_airtable'].get_by_airtable_id(item['fields']['Server'][0])
+                    self.server = kwargs["servers_airtable"].get_by_airtable_id(item["fields"]["Server"][0])
                 except KeyError:
                     raise KeyError(f"Server with Airtable ID [{item['fields']['Server'][0]}] not found.")
         else:
@@ -379,12 +390,7 @@ class NamespaceAirtable:
 
         :return: a Namespace as Airtable fields
         """
-        return {
-            'ID': self.id,
-            'Name': self.name,
-            'Title': self.title,
-            'Server': [self.server.airtable_id]
-        }
+        return {"ID": self.id, "Name": self.name, "Title": self.title, "Server": [self.server.airtable_id]}
 
     def _dict(self) -> Dict[str, str]:
         """
@@ -397,12 +403,7 @@ class NamespaceAirtable:
 
         :return: a Namespace's internal properties
         """
-        return {
-            'id': self.id,
-            'name': self.name,
-            'title': self.title,
-            'server': self.server
-        }
+        return {"id": self.id, "name": self.name, "title": self.title, "server": self.server}
 
     def __repr__(self) -> str:
         """
@@ -428,6 +429,7 @@ class RepositoryAirtable:
 
     See 'Airtable' class for general information.
     """
+
     def __init__(self, item: Union[Repository, dict], **kwargs):
         """
         :param item: a (local) Repository object or a (remote) Airtable representation of a Repository object
@@ -442,7 +444,7 @@ class RepositoryAirtable:
         self.schema = None
         self.workspace = None
 
-        if 'namespaces_airtable' not in kwargs:
+        if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
 
         if isinstance(item, Repository):
@@ -453,24 +455,24 @@ class RepositoryAirtable:
             self.host = item.hostname
             self.database = item.database
             self.schema = item.schema
-            self.workspace = kwargs['namespaces_airtable'].get_by_id(item.relationships['namespaces'].id)
+            self.workspace = kwargs["namespaces_airtable"].get_by_id(item.relationships["namespaces"].id)
         elif isinstance(item, dict):
-            self.airtable_id = item['id']
-            self.id = item['fields']['ID']
-            self.name = item['fields']['Name']
-            self.title = item['fields']['Title']
-            self.type = RepositoryTypeAirtable(item['fields']['Type'])
+            self.airtable_id = item["id"]
+            self.id = item["fields"]["ID"]
+            self.name = item["fields"]["Name"]
+            self.title = item["fields"]["Title"]
+            self.type = RepositoryTypeAirtable(item["fields"]["Type"])
 
-            if 'Host' in item['fields']:
-                self.host = item['fields']['Host']
-            if 'Database' in item['fields']:
-                self.database = item['fields']['Database']
-            if 'Schema' in item['fields']:
-                self.schema = item['fields']['Schema']
+            if "Host" in item["fields"]:
+                self.host = item["fields"]["Host"]
+            if "Database" in item["fields"]:
+                self.database = item["fields"]["Database"]
+            if "Schema" in item["fields"]:
+                self.schema = item["fields"]["Schema"]
 
-            if 'Workspace' in item['fields']:
+            if "Workspace" in item["fields"]:
                 try:
-                    self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
+                    self.workspace = kwargs["namespaces_airtable"].get_by_airtable_id(item["fields"]["Workspace"][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
         else:
@@ -486,14 +488,14 @@ class RepositoryAirtable:
         :return: a Repository as Airtable fields
         """
         return {
-            'ID': self.id,
-            'Name': self.name,
-            'Title': self.title,
-            'Type': self.type.value,
-            'Host': self.host,
-            'Database': self.database,
-            'Schema': self.schema,
-            'Workspace': [self.workspace.airtable_id]
+            "ID": self.id,
+            "Name": self.name,
+            "Title": self.title,
+            "Type": self.type.value,
+            "Host": self.host,
+            "Database": self.database,
+            "Schema": self.schema,
+            "Workspace": [self.workspace.airtable_id],
         }
 
     def _dict(self) -> Dict[str, Union[str, List[str]]]:
@@ -508,14 +510,14 @@ class RepositoryAirtable:
         :return: a Repositories internal properties
         """
         return {
-            'id': self.id,
-            'name': self.name,
-            'title': self.title,
-            'type': self.type.value,
-            'host': self.host,
-            'database': self.database,
-            'schema': self.schema,
-            'workspace': [self.workspace.airtable_id]
+            "id": self.id,
+            "name": self.name,
+            "title": self.title,
+            "type": self.type.value,
+            "host": self.host,
+            "database": self.database,
+            "schema": self.schema,
+            "workspace": [self.workspace.airtable_id],
         }
 
     def __repr__(self) -> str:
@@ -542,6 +544,7 @@ class StyleAirtable:
 
     See 'Airtable' class for general information.
     """
+
     def __init__(self, item: Union[Style, dict], **kwargs):
         """
         :param item: a (local) Style object or a (remote) Airtable representation of a Style object
@@ -553,7 +556,7 @@ class StyleAirtable:
         self.type = None
         self.workspace = None
 
-        if 'namespaces_airtable' not in kwargs:
+        if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
 
         if isinstance(item, Style):
@@ -561,18 +564,18 @@ class StyleAirtable:
             self.name = item.label
             self.title = item.title
             self.type = StyleTypeAirtable[item.type.name]
-            if item.relationships['namespaces'] is not None:
-                self.workspace = kwargs['namespaces_airtable'].get_by_id(item.relationships['namespaces'].id)
+            if item.relationships["namespaces"] is not None:
+                self.workspace = kwargs["namespaces_airtable"].get_by_id(item.relationships["namespaces"].id)
         elif isinstance(item, dict):
-            self.airtable_id = item['id']
-            self.id = item['fields']['ID']
-            self.name = item['fields']['Name']
-            self.title = item['fields']['Title']
-            self.type = StyleTypeAirtable(item['fields']['Type'])
+            self.airtable_id = item["id"]
+            self.id = item["fields"]["ID"]
+            self.name = item["fields"]["Name"]
+            self.title = item["fields"]["Title"]
+            self.type = StyleTypeAirtable(item["fields"]["Type"])
 
-            if 'Workspace' in item['fields']:
+            if "Workspace" in item["fields"]:
                 try:
-                    self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
+                    self.workspace = kwargs["namespaces_airtable"].get_by_airtable_id(item["fields"]["Workspace"][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
         else:
@@ -588,13 +591,13 @@ class StyleAirtable:
         :return: a Style as Airtable fields
         """
         _fields = {
-            'ID': self.id,
-            'Name': self.name,
-            'Title': self.title,
-            'Type': self.type.value,
+            "ID": self.id,
+            "Name": self.name,
+            "Title": self.title,
+            "Type": self.type.value,
         }
         if self.workspace is not None:
-            _fields['Workspace'] = [self.workspace.airtable_id]
+            _fields["Workspace"] = [self.workspace.airtable_id]
 
         return _fields
 
@@ -610,13 +613,13 @@ class StyleAirtable:
         :return: a Style's internal properties
         """
         _dict = {
-            'id': self.id,
-            'name': self.name,
-            'title': self.title,
-            'type': self.type.value,
+            "id": self.id,
+            "name": self.name,
+            "title": self.title,
+            "type": self.type.value,
         }
         if self.workspace is not None:
-            _dict['namespace'] = [self.workspace.airtable_id]
+            _dict["namespace"] = [self.workspace.airtable_id]
 
         return _dict
 
@@ -644,6 +647,7 @@ class LayerAirtable:
 
     See 'Airtable' class for general information.
     """
+
     def __init__(self, item: Union[Layer, dict], **kwargs):
         """
         :param item: a (local) Layer object or a (remote) Airtable representation of a Layer object
@@ -660,11 +664,11 @@ class LayerAirtable:
         self.store = None
         self.styles = []
 
-        if 'namespaces_airtable' not in kwargs:
+        if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
-        if 'repositories_airtable' not in kwargs:
+        if "repositories_airtable" not in kwargs:
             raise RuntimeError("RepositoriesAirtable collection not included as keyword argument.")
-        if 'styles_airtable' not in kwargs:
+        if "styles_airtable" not in kwargs:
             raise RuntimeError("StylesAirtable collection not included as keyword argument.")
 
         if isinstance(item, Layer):
@@ -678,39 +682,39 @@ class LayerAirtable:
                 self.services.append(LayerServiceAirtable[service.name])
             if item.table_view is not None:
                 self.table_view = item.table_view
-            self.workspace = kwargs['namespaces_airtable'].get_by_id(item.relationships['namespaces'].id)
-            self.store = kwargs['repositories_airtable'].get_by_id(item.relationships['repositories'].id)
-            for style_id in item.relationships['styles']:
-                self.styles.append(kwargs['styles_airtable'].get_by_id(style_id.id))
+            self.workspace = kwargs["namespaces_airtable"].get_by_id(item.relationships["namespaces"].id)
+            self.store = kwargs["repositories_airtable"].get_by_id(item.relationships["repositories"].id)
+            for style_id in item.relationships["styles"]:
+                self.styles.append(kwargs["styles_airtable"].get_by_id(style_id.id))
         elif isinstance(item, dict):
-            self.airtable_id = item['id']
-            self.id = item['fields']['ID']
-            self.name = item['fields']['Name']
-            self.title = item['fields']['Title']
-            self.type = LayerTypeAirtable(item['fields']['Type'])
+            self.airtable_id = item["id"]
+            self.id = item["fields"]["ID"]
+            self.name = item["fields"]["Name"]
+            self.title = item["fields"]["Title"]
+            self.type = LayerTypeAirtable(item["fields"]["Type"])
 
-            if 'Geometry' in item['fields']:
-                self.geometry = LayerGeometryAirtable(item['fields']['Geometry'])
-            if 'Services' in item['fields']:
-                for service in item['fields']['Services']:
+            if "Geometry" in item["fields"]:
+                self.geometry = LayerGeometryAirtable(item["fields"]["Geometry"])
+            if "Services" in item["fields"]:
+                for service in item["fields"]["Services"]:
                     self.services.append(LayerServiceAirtable(service))
-            if 'Table/View' in item['fields']:
-                self.table_view = item['fields']['Table/View']
+            if "Table/View" in item["fields"]:
+                self.table_view = item["fields"]["Table/View"]
 
-            if 'Workspace' in item['fields']:
+            if "Workspace" in item["fields"]:
                 try:
-                    self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
+                    self.workspace = kwargs["namespaces_airtable"].get_by_airtable_id(item["fields"]["Workspace"][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
-            if 'Store' in item['fields']:
+            if "Store" in item["fields"]:
                 try:
-                    self.store = kwargs['repositories_airtable'].get_by_airtable_id(item['fields']['Store'][0])
+                    self.store = kwargs["repositories_airtable"].get_by_airtable_id(item["fields"]["Store"][0])
                 except KeyError:
                     raise KeyError(f"Repository with Airtable ID [{item['fields']['Store'][0]}] not found.")
-            if 'Styles' in item['fields']:
-                for style_id in item['fields']['Styles']:
+            if "Styles" in item["fields"]:
+                for style_id in item["fields"]["Styles"]:
                     try:
-                        self.styles.append(kwargs['styles_airtable'].get_by_airtable_id(style_id))
+                        self.styles.append(kwargs["styles_airtable"].get_by_airtable_id(style_id))
                     except KeyError:
                         raise KeyError(f"Style with Airtable ID [{style_id}] not found.")
         else:
@@ -732,19 +736,19 @@ class LayerAirtable:
         for style in self.styles:
             _styles.append(style.airtable_id)
         _fields = {
-            'ID': self.id,
-            'Name': self.name,
-            'Title': self.title,
-            'Type': self.type.value,
-            'Geometry': None,
-            'Services': _services,
-            'Table/View': self.table_view,
-            'Workspace': [self.workspace.airtable_id],
-            'Store': [self.store.airtable_id],
-            'Styles': _styles
+            "ID": self.id,
+            "Name": self.name,
+            "Title": self.title,
+            "Type": self.type.value,
+            "Geometry": None,
+            "Services": _services,
+            "Table/View": self.table_view,
+            "Workspace": [self.workspace.airtable_id],
+            "Store": [self.store.airtable_id],
+            "Styles": _styles,
         }
         if self.geometry is not None:
-            _fields['Geometry'] = self.geometry.value
+            _fields["Geometry"] = self.geometry.value
 
         return _fields
 
@@ -766,19 +770,19 @@ class LayerAirtable:
         for style in self.styles:
             _styles.append(style.airtable_id)
         _dict = {
-            'id': self.id,
-            'name': self.name,
-            'title': self.title,
-            'type': self.type.value,
-            'geometry': None,
-            'services': _services,
-            'table-view': self.table_view,
-            'workspace': [self.workspace.airtable_id],
-            'store': [self.store.airtable_id],
-            'styles': _styles
+            "id": self.id,
+            "name": self.name,
+            "title": self.title,
+            "type": self.type.value,
+            "geometry": None,
+            "services": _services,
+            "table-view": self.table_view,
+            "workspace": [self.workspace.airtable_id],
+            "store": [self.store.airtable_id],
+            "styles": _styles,
         }
         if self.geometry is not None:
-            _dict['geometry'] = self.geometry.value
+            _dict["geometry"] = self.geometry.value
 
         return _dict
 
@@ -806,6 +810,7 @@ class LayerGroupAirtable:
 
     See 'Airtable' class for general information.
     """
+
     def __init__(self, item: Union[LayerGroup, dict], **kwargs):
         """
         :param item: a (local) LayerGroup object or a (remote) Airtable representation of a LayerGroup object
@@ -819,11 +824,11 @@ class LayerGroupAirtable:
         self.layers = []
         self.styles = []
 
-        if 'namespaces_airtable' not in kwargs:
+        if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
-        if 'layers_airtable' not in kwargs:
+        if "layers_airtable" not in kwargs:
             raise RuntimeError("LayersAirtable collection not included as keyword argument.")
-        if 'styles_airtable' not in kwargs:
+        if "styles_airtable" not in kwargs:
             raise RuntimeError("StylesAirtable collection not included as keyword argument.")
 
         if isinstance(item, LayerGroup):
@@ -832,36 +837,36 @@ class LayerGroupAirtable:
             self.title = item.title
             for service in item.services:
                 self.services.append(LayerGroupServiceAirtable[service.name])
-            if item.relationships['namespaces'] is not None:
-                self.workspace = kwargs['namespaces_airtable'].get_by_id(item.relationships['namespaces'].id)
-            for layer in item.relationships['layers']:
-                self.layers.append(kwargs['layers_airtable'].get_by_id(layer.id))
-            for style in item.relationships['styles']:
-                self.styles.append(kwargs['styles_airtable'].get_by_id(style.id))
+            if item.relationships["namespaces"] is not None:
+                self.workspace = kwargs["namespaces_airtable"].get_by_id(item.relationships["namespaces"].id)
+            for layer in item.relationships["layers"]:
+                self.layers.append(kwargs["layers_airtable"].get_by_id(layer.id))
+            for style in item.relationships["styles"]:
+                self.styles.append(kwargs["styles_airtable"].get_by_id(style.id))
         elif isinstance(item, dict):
-            self.airtable_id = item['id']
-            self.id = item['fields']['ID']
-            self.name = item['fields']['Name']
-            self.title = item['fields']['Title']
+            self.airtable_id = item["id"]
+            self.id = item["fields"]["ID"]
+            self.name = item["fields"]["Name"]
+            self.title = item["fields"]["Title"]
 
-            if 'Services' in item['fields']:
-                for service in item['fields']['Services']:
+            if "Services" in item["fields"]:
+                for service in item["fields"]["Services"]:
                     self.services.append(LayerGroupServiceAirtable(service))
-            if 'Workspace' in item['fields']:
+            if "Workspace" in item["fields"]:
                 try:
-                    self.workspace = kwargs['namespaces_airtable'].get_by_airtable_id(item['fields']['Workspace'][0])
+                    self.workspace = kwargs["namespaces_airtable"].get_by_airtable_id(item["fields"]["Workspace"][0])
                 except KeyError:
                     raise KeyError(f"Namespace with Airtable ID [{item['fields']['Workspace'][0]}] not found.")
-            if 'Layers' in item['fields']:
-                for layer in item['fields']['Layers']:
+            if "Layers" in item["fields"]:
+                for layer in item["fields"]["Layers"]:
                     try:
-                        self.layers.append(kwargs['layers_airtable'].get_by_airtable_id(layer))
+                        self.layers.append(kwargs["layers_airtable"].get_by_airtable_id(layer))
                     except KeyError:
                         raise KeyError(f"Layer with Airtable ID [{layer}] not found.")
-            if 'Styles' in item['fields']:
-                for style_id in item['fields']['Styles']:
+            if "Styles" in item["fields"]:
+                for style_id in item["fields"]["Styles"]:
                     try:
-                        self.styles.append(kwargs['styles_airtable'].get_by_airtable_id(style_id))
+                        self.styles.append(kwargs["styles_airtable"].get_by_airtable_id(style_id))
                     except KeyError:
                         raise KeyError(f"Style with Airtable ID [{style_id}] not found.")
         else:
@@ -886,13 +891,13 @@ class LayerGroupAirtable:
         for style in self.styles:
             _styles.append(style.airtable_id)
         return {
-            'ID': self.id,
-            'Name': self.name,
-            'Title': self.title,
-            'Services': _services,
-            'Workspace': [self.workspace.airtable_id],
-            'Layers': _layers,
-            'Styles': _styles
+            "ID": self.id,
+            "Name": self.name,
+            "Title": self.title,
+            "Services": _services,
+            "Workspace": [self.workspace.airtable_id],
+            "Layers": _layers,
+            "Styles": _styles,
         }
 
     def _dict(self) -> Dict[str, Union[str, List[str]]]:
@@ -916,13 +921,13 @@ class LayerGroupAirtable:
         for style in self.styles:
             _styles.append(style.airtable_id)
         return {
-            'id': self.id,
-            'name': self.name,
-            'title': self.title,
-            'services': _services,
-            'workspace': [self.workspace.airtable_id],
-            'layers': _layers,
-            'styles': _styles
+            "id": self.id,
+            "name": self.name,
+            "title": self.title,
+            "services": _services,
+            "workspace": [self.workspace.airtable_id],
+            "layers": _layers,
+            "styles": _styles,
         }
 
     def __repr__(self) -> str:
@@ -947,6 +952,7 @@ class ServersAirtable(Airtable):
     """
     Represents a collection of servers in Airtable.
     """
+
     ItemClass = Server
     ItemClassAirtable = ServerAirtable
 
@@ -962,22 +968,17 @@ class NamespacesAirtable(Airtable):
     """
     Represents a collection of namespaces in Airtable.
     """
+
     ItemClass = Namespace
     ItemClassAirtable = NamespaceAirtable
 
-    def __init__(
-        self,
-        airtable: _Airtable,
-        namespaces: Namespaces,
-        servers_airtable: ServersAirtable,
-        **kwargs
-    ):
+    def __init__(self, airtable: _Airtable, namespaces: Namespaces, servers_airtable: ServersAirtable, **kwargs):
         """
         :param airtable: upstream Airtable SDK class instance
         :param servers: collection of Namespace items
         :param servers_airtable: collection of Airtable Server items for relating namespaces to servers
         """
-        kwargs['servers_airtable'] = servers_airtable
+        kwargs["servers_airtable"] = servers_airtable
         super().__init__(airtable=airtable, items=namespaces, **kwargs)
 
 
@@ -985,22 +986,19 @@ class RepositoriesAirtable(Airtable):
     """
     Represents a collection of repositories in Airtable.
     """
+
     ItemClass = Repository
     ItemClassAirtable = RepositoryAirtable
 
     def __init__(
-        self,
-        airtable: _Airtable,
-        repositories: Repositories,
-        namespaces_airtable: NamespacesAirtable,
-        **kwargs
+        self, airtable: _Airtable, repositories: Repositories, namespaces_airtable: NamespacesAirtable, **kwargs
     ):
         """
         :param airtable: upstream Airtable SDK class instance
         :param repositories: collection of Repository items
         :param namespaces_airtable: collection of Airtable Namespace items for relating repositories to namespaces
         """
-        kwargs['namespaces_airtable'] = namespaces_airtable
+        kwargs["namespaces_airtable"] = namespaces_airtable
         super().__init__(airtable=airtable, items=repositories, **kwargs)
 
 
@@ -1008,22 +1006,17 @@ class StylesAirtable(Airtable):
     """
     Represents a collection of styles in Airtable.
     """
+
     ItemClass = Style
     ItemClassAirtable = StyleAirtable
 
-    def __init__(
-        self,
-        airtable: _Airtable,
-        styles: Styles,
-        namespaces_airtable: NamespacesAirtable,
-        **kwargs
-    ):
+    def __init__(self, airtable: _Airtable, styles: Styles, namespaces_airtable: NamespacesAirtable, **kwargs):
         """
         :param airtable: upstream Airtable SDK class instance
         :param styles: collection of Style items
         :param namespaces_airtable: collection of Airtable Namespace items for relating styles to namespaces
         """
-        kwargs['namespaces_airtable'] = namespaces_airtable
+        kwargs["namespaces_airtable"] = namespaces_airtable
         super().__init__(airtable=airtable, items=styles, **kwargs)
 
 
@@ -1031,6 +1024,7 @@ class LayersAirtable(Airtable):
     """
     Represents a collection of layers in Airtable.
     """
+
     ItemClass = Layer
     ItemClassAirtable = LayerAirtable
 
@@ -1041,7 +1035,7 @@ class LayersAirtable(Airtable):
         namespaces_airtable: NamespacesAirtable,
         repositories_airtable: RepositoriesAirtable,
         styles_airtable: StylesAirtable,
-        **kwargs
+        **kwargs,
     ):
         """
         :param airtable: upstream Airtable SDK class instance
@@ -1050,9 +1044,9 @@ class LayersAirtable(Airtable):
         :param repositories_airtable: collection of Airtable Repository items for relating layers to repositories
         :param styles_airtable: collection of Airtable Style items for relating layers to styles
         """
-        kwargs['namespaces_airtable'] = namespaces_airtable
-        kwargs['repositories_airtable'] = repositories_airtable
-        kwargs['styles_airtable'] = styles_airtable
+        kwargs["namespaces_airtable"] = namespaces_airtable
+        kwargs["repositories_airtable"] = repositories_airtable
+        kwargs["styles_airtable"] = styles_airtable
         super().__init__(airtable=airtable, items=layers, **kwargs)
 
 
@@ -1060,6 +1054,7 @@ class LayerGroupsAirtable(Airtable):
     """
     Represents a collection of layer groups in Airtable.
     """
+
     ItemClass = LayerGroup
     ItemClassAirtable = LayerGroupAirtable
 
@@ -1070,7 +1065,7 @@ class LayerGroupsAirtable(Airtable):
         namespaces_airtable: NamespacesAirtable,
         styles_airtable: StylesAirtable,
         layers_airtable: LayersAirtable,
-        **kwargs
+        **kwargs,
     ):
         """
         :param airtable: upstream Airtable SDK class instance
@@ -1079,7 +1074,7 @@ class LayerGroupsAirtable(Airtable):
         :param styles_airtable: collection of Airtable Style items for relating layer groups to styles
         :param layers_airtable: collection of Airtable Layer items for relating layer groups to layers
         """
-        kwargs['namespaces_airtable'] = namespaces_airtable
-        kwargs['styles_airtable'] = styles_airtable
-        kwargs['layers_airtable'] = layers_airtable
+        kwargs["namespaces_airtable"] = namespaces_airtable
+        kwargs["styles_airtable"] = styles_airtable
+        kwargs["layers_airtable"] = layers_airtable
         super().__init__(airtable=airtable, items=layer_groups, **kwargs)

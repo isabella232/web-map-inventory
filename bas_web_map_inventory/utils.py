@@ -8,6 +8,7 @@ from tempfile import NamedTemporaryFile
 from typing import List
 
 from importlib_resources import path as resource_path
+
 # Exempting Bandit security issue (Using lxml.etree.parse to parse untrusted XML data)
 #
 # see specific reasons below
@@ -19,13 +20,12 @@ class OGCProtocol(Enum):
     """
     Represents various OGC standards
     """
-    WMS = 'wms'
+
+    WMS = "wms"
 
 
 def validate_ogc_capabilities(
-    ogc_protocol: OGCProtocol,
-    capabilities_url: str,
-    multiple_errors: bool = False
+    ogc_protocol: OGCProtocol, capabilities_url: str, multiple_errors: bool = False
 ) -> List[str]:
     """
     Validates a given OGC GetCapabilities document/response
@@ -66,11 +66,11 @@ def validate_ogc_capabilities(
     :return: A list of validation errors, empty if the GetCapabilities is valid
     """
     if ogc_protocol == OGCProtocol.WMS:
-        schema_file = 'wms-1.3.0.xsd'
+        schema_file = "wms-1.3.0.xsd"
     else:
-        raise ValueError('Invalid or unsupported OGC protocol')
+        raise ValueError("Invalid or unsupported OGC protocol")
 
-    with resource_path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
+    with resource_path("bas_web_map_inventory.resources.xml_schemas", schema_file) as schema_file_path:
         schema = etree.parse(str(schema_file_path)).getroot()
     validator = etree.XMLSchema(schema)
 
@@ -92,7 +92,7 @@ def validate_ogc_capabilities(
             capabilities_instance_file.write(etree.tostring(capabilities_instance, pretty_print=True))
 
             try:
-                with resource_path('bas_web_map_inventory.resources.xml_schemas', schema_file) as schema_file_path:
+                with resource_path("bas_web_map_inventory.resources.xml_schemas", schema_file) as schema_file_path:
                     # Exempting Bandit security issue (subprocess call with shell=True identified)
                     #
                     # The file passed to this method is taken from the URL given, which will be for a data source we
@@ -101,7 +101,11 @@ def validate_ogc_capabilities(
                     # vulnerability.
                     subprocess.run(
                         [f"xmllint --noout --schema {str(schema_file_path)} {capabilities_instance_file.name}"],
-                        shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # nosec
+                        shell=True,
+                        check=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )  # nosec
 
                     # Return empty errors list
                     return list()
@@ -123,17 +127,17 @@ def _process_xmllint_errors(error: str, file_name: str) -> List[str]:
 
     :return: list of formatted errors
     """
-    error_lines = error.split('\n')
-    if error_lines[len(error_lines) - 1] != '':
-        raise RuntimeError('xmllint error - error output is not recognised (no trailing new line)')
+    error_lines = error.split("\n")
+    if error_lines[len(error_lines) - 1] != "":
+        raise RuntimeError("xmllint error - error output is not recognised (no trailing new line)")
     error_lines.pop()
     if error_lines[len(error_lines) - 1] != f"{file_name} fails to validate":
-        raise RuntimeError('xmllint error - error output is not recognised (no final validation status)')
+        raise RuntimeError("xmllint error - error output is not recognised (no final validation status)")
     error_lines.pop()
 
     # Strip temporary file name from errors as this confuses tests
     for i, error_line in enumerate(error_lines):
-        error_lines[i] = error_line.replace(file_name, 'line')
+        error_lines[i] = error_line.replace(file_name, "line")
 
     return error_lines
 
@@ -147,8 +151,8 @@ def build_base_data_source_endpoint(data_source: dict) -> str:
     :param data_source: data source information
     :return: fully qualified URL for data source
     """
-    protocol = 'http'
-    if data_source['port'] == '443':
-        protocol = 'https'
+    protocol = "http"
+    if data_source["port"] == "443":
+        protocol = "https"
 
     return f"{protocol}://{data_source['hostname']}:{data_source['port']}"

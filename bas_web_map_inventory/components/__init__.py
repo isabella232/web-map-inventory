@@ -6,66 +6,73 @@ class ServerType(Enum):
     """
     Represents the technology/product a server uses.
     """
-    GEOSERVER = 'geoserver'
+
+    GEOSERVER = "geoserver"
 
 
 class RepositoryType(Enum):
     """
     Represents the technology/product a repository uses.
     """
-    POSTGIS = 'postgis'
-    GEOTIFF = 'geotiff'
-    ECW = 'ecw'
-    JPEG2000 = 'jp2ecw'
-    IMAGEMOSAIC = 'imagemosaic'
-    WORLDIMAGE = 'worldimage'
+
+    POSTGIS = "postgis"
+    GEOTIFF = "geotiff"
+    ECW = "ecw"
+    JPEG2000 = "jp2ecw"
+    IMAGEMOSAIC = "imagemosaic"
+    WORLDIMAGE = "worldimage"
 
 
 class StyleType(Enum):
     """
     Represents the format a style is written in.
     """
-    SLD = 'sld'
+
+    SLD = "sld"
 
 
 class LayerType(Enum):
     """
     Represents a layer's fundamental data type (raster or vector).
     """
-    RASTER = 'raster'
-    VECTOR = 'vector'
+
+    RASTER = "raster"
+    VECTOR = "vector"
 
 
 class LayerGeometry(Enum):
     """
     Represents a (vector) layer's geometry.
     """
-    POINT = 'point'
-    LINESTRING = 'linestring'
-    POLYGON = 'polygon'
-    MULTIPOINT = 'multi-point'
-    MULTILINESTRING = 'multi-linestring'
-    MULTIPOLYGON = 'multi-polygon'
+
+    POINT = "point"
+    LINESTRING = "linestring"
+    POLYGON = "polygon"
+    MULTIPOINT = "multi-point"
+    MULTILINESTRING = "multi-linestring"
+    MULTIPOLYGON = "multi-polygon"
 
 
 class LayerService(Enum):
     """
     Represents which OGC services a layer can be accessed with.
     """
-    WMS = 'wms'
-    WMTS = 'wmts'
-    WCS = 'wcs'
-    WFS = 'wfs'
+
+    WMS = "wms"
+    WMTS = "wmts"
+    WCS = "wcs"
+    WFS = "wfs"
 
 
 class LayerGroupService(Enum):
     """
     Represents which OGC services a layer group can be accessed with.
     """
-    WMS = 'wms'
-    WMTS = 'wmts'
-    WCS = 'wcs'
-    WFS = 'wfs'
+
+    WMS = "wms"
+    WMTS = "wmts"
+    WCS = "wcs"
+    WFS = "wfs"
 
 
 class Server:
@@ -77,14 +84,8 @@ class Server:
 
     Servers MUST be globally unique.
     """
-    def __init__(
-        self,
-        server_id: str,
-        label: str,
-        hostname: str,
-        server_type: str,
-        version: str
-    ):
+
+    def __init__(self, server_id: str, label: str, hostname: str, server_type: str, version: str):
         """
         Server_id should be defined independently from the server they are based on (i.e. they should be assigned by
         this project to servers, rather than read from them, to prevent clashes and loss of integrity)
@@ -108,11 +109,11 @@ class Server:
         :return: a Server represented as a dictionary
         """
         _server = {
-            'id': self.id,
-            'label': self.label,
-            'hostname': self.hostname,
-            'type': self.type.value,
-            'version': self.version
+            "id": self.id,
+            "label": self.label,
+            "hostname": self.hostname,
+            "type": self.type.value,
+            "version": self.version,
         }
 
         return _server
@@ -144,14 +145,8 @@ class Namespace:
     Namespaces belong to, and MUST be unique within, a single server. Namespaces SHOULD be globally unique across all
     servers to avoid confusion.
     """
-    def __init__(
-        self,
-        namespace_id: str,
-        label: str,
-        title: str,
-        namespace: str,
-        server: Server = None
-    ):
+
+    def __init__(self, namespace_id: str, label: str, title: str, namespace: str, server: Server = None):
         """
         Namespace_id should be defined independently from the namespace they are based on (i.e. they should be assigned
         by this project to namespaces, rather than read from them, to prevent clashes and loss of integrity)
@@ -167,12 +162,10 @@ class Namespace:
         self.label = label
         self.title = title
         self.namespace = namespace
-        self.relationships = {
-            'servers': None
-        }
+        self.relationships = {"servers": None}
 
         if server is not None:
-            self.relationships['servers'] = server
+            self.relationships["servers"] = server
 
     def to_dict(self) -> Dict[str, Union[str, Dict[str, str]]]:
         """
@@ -181,13 +174,11 @@ class Namespace:
         :return: a Namespace represented as a dictionary
         """
         _namespace = {
-            'id': self.id,
-            'label': self.label,
-            'title': self.title,
-            'namespace': self.namespace,
-            'relationships': {
-                'servers': self.relationships['servers'].id
-            }
+            "id": self.id,
+            "label": self.label,
+            "title": self.title,
+            "namespace": self.namespace,
+            "relationships": {"servers": self.relationships["servers"].id},
         }
 
         return _namespace
@@ -210,6 +201,7 @@ class Repository:
 
     Repositories belong to, and MUST be unique within, a single namespace.
     """
+
     def __init__(
         self,
         repository_id: str,
@@ -219,7 +211,7 @@ class Repository:
         hostname: str = None,
         database: str = None,
         schema: str = None,
-        namespace: Namespace = None
+        namespace: Namespace = None,
     ):
         """
         Repository_id should be defined independently from the repository they are based on (i.e. they should be
@@ -262,12 +254,10 @@ class Repository:
         self.hostname = hostname
         self.database = database
         self.schema = schema
-        self.relationships = {
-            'namespaces': None
-        }
+        self.relationships = {"namespaces": None}
 
         if namespace is not None:
-            self.relationships['namespaces'] = namespace
+            self.relationships["namespaces"] = namespace
 
     def to_dict(self) -> Dict[str, Union[str, Dict[str, str]]]:
         """
@@ -276,16 +266,14 @@ class Repository:
         :return: a Repository represented as a dictionary
         """
         _repository = {
-            'id': self.id,
-            'label': self.label,
-            'title': self.title,
-            'type': self.type.value,
-            'hostname': self.hostname,
-            'database': self.database,
-            'schema': self.schema,
-            'relationships': {
-                'namespaces': self.relationships['namespaces'].id
-            }
+            "id": self.id,
+            "label": self.label,
+            "title": self.title,
+            "type": self.type.value,
+            "hostname": self.hostname,
+            "database": self.database,
+            "schema": self.schema,
+            "relationships": {"namespaces": self.relationships["namespaces"].id},
         }
 
         return _repository
@@ -306,14 +294,8 @@ class Style:
 
     Styles belong to a single namespace and can be general, applying to multiple layers, or specific to a single layer.
     """
-    def __init__(
-        self,
-        style_id: str,
-        label: str,
-        title: str,
-        style_type: str,
-        namespace: Namespace = None
-    ):
+
+    def __init__(self, style_id: str, label: str, title: str, style_type: str, namespace: Namespace = None):
         """
         Style_id should be defined independently from the style they are based on (i.e. they should be assigned by this
         project to styles, rather than read from them, to prevent clashes and loss of integrity)
@@ -328,12 +310,10 @@ class Style:
         self.label = label
         self.title = title
         self.type = StyleType(style_type)
-        self.relationships = {
-            'namespaces': None
-        }
+        self.relationships = {"namespaces": None}
 
         if namespace is not None:
-            self.relationships['namespaces'] = namespace
+            self.relationships["namespaces"] = namespace
 
     def to_dict(self) -> Dict[str, Union[str, Dict[str, str]]]:
         """
@@ -342,17 +322,15 @@ class Style:
         :return: a Repository represented as a dictionary
         """
         _style = {
-            'id': self.id,
-            'label': self.label,
-            'title': self.title,
-            'type': self.type.value,
-            'relationships': {
-                'namespaces': None
-            }
+            "id": self.id,
+            "label": self.label,
+            "title": self.title,
+            "type": self.type.value,
+            "relationships": {"namespaces": None},
         }
-        if self.relationships['namespaces'] is not None:
+        if self.relationships["namespaces"] is not None:
             # noinspection PyTypeChecker
-            _style['relationships']['namespaces'] = self.relationships['namespaces'].id
+            _style["relationships"]["namespaces"] = self.relationships["namespaces"].id
 
         return _style
 
@@ -380,6 +358,7 @@ class Layer:
     Layers belong to a single namespace, backed by a single data source (or part of a single data source) and
     represented by one or more styles.
     """
+
     def __init__(
         self,
         layer_id: str,
@@ -391,7 +370,7 @@ class Layer:
         table_view: str = None,
         namespace: Namespace = None,
         repository: Repository = None,
-        styles: List[Style] = None
+        styles: List[Style] = None,
     ):
         """
         Layer_id should be defined independently from the Layer they are based on (i.e. they should be assigned by this
@@ -436,11 +415,7 @@ class Layer:
         self.title = title
         self.type = LayerType(layer_type)
         self.services = []
-        self.relationships = {
-            'namespaces': None,
-            "repositories": None,
-            'styles': []
-        }
+        self.relationships = {"namespaces": None, "repositories": None, "styles": []}
 
         self.geometry_type = None
         if geometry_type is not None:
@@ -455,11 +430,11 @@ class Layer:
                 self.services.append(LayerService(service))
 
         if namespace is not None:
-            self.relationships['namespaces'] = namespace
+            self.relationships["namespaces"] = namespace
         if repository is not None:
-            self.relationships['repositories'] = repository
+            self.relationships["repositories"] = repository
         if styles is not None and isinstance(styles, list):
-            self.relationships['styles'] = styles
+            self.relationships["styles"] = styles
 
     def to_dict(self) -> Dict[str, Union[str, Dict[str, Union[str, List[str]]]]]:
         """
@@ -468,25 +443,25 @@ class Layer:
         :return: a Layer represented as a dictionary
         """
         _layer = {
-            'id': self.id,
-            'label': self.label,
-            'title': self.title,
-            'type': self.type.value,
-            'geometry': None,
-            'services': [],
-            'table_view': self.table_view,
-            'relationships': {
-                'namespaces': self.relationships['namespaces'].id,
-                'repositories': self.relationships['repositories'].id,
-                'styles': []
-            }
+            "id": self.id,
+            "label": self.label,
+            "title": self.title,
+            "type": self.type.value,
+            "geometry": None,
+            "services": [],
+            "table_view": self.table_view,
+            "relationships": {
+                "namespaces": self.relationships["namespaces"].id,
+                "repositories": self.relationships["repositories"].id,
+                "styles": [],
+            },
         }
         if self.geometry_type is not None:
-            _layer['geometry'] = self.geometry_type.value
+            _layer["geometry"] = self.geometry_type.value
         for service in self.services:
-            _layer['services'].append(service.value)
-        for style in self.relationships['styles']:
-            _layer['relationships']['styles'].append(style.id)
+            _layer["services"].append(service.value)
+        for style in self.relationships["styles"]:
+            _layer["relationships"]["styles"].append(style.id)
 
         return _layer
 
@@ -511,6 +486,7 @@ class LayerGroup:
 
     Layer groups belong to a single namespace, represented by one or more styles.
     """
+
     def __init__(
         self,
         layer_group_id: str,
@@ -520,7 +496,7 @@ class LayerGroup:
         services: List[str] = None,
         namespace: Namespace = None,
         layers: List[Layer] = None,
-        styles: List[Style] = None
+        styles: List[Style] = None,
     ):
         """
         Layer_group_id should be defined independently from the LayerGroup they are based on (i.e. they should be
@@ -542,11 +518,7 @@ class LayerGroup:
         self.label = label
         self.title = title
         self.services = []
-        self.relationships = {
-            'namespaces': None,
-            "layers": [],
-            "styles": []
-        }
+        self.relationships = {"namespaces": None, "layers": [], "styles": []}
 
         self.geometry_type = None
         if geometry_type is not None:
@@ -557,11 +529,11 @@ class LayerGroup:
                 self.services.append(LayerGroupService(service))
 
         if namespace is not None:
-            self.relationships['namespaces'] = namespace
+            self.relationships["namespaces"] = namespace
         if layers is not None and isinstance(layers, list):
-            self.relationships['layers'] = layers
+            self.relationships["layers"] = layers
         if styles is not None and isinstance(styles, list):
-            self.relationships['styles'] = styles
+            self.relationships["styles"] = styles
 
     def to_dict(self) -> Dict[str, Union[str, Dict[str, Union[str, List[str]]]]]:
         """
@@ -570,30 +542,26 @@ class LayerGroup:
         :return: a LayerGroup represented as a dictionary
         """
         _layer_group = {
-            'id': self.id,
-            'label': self.label,
-            'title': self.title,
-            'geometry': None,
-            'services': [],
-            'relationships': {
-                'namespaces': None,
-                'layers': [],
-                'styles': []
-            }
+            "id": self.id,
+            "label": self.label,
+            "title": self.title,
+            "geometry": None,
+            "services": [],
+            "relationships": {"namespaces": None, "layers": [], "styles": []},
         }
 
         if self.geometry_type is not None:
-            _layer_group['geometry'] = self.geometry_type.value
+            _layer_group["geometry"] = self.geometry_type.value
         for service in self.services:
-            _layer_group['services'].append(service.value)
+            _layer_group["services"].append(service.value)
 
-        if self.relationships['namespaces'] is not None:
+        if self.relationships["namespaces"] is not None:
             # noinspection PyTypeChecker
-            _layer_group['relationships']['namespaces'] = self.relationships['namespaces'].id
-        for layer in self.relationships['layers']:
-            _layer_group['relationships']['layers'].append(layer.id)
-        for style in self.relationships['styles']:
-            _layer_group['relationships']['styles'].append(style.id)
+            _layer_group["relationships"]["namespaces"] = self.relationships["namespaces"].id
+        for layer in self.relationships["layers"]:
+            _layer_group["relationships"]["layers"].append(layer.id)
+        for style in self.relationships["styles"]:
+            _layer_group["relationships"]["styles"].append(style.id)
 
         return _layer_group
 
@@ -608,6 +576,7 @@ class Servers(dict):
     """
     Represents a collection of Servers.
     """
+
     def __init__(self, *args, **kwargs):
         super(Servers, self).__init__(*args, **kwargs)
 
@@ -627,6 +596,7 @@ class Namespaces(dict):
     """
     Represents a collection of Namespaces.
     """
+
     def __init__(self, *args, **kwargs):
         super(Namespaces, self).__init__(*args, **kwargs)
 
@@ -661,6 +631,7 @@ class Repositories(dict):
     """
     Represents a collection of Repositories.
     """
+
     def __init__(self, *args, **kwargs):
         super(Repositories, self).__init__(*args, **kwargs)
 
@@ -695,6 +666,7 @@ class Styles(dict):
     """
     Represents a collection of Styles.
     """
+
     def __init__(self, *args, **kwargs):
         super(Styles, self).__init__(*args, **kwargs)
 
@@ -715,7 +687,7 @@ class Styles(dict):
                 if namespace_label is None:
                     return item
                 else:
-                    if item.relationships['namespaces'].label == namespace_label:
+                    if item.relationships["namespaces"].label == namespace_label:
                         return item
         return None
 
@@ -756,7 +728,7 @@ class Layers(dict):
                 if namespace_label is None:
                     return item
                 else:
-                    if item.relationships['namespaces'].label == namespace_label:
+                    if item.relationships["namespaces"].label == namespace_label:
                         return item
         return None
 

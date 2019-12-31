@@ -29,17 +29,18 @@ class GeoServer(Server):
     [3] https://pypi.org/project/geoserver-restconfig
     [4] https://pypi.org/project/OWSLib/
     """
+
     def __init__(
-            self,
-            server_id: str,
-            label: str,
-            hostname: str,
-            port: str,
-            api_path: str,
-            wms_path: str,
-            wfs_path: str,
-            username: str,
-            password: str
+        self,
+        server_id: str,
+        label: str,
+        hostname: str,
+        port: str,
+        api_path: str,
+        wms_path: str,
+        wfs_path: str,
+        username: str,
+        password: str,
     ):
         """
         :param server_id: unique identifier, typically a ULID (Universally Unique Lexicographically Sortable Identifier)
@@ -54,32 +55,18 @@ class GeoServer(Server):
         :param username: username for account to use for GeoServer API
         :param password: password for account to use for GeoServer API
         """
-        endpoint = build_base_data_source_endpoint(data_source={'hostname': hostname, 'port': port})
+        endpoint = build_base_data_source_endpoint(data_source={"hostname": hostname, "port": port})
 
-        self.client = Catalogue(
-            service_url=f"{endpoint}{api_path}",
-            username=username,
-            password=password
-        )
-        self.wms = WebMapService(
-            url=f"{endpoint}{wms_path}",
-            version='1.3.0',
-            username=username,
-            password=password
-        )
-        self.wfs = WebFeatureService(
-            url=f"{endpoint}{wfs_path}",
-            version='2.0.0',
-            username=username,
-            password=password
-        )
+        self.client = Catalogue(service_url=f"{endpoint}{api_path}", username=username, password=password)
+        self.wms = WebMapService(url=f"{endpoint}{wms_path}", version="1.3.0", username=username, password=password)
+        self.wfs = WebFeatureService(url=f"{endpoint}{wfs_path}", version="2.0.0", username=username, password=password)
 
         super().__init__(
             server_id=server_id,
             label=label,
             hostname=hostname,
             server_type=ServerType.GEOSERVER.value,
-            version=self._get_geoserver_version()
+            version=self._get_geoserver_version(),
         )
 
     def get_namespaces(self) -> List[str]:
@@ -108,11 +95,7 @@ class GeoServer(Server):
         if workspace is None:
             raise KeyError(f"Namespace [{namespace_reference}] not found in server [{self.label}]")
 
-        return {
-            'label': workspace.name,
-            'title': '-',
-            'namespace': '-'
-        }
+        return {"label": workspace.name, "title": "-", "namespace": "-"}
 
     def get_repositories(self) -> List[Tuple[str, str]]:
         """
@@ -145,17 +128,17 @@ class GeoServer(Server):
             raise KeyError(f"Repository [{repository_reference}] not found in server [{self.label}]")
 
         store = {
-            'label': _store.name,
-            'title': '-',
-            'repository_type': str(_store.type).lower(),
-            'namespace_label': _store.workspace.name
+            "label": _store.name,
+            "title": "-",
+            "repository_type": str(_store.type).lower(),
+            "namespace_label": _store.workspace.name,
         }
-        if hasattr(_store, 'description') and _store.description is not None:
-            store['title'] = _store.description
-        if store['repository_type'] == 'postgis':
-            store['hostname'] = _store.connection_parameters['host']
-            store['database'] = _store.connection_parameters['database']
-            store['schema'] = _store.connection_parameters['schema']
+        if hasattr(_store, "description") and _store.description is not None:
+            store["title"] = _store.description
+        if store["repository_type"] == "postgis":
+            store["hostname"] = _store.connection_parameters["host"]
+            store["database"] = _store.connection_parameters["database"]
+            store["schema"] = _store.connection_parameters["schema"]
         return store
 
     def get_styles(self) -> List[Tuple[str, Optional[str]]]:
@@ -191,16 +174,16 @@ class GeoServer(Server):
         _style = self.client.get_style(name=style_reference, workspace=namespace_reference)
 
         _type = str(_style.style_format).lower()
-        if _type == 'sld10':
-            _type = 'sld'
+        if _type == "sld10":
+            _type = "sld"
 
         style = {
-            'label': _style.name,
-            'title': '-',
-            'style_type': _type,
+            "label": _style.name,
+            "title": "-",
+            "style_type": _type,
         }
-        if hasattr(_style, 'workspace') and _style.workspace is not None:
-            style['namespace_label'] = _style.workspace
+        if hasattr(_style, "workspace") and _style.workspace is not None:
+            style["namespace_label"] = _style.workspace
 
         return style
 
@@ -217,8 +200,9 @@ class GeoServer(Server):
 
         return layers
 
-    def get_layer(self, layer_reference: str) -> Dict[
-            str, Union[Optional[str], List[str], List[Tuple[str, Optional[str]]]]]:
+    def get_layer(
+        self, layer_reference: str
+    ) -> Dict[str, Union[Optional[str], List[str], List[Tuple[str, Optional[str]]]]]:
         """
         Gets a specific layer as a Layer
 
@@ -230,31 +214,31 @@ class GeoServer(Server):
         _layer = self.client.get_layer(name=layer_reference)
 
         layer = {
-            'label': _layer.resource.name,
-            'title': _layer.resource.title,
-            'layer_type': str(_layer.type).lower(),
-            'geometry_type': None,
-            'services': [],
-            'table_view': None,
-            'namespace_label': _layer.resource.workspace.name,
-            'repository_label': _layer.resource.store.name,
-            'style_labels': [(_layer.default_style.name, _layer.default_style.workspace)]
+            "label": _layer.resource.name,
+            "title": _layer.resource.title,
+            "layer_type": str(_layer.type).lower(),
+            "geometry_type": None,
+            "services": [],
+            "table_view": None,
+            "namespace_label": _layer.resource.workspace.name,
+            "repository_label": _layer.resource.store.name,
+            "style_labels": [(_layer.default_style.name, _layer.default_style.workspace)],
         }
 
         if layer_reference in list(self.wms.contents):
             # noinspection PyTypeChecker
-            layer['services'].append(LayerService.WMS.value)
+            layer["services"].append(LayerService.WMS.value)
         if layer_reference in list(self.wfs.contents):
             # noinspection PyTypeChecker
-            layer['services'].append(LayerService.WFS.value)
+            layer["services"].append(LayerService.WFS.value)
             _properties = self.wfs.get_schema(layer_reference)
-            if _properties['geometry'].lower() == 'point':
-                layer['geometry_type'] = LayerGeometry.POINT.value
+            if _properties["geometry"].lower() == "point":
+                layer["geometry_type"] = LayerGeometry.POINT.value
             else:
                 raise ValueError(f"Geometry type: [{_properties['geometry']}] not mapped to LayerGeometry enum.")
 
-        if str(_layer.resource.store.type).lower() == 'postgis':
-            layer['table_view'] = _layer.resource.native_name
+        if str(_layer.resource.store.type).lower() == "postgis":
+            layer["table_view"] = _layer.resource.native_name
 
         return layer
 
@@ -274,8 +258,9 @@ class GeoServer(Server):
 
         return layer_groups
 
-    def get_layer_group(self, layer_group_reference: str, namespace_reference: str) -> Dict[
-            str, Union[Optional[str], List[str], List[Tuple[str, Optional[str]]]]]:
+    def get_layer_group(
+        self, layer_group_reference: str, namespace_reference: str
+    ) -> Dict[str, Union[Optional[str], List[str], List[Tuple[str, Optional[str]]]]]:
         """
         Gets a specific layer group as a LayerGroup
 
@@ -290,38 +275,38 @@ class GeoServer(Server):
         _layer_group = self.client.get_layergroup(name=layer_group_reference, workspace=namespace_reference)
 
         layer_group = {
-            'label': _layer_group.name,
-            'title': _layer_group.title,
+            "label": _layer_group.name,
+            "title": _layer_group.title,
             "services": [],
-            'namespace_label': _layer_group.workspace,
-            'layer_labels': [],
-            'style_labels': []
+            "namespace_label": _layer_group.workspace,
+            "layer_labels": [],
+            "style_labels": [],
         }
         for layer_label in _layer_group.layers:
-            layer_label = layer_label.split(':')
+            layer_label = layer_label.split(":")
             if len(layer_label) == 2:
-                layer_group['layer_labels'].append((layer_label[1], layer_label[0]))
+                layer_group["layer_labels"].append((layer_label[1], layer_label[0]))
             elif len(layer_label) == 1:
-                layer_group['layer_labels'].append((layer_label[0], None))
+                layer_group["layer_labels"].append((layer_label[0], None))
 
         if f"{namespace_reference}:{layer_group_reference}" in list(self.wms.contents):
             # noinspection PyTypeChecker
-            layer_group['services'].append(LayerService.WMS.value)
+            layer_group["services"].append(LayerService.WMS.value)
         if f"{namespace_reference}:{layer_group_reference}" in list(self.wfs.contents):
             # noinspection PyTypeChecker
-            layer_group['services'].append(LayerService.WFS.value)
+            layer_group["services"].append(LayerService.WFS.value)
             _properties = self.wfs.get_schema(f"{namespace_reference}:{layer_group_reference}")
-            if _properties['geometry'].lower() == 'point':
-                layer_group['geometry_type'] = LayerGeometry.POINT.value
+            if _properties["geometry"].lower() == "point":
+                layer_group["geometry_type"] = LayerGeometry.POINT.value
             else:
                 raise ValueError(f"Geometry type: [{_properties['geometry']}] not mapped to LayerGeometry enum.")
 
         for style_label in _layer_group.styles:
-            style_label = style_label.split(':')
+            style_label = style_label.split(":")
             if len(style_label) == 2:
-                layer_group['style_labels'].append((style_label[1], style_label[0]))
+                layer_group["style_labels"].append((style_label[1], style_label[0]))
             if len(style_label) == 1:
-                layer_group['style_labels'].append((style_label[0], None))
+                layer_group["style_labels"].append((style_label[0], None))
 
         return layer_group
 

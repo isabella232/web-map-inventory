@@ -20,41 +20,42 @@ class Config:
 
     See the project README for configuration option details.
     """
-    ENV = os.environ.get('FLASK_ENV')
+
+    ENV = os.environ.get("FLASK_ENV")
     DEBUG = False
     TESTING = False
 
-    NAME = 'bas-web-map-inventory'
+    NAME = "bas-web-map-inventory"
 
     LOGGING_LEVEL = logging.WARNING
 
     def __init__(self):
         load_dotenv()
 
-        self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get('APP_ENABLE_FILE_LOGGING')) or False
-        self.APP_ENABLE_SENTRY = str2bool(os.environ.get('APP_ENABLE_SENTRY')) or True
+        self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get("APP_ENABLE_FILE_LOGGING")) or False
+        self.APP_ENABLE_SENTRY = str2bool(os.environ.get("APP_ENABLE_SENTRY")) or True
 
-        self.LOG_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s'
-        self.LOG_FILE_PATH = Path(os.environ.get('LOG_FILE_PATH') or '/var/log/app/app.log')
+        self.LOG_FORMAT = "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s"
+        self.LOG_FILE_PATH = Path(os.environ.get("LOG_FILE_PATH") or "/var/log/app/app.log")
 
-        self.SENTRY_DSN = os.environ.get('SENTRY_DSN') or None
+        self.SENTRY_DSN = os.environ.get("SENTRY_DSN") or None
 
-        self.AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY')
-        self.AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID')
+        self.AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY")
+        self.AIRTABLE_BASE_ID = os.environ.get("AIRTABLE_BASE_ID")
 
     # noinspection PyPep8Naming
     @property
     def VERSION(self) -> str:
-        return os.environ.get('APP_RELEASE') or 'unknown'
+        return os.environ.get("APP_RELEASE") or "unknown"
 
     # noinspection PyPep8Naming
     @property
     def SENTRY_CONFIG(self) -> Dict:
         return {
-            'dsn': self.SENTRY_DSN,
-            'integrations': [FlaskIntegration()],
-            'environment': self.ENV,
-            'release': self.VERSION
+            "dsn": self.SENTRY_DSN,
+            "integrations": [FlaskIntegration()],
+            "environment": self.ENV,
+            "release": self.VERSION,
         }
 
 
@@ -64,9 +65,10 @@ class ProductionConfig(Config):  # pragma: no cover
 
     Note: This method is excluded from test coverage as its meaning would be undermined.
     """
+
     def __init__(self):
         super().__init__()
-        self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get('APP_ENABLE_FILE_LOGGING')) or True
+        self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get("APP_ENABLE_FILE_LOGGING")) or True
 
     # noinspection PyPep8Naming
     @property
@@ -80,10 +82,11 @@ class DevelopmentConfig(Config):  # pragma: no cover
 
     Note: This method is excluded from test coverage as its meaning would be undermined.
     """
+
     @property
     def SENTRY_CONFIG(self) -> Dict:
         _config = super().SENTRY_CONFIG
-        _config['server_name'] = 'Local container'
+        _config["server_name"] = "Local container"
 
         return _config
 
@@ -91,18 +94,19 @@ class DevelopmentConfig(Config):  # pragma: no cover
 
     def __init__(self):
         super().__init__()
-        self.APP_ENABLE_SENTRY = str2bool(os.environ.get('APP_ENABLE_SENTRY')) or False
+        self.APP_ENABLE_SENTRY = str2bool(os.environ.get("APP_ENABLE_SENTRY")) or False
 
     # noinspection PyPep8Naming
     @property
     def VERSION(self) -> str:
-        return 'N/A'
+        return "N/A"
 
 
 class TestingConfig(Config):
     """
     Flask configuration for Testing environments
     """
+
     DEBUG = True
     TESTING = True
 
@@ -116,4 +120,4 @@ class TestingConfig(Config):
     # noinspection PyPep8Naming
     @property
     def VERSION(self) -> str:
-        return 'N/A'
+        return "N/A"
