@@ -12,6 +12,14 @@ from str2bool import str2bool
 
 
 class Config:
+    """
+    Flask configuration base class
+
+    Includes a mixture of static and dynamic configuration options. Dynamic objects are typically set from environment
+    variables (set directly or through environment files).
+
+    See the project README for configuration option details.
+    """
     ENV = os.environ.get('FLASK_ENV')
     DEBUG = False
     TESTING = False
@@ -51,6 +59,11 @@ class Config:
 
 
 class ProductionConfig(Config):  # pragma: no cover
+    """
+    Flask configuration for Production environments
+
+    Note: This method is excluded from test coverage as its meaning would be undermined.
+    """
     def __init__(self):
         super().__init__()
         self.APP_ENABLE_FILE_LOGGING = str2bool(os.environ.get('APP_ENABLE_FILE_LOGGING')) or True
@@ -62,6 +75,11 @@ class ProductionConfig(Config):  # pragma: no cover
 
 
 class DevelopmentConfig(Config):  # pragma: no cover
+    """
+    Flask configuration for (local) Development environments
+
+    Note: This method is excluded from test coverage as its meaning would be undermined.
+    """
     @property
     def SENTRY_CONFIG(self) -> Dict:
         _config = super().SENTRY_CONFIG
@@ -82,6 +100,9 @@ class DevelopmentConfig(Config):  # pragma: no cover
 
 
 class TestingConfig(Config):
+    """
+    Flask configuration for Testing environments
+    """
     DEBUG = True
     TESTING = True
 

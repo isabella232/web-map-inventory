@@ -31,6 +31,10 @@ class Airtable:
     ItemClassAirtable = None
 
     def __init__(self, airtable: _Airtable, items, **kwargs):
+        """
+        :param airtable: upstream Airtable SDK class instance
+        :param items: collection of items (layers, repositories, etc.)
+        """
         self.airtable = airtable
         self.kwargs = kwargs
 
@@ -51,6 +55,17 @@ class Airtable:
         self.stat()
 
     def stat(self) -> None:
+        """
+        Calculates the state of a set of local items compared to items stored in an Airtable table
+
+        Items can be in one of four states:
+        1. missing - item exists locally but not in Airtable
+        2. current - item exists both locally and in Airtable and are both the same
+        3. outdated -  item exists both locally and in Airtable but the local version is different to Airtble
+        4. orphaned - item does not exist locally but does in Airtable
+
+        The identifier of each item (e.g. layer identifier) is added to a list per state.
+        """
         self.items_airtable = {}
 
         self.missing = []
@@ -64,7 +79,7 @@ class Airtable:
                 item = self.ItemClassAirtable(item=airtable_item, **self.kwargs)
                 self.items_airtable[item.id] = item
 
-                # try to add Airtable ID to corresponding local item
+                # try to add Airtable ID to corresponding local item, if missing assume item is orphaned
                 self.items_local[item.id].airtable_id = item.airtable_id
                 self.airtable_ids_to_ids[item.airtable_id] = item.id
             except KeyError:
@@ -83,13 +98,30 @@ class Airtable:
                 continue
 
     def get_by_id(self, item_id: str):
+        """
+        Gets a local item by its identifier
+
+        :param item_id: identifier for a local item
+
+        :return: local item with identifier
+        """
         return self.items_local[item_id]
 
     def get_by_airtable_id(self, item_airtable_id: str):
+        """
+        Gets an local item by its corresponding Airtable (i.e. foreign) identifier
+
+        :param item_airtable_id: Airtable native identifier for a local item
+
+        :return: local item with corresponding Airtable native identifier
+        """
         return self.items_local[self.airtable_ids_to_ids[item_airtable_id]]
 
     def load(self) -> None:
         """
+        Import any missing local items into Airtable
+
+        The Airtable SDK's batch insert method is used to automatically comply with Airtable's rate limiting.
         """
         _items = []
         for missing_id in self.missing:
@@ -98,6 +130,11 @@ class Airtable:
 
     def sync(self) -> None:
         """
+        Updates Airtable items that are outdated (i.e. properties of local items have changed) or orphaned (i.e. local
+        items that no longer exist)
+
+        The Airtable SDK's batch delete method is used for orphaned items to automatically comply with Airtable's rate
+        limiting.
         """
         self.load()
 
@@ -112,6 +149,12 @@ class Airtable:
 
     def reset(self) -> None:
         """
+        Removes all Airtable items
+
+        This method is largely intended for testing purposes.
+
+        The Airtable SDK's batch delete method is used for orphaned items to automatically comply with Airtable's rate
+        limiting.
         """
         _ids = []
         for item in self.items_airtable.values():
@@ -119,6 +162,13 @@ class Airtable:
         self.airtable.batch_delete(record_ids=_ids)
 
     def status(self) -> Dict[str, List[str]]:
+        """
+        Outputs the state of a set of local items compared to items stored in an Airtable table
+
+        Item identifiers are organised by state (see the stat() method for possible states).
+
+        :return: identifiers of items organised by state
+        """
         self.stat()
 
         return {
@@ -140,7 +190,6 @@ class RepositoryTypeAirtable(Enum):
     """
     Represents the technology/product a repository uses in Airtable.
     """
-
     POSTGIS = 'PostGIS'
     GEOTIFF = 'GeoTiff'
     ECW = 'ECW'
@@ -202,9 +251,11 @@ class ServerAirtable:
 
     See 'Airtable' class for general information.
     """
-
     # noinspection PyUnusedLocal
     def __init__(self, item: Union[Server, dict], **kwargs):
+        """
+        :param item: a (local) Server object or a (remote) Airtable representation of a Server object
+        """
         self.airtable_id = None
         self.id = None
         self.name = None
@@ -228,7 +279,14 @@ class ServerAirtable:
         else:
             raise TypeError("Item must be a dict or Server object")
 
-    def airtable_fields(self) -> dict:
+    def airtable_fields(self) -> Dict[str, str]:
+        """
+        Translates a Server's properties to Airtable fields
+
+        This includes mapping property names to Airtable versions (e.g. 'id' to 'ID').
+
+        :return: a Server as Airtable fields
+        """
         return {
             'ID': self.id,
             'Name': self.name,
@@ -237,7 +295,17 @@ class ServerAirtable:
             'Version': self.version
         }
 
-    def _dict(self) -> dict:
+    def _dict(self) -> Dict[str, str]:
+        """
+        Outputs an item's internal properties as a dictionary
+
+        Internal properties are properties that relate directly to the resource, rather than properties assigned to
+        the resource by external entities (such as an Airtable ID).
+
+        This method is intended to prevent false positives when checking if an item has changed and needs updating.
+
+        :return: a Server's internal properties
+        """
         return {
             'id': self.id,
             'name': self.name,
@@ -246,10 +314,20 @@ class ServerAirtable:
             'version': self.version
         }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of an Airtable Server
+        """
         return f"Server(Airtable) <id={self.id}, airtable_id={self.airtable_id}, name={self.name}, type={self.type}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """
+        Used to determine if an item is materially different to another (in terms of properties specific to the resource
+        rather than metadata). Typically used to determine if an item needs to be updated when comparing a local item
+        against an Airtable counterpart.
+
+        :return: Whether an Airtable Server is effectively equal to another
+        """
         # noinspection PyProtectedMember
         return self._dict() == other._dict()
 
@@ -261,6 +339,9 @@ class NamespaceAirtable:
     See 'Airtable' class for general information.
     """
     def __init__(self, item: Union[Namespace, dict], **kwargs):
+        """
+        :param item: a (local) Namespace object or a (remote) Airtable representation of a Namespace object
+        """
         self.airtable_id = None
         self.id = None
         self.name = None
@@ -289,7 +370,15 @@ class NamespaceAirtable:
         else:
             raise TypeError("Item must be a dict or Namespace object")
 
-    def airtable_fields(self) -> dict:
+    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Translates a Namespace's properties to Airtable fields
+
+        This includes mapping property names to Airtable versions (e.g. 'id' to 'ID') and related objects linked by
+        Airtable identifiers.
+
+        :return: a Namespace as Airtable fields
+        """
         return {
             'ID': self.id,
             'Name': self.name,
@@ -297,7 +386,17 @@ class NamespaceAirtable:
             'Server': [self.server.airtable_id]
         }
 
-    def _dict(self) -> dict:
+    def _dict(self) -> Dict[str, str]:
+        """
+        Outputs an item's internal properties as a dictionary
+
+        Internal properties are properties that relate directly to the resource, rather than properties assigned to
+        the resource by external entities (such as an Airtable ID).
+
+        This method is intended to prevent false positives when checking if an item has changed and needs updating.
+
+        :return: a Namespace's internal properties
+        """
         return {
             'id': self.id,
             'name': self.name,
@@ -305,10 +404,20 @@ class NamespaceAirtable:
             'server': self.server
         }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of an Airtable Namespace
+        """
         return f"Namespace(Airtable) <id={self.id}, airtable_id={self.airtable_id}, name={self.name}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """
+        Used to determine if an item is materially different to another (in terms of properties specific to the resource
+        rather than metadata). Typically used to determine if an item needs to be updated when comparing a local item
+        against an Airtable counterpart.
+
+        :return: Whether an Airtable Namespace is effectively equal to another
+        """
         # noinspection PyProtectedMember
         return self._dict() == other._dict()
 
@@ -319,8 +428,10 @@ class RepositoryAirtable:
 
     See 'Airtable' class for general information.
     """
-
     def __init__(self, item: Union[Repository, dict], **kwargs):
+        """
+        :param item: a (local) Repository object or a (remote) Airtable representation of a Repository object
+        """
         self.airtable_id = None
         self.id = None
         self.name = None
@@ -365,7 +476,15 @@ class RepositoryAirtable:
         else:
             raise TypeError("Item must be a dict or Repository object")
 
-    def airtable_fields(self) -> dict:
+    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Translates a Repositories properties to Airtable fields
+
+        This includes mapping property names to Airtable versions (e.g. 'id' to 'ID') and related objects linked by
+        Airtable identifiers.
+
+        :return: a Repository as Airtable fields
+        """
         return {
             'ID': self.id,
             'Name': self.name,
@@ -377,7 +496,17 @@ class RepositoryAirtable:
             'Workspace': [self.workspace.airtable_id]
         }
 
-    def _dict(self) -> dict:
+    def _dict(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Outputs an item's internal properties as a dictionary
+
+        Internal properties are properties that relate directly to the resource, rather than properties assigned to
+        the resource by external entities (such as an Airtable ID).
+
+        This method is intended to prevent false positives when checking if an item has changed and needs updating.
+
+        :return: a Repositories internal properties
+        """
         return {
             'id': self.id,
             'name': self.name,
@@ -389,10 +518,20 @@ class RepositoryAirtable:
             'workspace': [self.workspace.airtable_id]
         }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of an Airtable Repository
+        """
         return f"Repository(Airtable) <id={self.id}, airtable_id={self.airtable_id}, name={self.name}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """
+        Used to determine if an item is materially different to another (in terms of properties specific to the resource
+        rather than metadata). Typically used to determine if an item needs to be updated when comparing a local item
+        against an Airtable counterpart.
+
+        :return: Whether an Airtable Repository is effectively equal to another
+        """
         # noinspection PyProtectedMember
         return self._dict() == other._dict()
 
@@ -403,8 +542,10 @@ class StyleAirtable:
 
     See 'Airtable' class for general information.
     """
-
     def __init__(self, item: Union[Style, dict], **kwargs):
+        """
+        :param item: a (local) Style object or a (remote) Airtable representation of a Style object
+        """
         self.airtable_id = None
         self.id = None
         self.name = None
@@ -437,7 +578,15 @@ class StyleAirtable:
         else:
             raise TypeError("Item must be a dict or Style object")
 
-    def airtable_fields(self) -> dict:
+    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Translates a Style's properties to Airtable fields
+
+        This includes mapping property names to Airtable versions (e.g. 'id' to 'ID') and related objects linked by
+        Airtable identifiers.
+
+        :return: a Style as Airtable fields
+        """
         _fields = {
             'ID': self.id,
             'Name': self.name,
@@ -449,7 +598,17 @@ class StyleAirtable:
 
         return _fields
 
-    def _dict(self) -> dict:
+    def _dict(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Outputs an item's internal properties as a dictionary
+
+        Internal properties are properties that relate directly to the resource, rather than properties assigned to
+        the resource by external entities (such as an Airtable ID).
+
+        This method is intended to prevent false positives when checking if an item has changed and needs updating.
+
+        :return: a Style's internal properties
+        """
         _dict = {
             'id': self.id,
             'name': self.name,
@@ -461,10 +620,20 @@ class StyleAirtable:
 
         return _dict
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of an Airtable Style
+        """
         return f"Style(Airtable) <id={self.id}, airtable_id={self.airtable_id}, name={self.name}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """
+        Used to determine if an item is materially different to another (in terms of properties specific to the resource
+        rather than metadata). Typically used to determine if an item needs to be updated when comparing a local item
+        against an Airtable counterpart.
+
+        :return: Whether an Airtable Style is effectively equal to another
+        """
         # noinspection PyProtectedMember
         return self._dict() == other._dict()
 
@@ -475,8 +644,10 @@ class LayerAirtable:
 
     See 'Airtable' class for general information.
     """
-
     def __init__(self, item: Union[Layer, dict], **kwargs):
+        """
+        :param item: a (local) Layer object or a (remote) Airtable representation of a Layer object
+        """
         self.airtable_id = None
         self.id = None
         self.name = None
@@ -545,7 +716,15 @@ class LayerAirtable:
         else:
             raise TypeError("Item must be a dict or Layer object")
 
-    def airtable_fields(self) -> dict:
+    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Translates a Layer's properties to Airtable fields
+
+        This includes mapping property names to Airtable versions (e.g. 'id' to 'ID') and related objects linked by
+        Airtable identifiers.
+
+        :return: a Layer as Airtable fields
+        """
         _services = []
         for service in self.services:
             _services.append(service.value)
@@ -569,7 +748,17 @@ class LayerAirtable:
 
         return _fields
 
-    def _dict(self) -> dict:
+    def _dict(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Outputs an item's internal properties as a dictionary
+
+        Internal properties are properties that relate directly to the resource, rather than properties assigned to
+        the resource by external entities (such as an Airtable ID).
+
+        This method is intended to prevent false positives when checking if an item has changed and needs updating.
+
+        :return: a Layer's internal properties
+        """
         _services = []
         for service in self.services:
             _services.append(service.value)
@@ -593,10 +782,20 @@ class LayerAirtable:
 
         return _dict
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of an Airtable Layer
+        """
         return f"Layer(Airtable) <id={self.id}, airtable_id={self.airtable_id}, name={self.name}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """
+        Used to determine if an item is materially different to another (in terms of properties specific to the resource
+        rather than metadata). Typically used to determine if an item needs to be updated when comparing a local item
+        against an Airtable counterpart.
+
+        :return: Whether an Airtable Layer is effectively equal to another
+        """
         # noinspection PyProtectedMember
         return self._dict() == other._dict()
 
@@ -607,8 +806,10 @@ class LayerGroupAirtable:
 
     See 'Airtable' class for general information.
     """
-
     def __init__(self, item: Union[LayerGroup, dict], **kwargs):
+        """
+        :param item: a (local) LayerGroup object or a (remote) Airtable representation of a LayerGroup object
+        """
         self.airtable_id = None
         self.id = None
         self.name = None
@@ -666,7 +867,15 @@ class LayerGroupAirtable:
         else:
             raise TypeError("Item must be a dict or LayerGroup object")
 
-    def airtable_fields(self) -> dict:
+    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Translates a LayerGroup's properties to Airtable fields
+
+        This includes mapping property names to Airtable versions (e.g. 'id' to 'ID') and related objects linked by
+        Airtable identifiers.
+
+        :return: a LayerGroup as Airtable fields
+        """
         _services = []
         for service in self.services:
             _services.append(service.value)
@@ -686,7 +895,17 @@ class LayerGroupAirtable:
             'Styles': _styles
         }
 
-    def _dict(self) -> dict:
+    def _dict(self) -> Dict[str, Union[str, List[str]]]:
+        """
+        Outputs an item's internal properties as a dictionary
+
+        Internal properties are properties that relate directly to the resource, rather than properties assigned to
+        the resource by external entities (such as an Airtable ID).
+
+        This method is intended to prevent false positives when checking if an item has changed and needs updating.
+
+        :return: a LayerGroup's internal properties
+        """
         _services = []
         for service in self.services:
             _services.append(service.value)
@@ -706,10 +925,20 @@ class LayerGroupAirtable:
             'styles': _styles
         }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of an Airtable LayerGroup
+        """
         return f"LayerGroup(Airtable) <id={self.id}, airtable_id={self.airtable_id}, name={self.name}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """
+        Used to determine if an item is materially different to another (in terms of properties specific to the resource
+        rather than metadata). Typically used to determine if an item needs to be updated when comparing a local item
+        against an Airtable counterpart.
+
+        :return: Whether an Airtable LayerGroup is effectively equal to another
+        """
         # noinspection PyProtectedMember
         return self._dict() == other._dict()
 
@@ -722,6 +951,10 @@ class ServersAirtable(Airtable):
     ItemClassAirtable = ServerAirtable
 
     def __init__(self, airtable: _Airtable, servers: Servers, **kwargs):
+        """
+        :param airtable: upstream Airtable SDK class instance
+        :param servers: collection of Server items
+        """
         super().__init__(airtable=airtable, items=servers, **kwargs)
 
 
@@ -739,6 +972,11 @@ class NamespacesAirtable(Airtable):
         servers_airtable: ServersAirtable,
         **kwargs
     ):
+        """
+        :param airtable: upstream Airtable SDK class instance
+        :param servers: collection of Namespace items
+        :param servers_airtable: collection of Airtable Server items for relating namespaces to servers
+        """
         kwargs['servers_airtable'] = servers_airtable
         super().__init__(airtable=airtable, items=namespaces, **kwargs)
 
@@ -757,6 +995,11 @@ class RepositoriesAirtable(Airtable):
         namespaces_airtable: NamespacesAirtable,
         **kwargs
     ):
+        """
+        :param airtable: upstream Airtable SDK class instance
+        :param repositories: collection of Repository items
+        :param namespaces_airtable: collection of Airtable Namespace items for relating repositories to namespaces
+        """
         kwargs['namespaces_airtable'] = namespaces_airtable
         super().__init__(airtable=airtable, items=repositories, **kwargs)
 
@@ -775,6 +1018,11 @@ class StylesAirtable(Airtable):
         namespaces_airtable: NamespacesAirtable,
         **kwargs
     ):
+        """
+        :param airtable: upstream Airtable SDK class instance
+        :param styles: collection of Style items
+        :param namespaces_airtable: collection of Airtable Namespace items for relating styles to namespaces
+        """
         kwargs['namespaces_airtable'] = namespaces_airtable
         super().__init__(airtable=airtable, items=styles, **kwargs)
 
@@ -795,6 +1043,13 @@ class LayersAirtable(Airtable):
         styles_airtable: StylesAirtable,
         **kwargs
     ):
+        """
+        :param airtable: upstream Airtable SDK class instance
+        :param repositories: collection of Layer items
+        :param namespaces_airtable: collection of Airtable Namespace items for relating layers to namespaces
+        :param repositories_airtable: collection of Airtable Repository items for relating layers to repositories
+        :param styles_airtable: collection of Airtable Style items for relating layers to styles
+        """
         kwargs['namespaces_airtable'] = namespaces_airtable
         kwargs['repositories_airtable'] = repositories_airtable
         kwargs['styles_airtable'] = styles_airtable
@@ -817,6 +1072,13 @@ class LayerGroupsAirtable(Airtable):
         layers_airtable: LayersAirtable,
         **kwargs
     ):
+        """
+        :param airtable: upstream Airtable SDK class instance
+        :param repositories: collection of LayerGroup items
+        :param namespaces_airtable: collection of Airtable Namespace items for relating layer groups to namespaces
+        :param styles_airtable: collection of Airtable Style items for relating layer groups to styles
+        :param layers_airtable: collection of Airtable Layer items for relating layer groups to layers
+        """
         kwargs['namespaces_airtable'] = namespaces_airtable
         kwargs['styles_airtable'] = styles_airtable
         kwargs['layers_airtable'] = layers_airtable

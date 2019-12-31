@@ -59,15 +59,11 @@ def validate_ogc_capabilities(
 
     :param ogc_protocol: The OGC protocol to validate the Get Capabilities document against, specified as a member from
     an enumeration of supported protocols
-    :type ogc_protocol: OGCProtocol
     :param capabilities_url: Path to Get Capabilities document/response, can be any form supported by lxml including a
     file or HTTP endpoint
-    :type capabilities_url: str
     :param multiple_errors: Whether to fail at the first validation error encountered or return all errors at once
-    :type multiple_errors: bool
 
     :return: A list of validation errors, empty if the GetCapabilities is valid
-    :rtype list
     """
     if ogc_protocol == OGCProtocol.WMS:
         schema_file = 'wms-1.3.0.xsd'
@@ -114,6 +110,19 @@ def validate_ogc_capabilities(
 
 
 def _process_xmllint_errors(error: str, file_name: str) -> List[str]:
+    """
+    Processes errors returned by `xmllint` CLI tool
+
+    Error output is broken down into individual errors, with blank and summary lines removed.
+    Individual errors are formatted to remove potentially inconsistent output, such as file names.
+
+    This is a standalone method to aid in mocking during testing.
+
+    :param error: raw output from xmllint tool
+    :param file_name: name of the file passed to xmllint
+
+    :return: list of formatted errors
+    """
     error_lines = error.split('\n')
     if error_lines[len(error_lines) - 1] != '':
         raise RuntimeError('xmllint error - error output is not recognised (no trailing new line)')
@@ -130,6 +139,14 @@ def _process_xmllint_errors(error: str, file_name: str) -> List[str]:
 
 
 def build_base_data_source_endpoint(data_source: dict) -> str:
+    """
+    Shared method to construct a base URL for a data source
+
+    If a HTTPS is used set the protocol is set to HTTPS.
+
+    :param data_source: data source information
+    :return: fully qualified URL for data source
+    """
     protocol = 'http'
     if data_source['port'] == '443':
         protocol = 'https'

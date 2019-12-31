@@ -16,10 +16,29 @@ from bas_web_map_inventory.cli import fetch as data_fetch_cmd, validate as data_
 
 
 def _create_app_config() -> Dict[str, Any]:
+    """
+    Creates an object to use as a Flask app's configuration
+
+    Creates an instance of a class defined in config.py specific to the application environment (e.g. production).
+
+    This is a standalone class to aid in mocking during testing.
+
+    :return: object for a Flask app's configuration
+    """
     return import_string(f"bas_web_map_inventory.config.{str(os.environ['FLASK_ENV']).capitalize()}Config")()
 
 
-def create_app():
+def create_app() -> Flask:
+    """
+    Flask app factory
+
+    Creates an instance of a Flask application. Flask configuration options are used to enable various optional features
+    (such as logging to a file).
+
+    This method is used to load routes, CLI commands and blueprints that make up the Flask application.
+
+    :return: Flask application instance
+    """
     app = Flask(__name__)
 
     app.config.from_object(_create_app_config())

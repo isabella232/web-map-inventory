@@ -18,14 +18,22 @@ from airtable import Airtable as _Airtable
 from bas_web_map_inventory.components import Server, Servers, Namespaces, Namespace, Repositories, Repository, Styles, \
     Style, Layers, Layer, LayerGroup, LayerGroups
 from bas_web_map_inventory.components.geoserver import GeoServer
-from bas_web_map_inventory.components.airtable import ServersAirtable, NamespacesAirtable, RepositoriesAirtable, \
-    StylesAirtable, LayersAirtable, LayerGroupsAirtable
+from bas_web_map_inventory.components.airtable import Airtable, ServersAirtable, NamespacesAirtable, \
+    RepositoriesAirtable, StylesAirtable, LayersAirtable, LayerGroupsAirtable
 from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities, build_base_data_source_endpoint
 
 
 # Utils
 
 def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[str, str]]:
+    """
+    Shared method for loading and validating data sources from a configuration file
+
+    See the project README and referenced JSON Schema for how data sources should be defined.
+
+    :param data_sources_file_path: file path to a data sources file
+    :return: list of data source dictionaries
+    """
     echo(f"Loading sources from {click_style(str(data_sources_file_path), fg='blue')}")
     with open(Path(data_sources_file_path), 'r') as data_sources_file:
         data_sources_data = data_sources_file.read()
@@ -44,6 +52,15 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
 
 
 def _load_data(data_file_path: Path) -> None:
+    """
+    Shared method for loading and validating data from a configuration file
+
+    This data consists of components (layers, repositories, etc.) previously fetched from data sources. See the project
+    README and referenced JSON Schema for how data items should be defined [#20].
+
+    :param data_file_path:
+    :return:
+    """
     app.logger.info('Loading data...')
 
     with open(Path(data_file_path), 'r') as data_file:
@@ -151,7 +168,21 @@ def _load_data(data_file_path: Path) -> None:
     }
 
 
-def _setup_airtable(config: dict) -> dict:  # pragma: no cover
+def _setup_airtable(config: dict) -> Dict[str, Airtable]:  # pragma: no cover
+    """
+    Creates a series of Airtable SDK and Airtable Component collection instances for each component and corresponding
+    table in a Airtable workspace
+
+    The Airtable SDK does not yet support connecting to multiple tables within a single workspace [1].
+
+    Note: This method is excluded from test coverage as its contents cannot feasibly mocked, instead method itself is
+    mocked where needed.
+
+    [1] https://github.com/gtalarico/airtable-python-wrapper/issues/39
+
+    :param config: Flask configuration object containing items needed to create Airtable Component collection instances
+    :return: Airtable Component collection instances
+    """
     _servers_airtable = _Airtable(
         base_key=config['AIRTABLE_BASE_ID'],
         api_key=config['AIRTABLE_API_KEY'],
@@ -231,7 +262,13 @@ def _setup_airtable(config: dict) -> dict:  # pragma: no cover
     }
 
 
-def _process_component_airtable_status(global_status: Dict[str, int], component_type: str):
+def _process_component_airtable_status(global_status: Dict[str, int], component_type: str) -> None:
+    """
+    Shared method to present detailed and summary sync status information for a component
+
+    :param global_status: dictionary of sync states to add a components status totals to compile overall status totals
+    :param component_type: name of the current component being reported
+    """
     echo(f"Getting status for {click_style(component_type.capitalize(), fg='cyan')}:")
     _status = app.config['airtable'][component_type].status()
     global_status['current'] += len(_status['current'])
@@ -245,7 +282,15 @@ def _process_component_airtable_status(global_status: Dict[str, int], component_
     echo(_status)
 
 
-def _make_geoserver_server(server_config: Dict[str, str]):
+def _make_geoserver_server(server_config: Dict[str, str]) -> GeoServer:
+    """
+    Create a GeoServer Server class instance from a data source configuration object
+
+    This is a standalone class to aid in mocking during testing.
+
+    :param server_config: data source configuration object
+    :return: GeoServer Server instance
+    """
     return GeoServer(
         server_id=server_config['id'],
         label=server_config['label'],

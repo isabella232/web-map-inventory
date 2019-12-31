@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 
 class ServerType(Enum):
@@ -77,7 +77,6 @@ class Server:
 
     Servers MUST be globally unique.
     """
-
     def __init__(
         self,
         server_id: str,
@@ -86,13 +85,28 @@ class Server:
         server_type: str,
         version: str
     ):
+        """
+        Server_id should be defined independently from the server they are based on (i.e. they should be assigned by
+        this project to servers, rather than read from them, to prevent clashes and loss of integrity)
+
+        :param server_id: unique identifier, typically a ULID (Universally Unique Lexicographically Sortable Identifier)
+        :param label: a human readable, well-known, identifier for the server - typically based on the hostname
+        :param hostname: servers fully qualified hostname
+        :param server_type: a servers implementation, specified as a member of the ServerType enumeration
+        :param version: the version of the server's implementation
+        """
         self.id = server_id
         self.label = label
         self.hostname = hostname
         self.type = ServerType(server_type)
         self.version = version
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Represents a Server as a dictionary
+
+        :return: a Server represented as a dictionary
+        """
         _server = {
             'id': self.id,
             'label': self.label,
@@ -103,7 +117,10 @@ class Server:
 
         return _server
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of a Server
+        """
         return f"Server <id={self.id}, label={self.label}, type={self.type}>"
 
 
@@ -127,7 +144,6 @@ class Namespace:
     Namespaces belong to, and MUST be unique within, a single server. Namespaces SHOULD be globally unique across all
     servers to avoid confusion.
     """
-
     def __init__(
         self,
         namespace_id: str,
@@ -136,6 +152,17 @@ class Namespace:
         namespace: str,
         server: Server = None
     ):
+        """
+        Namespace_id should be defined independently from the namespace they are based on (i.e. they should be assigned
+        by this project to namespaces, rather than read from them, to prevent clashes and loss of integrity)
+
+        :param namespace_id: unique identifier, typically a ULID (Universally Unique Lexicographically Sortable
+        Identifier)
+        :param label: a human readable, well-known, identifier for the namespace
+        :param title: a descriptive, formal, name for the namespace
+        :param namespace: a globally unique URI for the namespace
+        :param server: the identifier of a Server (server_id) the namespace is defined within
+        """
         self.id = namespace_id
         self.label = label
         self.title = title
@@ -147,7 +174,12 @@ class Namespace:
         if server is not None:
             self.relationships['servers'] = server
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Union[str, Dict[str, str]]]:
+        """
+        Represents a Namespace as a dictionary
+
+        :return: a Namespace represented as a dictionary
+        """
         _namespace = {
             'id': self.id,
             'label': self.label,
@@ -160,7 +192,10 @@ class Namespace:
 
         return _namespace
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of a Namespace
+        """
         return f"Namespace <id={self.id}, label={self.label}, server={self.relationships['servers'].id}>"
 
 
@@ -175,7 +210,6 @@ class Repository:
 
     Repositories belong to, and MUST be unique within, a single namespace.
     """
-
     def __init__(
         self,
         repository_id: str,
@@ -187,6 +221,40 @@ class Repository:
         schema: str = None,
         namespace: Namespace = None
     ):
+        """
+        Repository_id should be defined independently from the repository they are based on (i.e. they should be
+        assigned by this project to repositories, rather than read from them, to prevent clashes and loss of integrity)
+
+        Repositories consist of a range of core and optional properties, depending on the technology that underpins it.
+        For example data in a PostgreSQL/PostGIS repository sits within a schema of a database, itself within an
+        instance (server). The properties, schema, database, server (hostname) are not used for other types of
+        repository such as a GeoTiff image.
+
+        Core properties are:
+        * repository_id
+        * label
+        * title
+        * repository_type
+        * namespace (relation)
+
+        Optional properties are:
+        * hostname
+        * database
+        * schema
+
+        Note: This class requires all properties to be defined (using None for unknown or not-applicable values).
+        In future, only core properties will be required, with any relevant optional properties then checked [#29].
+
+        :param repository_id: unique identifier, typically a ULID (Universally Unique Lexicographically Sortable
+        Identifier)
+        :param label: a human readable, well-known, identifier for the repository
+        :param title: a descriptive, formal, name for the repository
+        :param repository_type: the repositories implementation, specified as a member of the RepositoryType enumeration
+        :param hostname: the hostname of the remote resource, where the repository represents is a remote resource
+        :param database: the name of a database containing repository data, where the repository is a database
+        :param schema: the name of a schema containing repository data, where the repository database supports schemas
+        :param namespace: the identifier of a Namespace (namespace_id) the repository is defined within
+        """
         self.id = repository_id
         self.label = label
         self.title = title
@@ -201,7 +269,12 @@ class Repository:
         if namespace is not None:
             self.relationships['namespaces'] = namespace
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Union[str, Dict[str, str]]]:
+        """
+        Represents a Repository as a dictionary
+
+        :return: a Repository represented as a dictionary
+        """
         _repository = {
             'id': self.id,
             'label': self.label,
@@ -217,7 +290,10 @@ class Repository:
 
         return _repository
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of a Repository
+        """
         return f"Repository <id={self.id}, label={self.label}, type={self.type}>"
 
 
@@ -230,7 +306,6 @@ class Style:
 
     Styles belong to a single namespace and can be general, applying to multiple layers, or specific to a single layer.
     """
-
     def __init__(
         self,
         style_id: str,
@@ -239,6 +314,16 @@ class Style:
         style_type: str,
         namespace: Namespace = None
     ):
+        """
+        Style_id should be defined independently from the style they are based on (i.e. they should be assigned by this
+        project to styles, rather than read from them, to prevent clashes and loss of integrity)
+
+        :param style_id: unique identifier, typically a ULID (Universally Unique Lexicographically Sortable Identifier)
+        :param label: a human readable, well-known, identifier for the style
+        :param title: a descriptive, formal, name for the style
+        :param style_type: the style implementation, specified as a member of the StyleType enumeration
+        :param namespace: the identifier of a Namespace (namespace_id) the repository is defined within
+        """
         self.id = style_id
         self.label = label
         self.title = title
@@ -250,7 +335,12 @@ class Style:
         if namespace is not None:
             self.relationships['namespaces'] = namespace
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Union[str, Dict[str, str]]]:
+        """
+        Represents a Style as a dictionary
+
+        :return: a Repository represented as a dictionary
+        """
         _style = {
             'id': self.id,
             'label': self.label,
@@ -266,7 +356,10 @@ class Style:
 
         return _style
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of a Style
+        """
         return f"Style <id={self.id}, label={self.label}, type={self.type}>"
 
 
@@ -287,7 +380,6 @@ class Layer:
     Layers belong to a single namespace, backed by a single data source (or part of a single data source) and
     represented by one or more styles.
     """
-
     def __init__(
         self,
         layer_id: str,
@@ -301,6 +393,44 @@ class Layer:
         repository: Repository = None,
         styles: List[Style] = None
     ):
+        """
+        Layer_id should be defined independently from the Layer they are based on (i.e. they should be assigned by this
+        project to layers, rather than read from them, to prevent clashes and loss of integrity)
+
+        Layers consist of a range of core and optional properties, depending on the data they represent. For example
+        vector data have a geometry type (point, line, etc.). whereas raster data does not.
+
+        Core properties are:
+        * layer_id
+        * label
+        * title
+        * layer_type
+        * services
+        * namespace (relation)
+        * repository (relation)
+        * styles (relation)
+
+        Optional properties are:
+        * geometry_type
+        * table_view
+
+        Note: This class requires all properties to be defined (using None for unknown or not-applicable values).
+        In future, only core properties will be required, with any relevant optional properties then checked [#29].
+
+        :param layer_id: unique identifier, typically a ULID (Universally Unique Lexicographically Sortable Identifier)
+        :param label: a human readable, well-known, identifier for the layer
+        :param title: a descriptive, formal, name for the layer
+        :param layer_type: whether the layer represents raster or vector data, specified as a member of the LayerType
+        enumeration
+        :param geometry_type: the type of vector data, specified as a member of the LayerGeometry enumeration, where the
+        layer is vector data
+        :param services: OGC services the layer is accessible by, specified as members of the LayerService enumeration
+        :param table_view: the name of the table containing layer data, where the layer is based on a database based
+        repository
+        :param namespace: the identifier of a Namespace the layer is defined within
+        :param repository: the identifier of a Repository the layer's data is sourced from
+        :param styles: identifiers of styles through which the layer can be presented/represented
+        """
         self.id = layer_id
         self.label = label
         self.title = title
@@ -331,7 +461,12 @@ class Layer:
         if styles is not None and isinstance(styles, list):
             self.relationships['styles'] = styles
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Union[str, Dict[str, Union[str, List[str]]]]]:
+        """
+        Represents a Layer as a dictionary
+
+        :return: a Layer represented as a dictionary
+        """
         _layer = {
             'id': self.id,
             'label': self.label,
@@ -355,7 +490,10 @@ class Layer:
 
         return _layer
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of a Layer
+        """
         return f"Layer <id={self.id}, label={self.label}, type={self.type}>"
 
 
@@ -373,7 +511,6 @@ class LayerGroup:
 
     Layer groups belong to a single namespace, represented by one or more styles.
     """
-
     def __init__(
         self,
         layer_group_id: str,
@@ -385,6 +522,22 @@ class LayerGroup:
         layers: List[Layer] = None,
         styles: List[Style] = None
     ):
+        """
+        Layer_group_id should be defined independently from the LayerGroup they are based on (i.e. they should be
+        assigned by this project to layer groups, rather than read from them, to prevent clashes and loss of integrity)
+
+        :param layer_group_id: unique identifier, typically a ULID (Universally Unique Lexicographically Sortable
+        Identifier)
+        :param label: a human readable, well-known, identifier for the layer group
+        :param title: a descriptive, formal, name for the layer group
+        :param geometry_type: the type of vector data, specified as a member of the LayerGeometry enumeration, where the
+        layer group contains vector data
+        :param services: OGC services the layer group is accessible by, specified as members of the LayerService
+        enumeration
+        :param namespace: the identifier of a Namespace the layer group is defined within
+        :param layers: the identifiers of layers that make up the layer group
+        :param styles: identifiers of styles through which the layer group can be presented/represented
+        """
         self.id = layer_group_id
         self.label = label
         self.title = title
@@ -410,7 +563,12 @@ class LayerGroup:
         if styles is not None and isinstance(styles, list):
             self.relationships['styles'] = styles
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Union[str, Dict[str, Union[str, List[str]]]]]:
+        """
+        Represents a LayerGroup as a dictionary
+
+        :return: a LayerGroup represented as a dictionary
+        """
         _layer_group = {
             'id': self.id,
             'label': self.label,
@@ -439,19 +597,26 @@ class LayerGroup:
 
         return _layer_group
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        :return: String representation of a LayerGroup
+        """
         return f"LayerGroup <id={self.id}, label={self.label}>"
 
 
 class Servers(dict):
     """
-    Represents a collection of servers.
+    Represents a collection of Servers.
     """
-
     def __init__(self, *args, **kwargs):
         super(Servers, self).__init__(*args, **kwargs)
 
     def to_list(self) -> List[Dict]:
+        """
+        Represents a collection of Servers as a list of dictionaries
+
+        :return: a collection of Servers represented as dictionaries
+        """
         _servers = []
         for server in self.values():
             _servers.append(server.to_dict())
@@ -460,19 +625,32 @@ class Servers(dict):
 
 class Namespaces(dict):
     """
-    Represents a collection of namespaces.
+    Represents a collection of Namespaces.
     """
-
     def __init__(self, *args, **kwargs):
         super(Namespaces, self).__init__(*args, **kwargs)
 
     def get_by_label(self, label: str) -> Optional[Namespace]:
+        """
+        Gets a Namespace from a collection of Namespaces identified by a name/label
+
+        Matches are exact and based on labels rather than identifiers.
+
+        :param label: label for a Style
+
+        :return: Matching namespace or None if no matching namespace found
+        """
         for item in self.values():
             if item.label == label:
                 return item
         return None
 
     def to_list(self) -> List[Dict]:
+        """
+        Represents a collection of Namespaces as a list of dictionaries
+
+        :return: a collection of Namespaces represented as dictionaries
+        """
         _namespaces = []
         for namespace in self.values():
             _namespaces.append(namespace.to_dict())
@@ -481,65 +659,98 @@ class Namespaces(dict):
 
 class Repositories(dict):
     """
-    Represents a collection of repositories.
+    Represents a collection of Repositories.
     """
-
     def __init__(self, *args, **kwargs):
         super(Repositories, self).__init__(*args, **kwargs)
 
-    def to_list(self) -> List[Dict]:
-        _repositories = []
-        for repository in self.values():
-            _repositories.append(repository.to_dict())
-        return _repositories
-
     def get_by_label(self, label: str) -> Optional[Repository]:
+        """
+        Gets a Repository from a collection of Repositories identified by a name/label
+
+        Matches are exact and based on labels rather than identifiers.
+
+        :param label: label for a Style
+
+        :return: Matching style or None if no matching repositories found
+        """
         for item in self.values():
             if item.label == label:
                 return item
         return None
 
+    def to_list(self) -> List[Dict]:
+        """
+        Represents a collection of Repositories as a list of dictionaries
+
+        :return: a collection of Repositories represented as dictionaries
+        """
+        _repositories = []
+        for repository in self.values():
+            _repositories.append(repository.to_dict())
+        return _repositories
+
 
 class Styles(dict):
     """
-    Represents a collection of styles.
+    Represents a collection of Styles.
     """
-
     def __init__(self, *args, **kwargs):
         super(Styles, self).__init__(*args, **kwargs)
 
+    def get_by_label(self, label: str, namespace_label: str = None) -> Optional[Style]:
+        """
+        Gets a Style from a collection of Styles identified by a name/label and, optionally, from within a namespace
+
+        Matches are exact and based on labels rather than identifiers. If a namespace is specified any matching Styles
+        must exist within this namespace or no match will be returned.
+
+        :param label: label for a Style
+        :param namespace_label: label for a namespace
+
+        :return: Matching style or None if no matching style found
+        """
+        for item in self.values():
+            if item.label == label:
+                if namespace_label is None:
+                    return item
+                else:
+                    if item.relationships['namespaces'].label == namespace_label:
+                        return item
+        return None
+
     def to_list(self) -> List[Dict]:
+        """
+        Represents a collection of Styles as a list of dictionaries
+
+        :return: a collection of Styles represented as dictionaries
+        """
         _styles = []
         for style in self.values():
             _styles.append(style.to_dict())
         return _styles
 
-    def get_by_label(self, label: str, namespace_label: str = None) -> Optional[Style]:
-        for item in self.values():
-            if item.label == label:
-                if namespace_label is None:
-                    return item
-                else:
-                    if item.relationships['namespaces'].label == namespace_label:
-                        return item
-        return None
-
 
 class Layers(dict):
     """
-    Represents a collection of layers.
+    Represents a collection of Layers.
     """
 
     def __init__(self, *args, **kwargs):
         super(Layers, self).__init__(*args, **kwargs)
 
-    def to_list(self) -> List[Dict]:
-        _layers = []
-        for layer in self.values():
-            _layers.append(layer.to_dict())
-        return _layers
-
     def get_by_label(self, label: str, namespace_label: str = None) -> Optional[Layer]:
+        """
+        Gets a Layer from a collection of Layers identified by a name/label and, optionally, from within a namespace
+
+        Matches are exact and based on labels rather than identifiers. If a namespace is specified any matching Layers
+        must exist within this namespace or no match will be returned.
+
+        :param label: label for a Layer
+        :param namespace_label: label for a namespace
+
+        :return: Matching layer or None if no matching layer found
+        """
         for item in self.values():
             if item.label == label:
                 if namespace_label is None:
@@ -549,10 +760,21 @@ class Layers(dict):
                         return item
         return None
 
+    def to_list(self) -> List[Dict]:
+        """
+        Represents a collection of Layers as a list of dictionaries
+
+        :return: a collection of Layers represented as dictionaries
+        """
+        _layers = []
+        for layer in self.values():
+            _layers.append(layer.to_dict())
+        return _layers
+
 
 class LayerGroups(dict):
     """
-    Represents a collection of layer groups.
+    Represents a collection of LayerGroups.
     """
 
     def __init__(self, *args, **kwargs):
