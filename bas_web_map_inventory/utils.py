@@ -99,13 +99,13 @@ def validate_ogc_capabilities(
                     # have added. It is assumed such data sources will either be operated by us or otherwise trusted
                     # enough to added to this inventory, therefore there should be a low risk of them containing a
                     # vulnerability.
-                    subprocess.run(
+                    subprocess.run(  # nosec
                         [f"xmllint --noout --schema {str(schema_file_path)} {capabilities_instance_file.name}"],
                         shell=True,
                         check=True,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE,
-                    )  # nosec
+                    )
 
                     # Return empty errors list
                     return list()
