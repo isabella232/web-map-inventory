@@ -6,7 +6,9 @@ from pathlib import Path
 from typing import Dict, List
 
 from importlib_resources import path as resource_path
-from flask.cli import current_app as app, with_appcontext
+
+from flask import current_app as app
+from flask.cli import with_appcontext
 
 # noinspection PyPackageRequirements
 from click import command, option, echo, confirm, style as click_style, Path as ClickPath, Choice
@@ -344,30 +346,30 @@ def fetch(data_sources_file_path: str, data_output_file_path: str):
     app.config["data"]["servers"] = servers
     echo(f"* fetched {click_style(str(len(servers)), fg='blue')} servers (total)")
 
-    server_namespaces = {}
+    server_namespaces: Dict[str, List[Dict[str, str]]] = {}
     for server in servers.values():
         server_namespaces[server.id] = []
         if isinstance(server, GeoServer):
-            for namespace in server.get_namespaces():
-                server_namespaces[server.id].append(server.get_namespace(namespace_reference=namespace))
+            for _namespace in server.get_namespaces():
+                server_namespaces[server.id].append(server.get_namespace(namespace_reference=_namespace))
 
     namespaces = Namespaces()
-    for server_id, _namespaces in server_namespaces.items():
+    for server_id, _server_namespaces in server_namespaces.items():
         echo(
             f"Fetching {click_style('Namespaces', fg='cyan')} in "
             f"{click_style(servers[server_id].label, fg='magenta')}:"
         )
-        for namespace in _namespaces:
+        for _server_namespace in _server_namespaces:
             namespace = Namespace(
                 namespace_id=ulid.new().str,
-                label=namespace["label"],
-                title=namespace["title"],
-                namespace=namespace["namespace"],
+                label=_server_namespace["label"],
+                title=_server_namespace["title"],
+                namespace=_server_namespace["namespace"],
                 server=servers[server_id],
             )
             namespaces[namespace.id] = namespace
         echo(
-            f"* fetched {click_style(str(len(_namespaces)), fg='blue')} namespaces for "
+            f"* fetched {click_style(str(len(_server_namespaces)), fg='blue')} namespaces for "
             f"{click_style(servers[server_id].label, fg='magenta')}"
         )
     app.config["data"]["namespaces"] = namespaces
@@ -513,17 +515,17 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
             selected_data_sources.append(source)
 
     if validation_protocol is None:
-        choices = [OGCProtocol.WMS]
+        choices = [str(OGCProtocol.WMS)]
         choice = inquirer.prompt([inquirer.List("protocol", message="Select protocol", choices=choices)])
         validation_protocol = choice["protocol"]
     try:
-        validation_protocol = OGCProtocol(validation_protocol)
+        _validation_protocol: OGCProtocol = OGCProtocol(validation_protocol)
     except ValueError:
         raise ValueError(f"Protocol [{validation_protocol}] not found")
 
     validation_endpoints = []
     endpoint_path = None
-    if validation_protocol == OGCProtocol.WMS:
+    if _validation_protocol == OGCProtocol.WMS:
         endpoint_path = "wms-path"
     for selected_data_source in selected_data_sources:
         endpoint = build_base_data_source_endpoint(data_source=selected_data_source)
@@ -535,12 +537,12 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
 
     for validation_endpoint in validation_endpoints:
         echo(
-            f"Validating {click_style(validation_protocol.value.upper(), fg='blue')} feed for "
+            f"Validating {click_style(_validation_protocol.value.upper(), fg='blue')} feed for "
             f"{click_style(validation_endpoint['label'], fg='blue')}:"
         )
 
         validation_errors = validate_ogc_capabilities(
-            ogc_protocol=validation_protocol, capabilities_url=validation_endpoint["endpoint"], multiple_errors=True
+            ogc_protocol=_validation_protocol, capabilities_url=validation_endpoint["endpoint"], multiple_errors=True
         )
         if len(validation_errors) > 0:
             echo(f"{click_style('* validation failure 😞', fg='red')} ({len(validation_errors)} errors):")

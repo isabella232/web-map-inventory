@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 
 
 class ServerType(Enum):
@@ -162,7 +162,7 @@ class Namespace:
         self.label = label
         self.title = title
         self.namespace = namespace
-        self.relationships = {"servers": None}
+        self.relationships: Dict[str, Server] = {}
 
         if server is not None:
             self.relationships["servers"] = server
@@ -173,7 +173,7 @@ class Namespace:
 
         :return: a Namespace represented as a dictionary
         """
-        _namespace = {
+        _namespace: Dict[str, Union[str, Dict[str, str]]] = {
             "id": self.id,
             "label": self.label,
             "title": self.title,
@@ -254,7 +254,7 @@ class Repository:
         self.hostname = hostname
         self.database = database
         self.schema = schema
-        self.relationships = {"namespaces": None}
+        self.relationships: Dict[str, Namespace] = {}
 
         if namespace is not None:
             self.relationships["namespaces"] = namespace
@@ -310,12 +310,12 @@ class Style:
         self.label = label
         self.title = title
         self.type = StyleType(style_type)
-        self.relationships = {"namespaces": None}
+        self.relationships: Dict[str, Optional[Namespace]] = {}
 
         if namespace is not None:
             self.relationships["namespaces"] = namespace
 
-    def to_dict(self) -> Dict[str, Union[str, Dict[str, str]]]:
+    def to_dict(self) -> Dict[str, Union[str, Dict[str, Optional[str]]]]:
         """
         Represents a Style as a dictionary
 
@@ -415,7 +415,7 @@ class Layer:
         self.title = title
         self.type = LayerType(layer_type)
         self.services = []
-        self.relationships = {"namespaces": None, "repositories": None, "styles": []}
+        self.relationships: Dict[str, Any] = {}
 
         self.geometry_type = None
         if geometry_type is not None:
@@ -518,7 +518,7 @@ class LayerGroup:
         self.label = label
         self.title = title
         self.services = []
-        self.relationships = {"namespaces": None, "layers": [], "styles": []}
+        self.relationships: Dict[str, Any] = {}
 
         self.geometry_type = None
         if geometry_type is not None:
@@ -535,13 +535,13 @@ class LayerGroup:
         if styles is not None and isinstance(styles, list):
             self.relationships["styles"] = styles
 
-    def to_dict(self) -> Dict[str, Union[str, Dict[str, Union[str, List[str]]]]]:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Represents a LayerGroup as a dictionary
 
         :return: a LayerGroup represented as a dictionary
         """
-        _layer_group = {
+        _layer_group: Dict[str, Any] = {
             "id": self.id,
             "label": self.label,
             "title": self.title,
@@ -551,7 +551,7 @@ class LayerGroup:
         }
 
         if self.geometry_type is not None:
-            _layer_group["geometry"] = self.geometry_type.value
+            _layer_group["geometry"] = str(self.geometry_type.value)
         for service in self.services:
             _layer_group["services"].append(service.value)
 

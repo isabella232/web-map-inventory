@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any, Optional
 
 # noinspection PyPackageRequirements
 from airtable import Airtable as _Airtable
@@ -40,8 +40,8 @@ class Airtable:
     * which items are now orphaned as they've been removed locally
     """
 
-    ItemClass = None
-    ItemClassAirtable = None
+    ItemClass: Any = None
+    ItemClassAirtable: Any = None
 
     def __init__(self, airtable: _Airtable, items, **kwargs):
         """
@@ -51,15 +51,15 @@ class Airtable:
         self.airtable = airtable
         self.kwargs = kwargs
 
-        self.items_local = {}
-        self.items_airtable = {}
+        self.items_local: Dict[str, Any] = {}
+        self.items_airtable: Dict[str, Any] = {}
 
-        self.airtable_ids_to_ids = {}
+        self.airtable_ids_to_ids: Dict[str, str] = {}
 
-        self.missing = []
-        self.current = []
-        self.outdated = []
-        self.orphaned = []
+        self.missing: List[str] = []
+        self.current: List[str] = []
+        self.outdated: List[str] = []
+        self.orphaned: List[str] = []
 
         if items is not None:
             for item in items.values():
@@ -272,12 +272,12 @@ class ServerAirtable:
         """
         :param item: a (local) Server object or a (remote) Airtable representation of a Server object
         """
-        self.airtable_id = None
-        self.id = None
-        self.name = None
-        self.hostname = None
-        self.type = None
-        self.version = None
+        self.airtable_id: Optional[str] = None
+        self.id: str
+        self.name: str
+        self.hostname: str
+        self.type: ServerTypeAirtable
+        self.version: str
 
         if isinstance(item, Server):
             self.id = item.id
@@ -307,7 +307,7 @@ class ServerAirtable:
             "ID": self.id,
             "Name": self.name,
             "Hostname": self.hostname,
-            "Type": self.type.value,
+            "Type": str(self.type.value),
             "Version": self.version,
         }
 
@@ -322,7 +322,13 @@ class ServerAirtable:
 
         :return: a Server's internal properties
         """
-        return {"id": self.id, "name": self.name, "hostname": self.hostname, "type": self.type, "version": self.version}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "hostname": self.hostname,
+            "type": self.type.value,
+            "version": self.version,
+        }
 
     def __repr__(self) -> str:
         """
@@ -353,11 +359,11 @@ class NamespaceAirtable:
         """
         :param item: a (local) Namespace object or a (remote) Airtable representation of a Namespace object
         """
-        self.airtable_id = None
-        self.id = None
-        self.name = None
-        self.title = None
-        self.server = None
+        self.airtable_id: Optional[str] = None
+        self.id: str
+        self.name: str
+        self.title: str
+        self.server: ServerAirtable
 
         if "servers_airtable" not in kwargs:
             raise RuntimeError("ServersAirtable collection not included as keyword argument.")
@@ -381,7 +387,7 @@ class NamespaceAirtable:
         else:
             raise TypeError("Item must be a dict or Namespace object")
 
-    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+    def airtable_fields(self) -> Dict[str, Union[str, List[Optional[str]]]]:
         """
         Translates a Namespace's properties to Airtable fields
 
@@ -403,7 +409,7 @@ class NamespaceAirtable:
 
         :return: a Namespace's internal properties
         """
-        return {"id": self.id, "name": self.name, "title": self.title, "server": self.server}
+        return {"id": self.id, "name": self.name, "title": self.title, "server": self.server.id}
 
     def __repr__(self) -> str:
         """
@@ -434,15 +440,15 @@ class RepositoryAirtable:
         """
         :param item: a (local) Repository object or a (remote) Airtable representation of a Repository object
         """
-        self.airtable_id = None
-        self.id = None
-        self.name = None
-        self.title = None
-        self.type = None
-        self.host = None
-        self.database = None
-        self.schema = None
-        self.workspace = None
+        self.airtable_id: Optional[str] = None
+        self.id: str
+        self.name: str
+        self.title: str
+        self.type: RepositoryTypeAirtable
+        self.host: Optional[str]
+        self.database: Optional[str]
+        self.schema: Optional[str]
+        self.workspace: NamespaceAirtable
 
         if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
@@ -478,7 +484,7 @@ class RepositoryAirtable:
         else:
             raise TypeError("Item must be a dict or Repository object")
 
-    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+    def airtable_fields(self) -> Dict[str, Union[Optional[str], List[Optional[str]]]]:
         """
         Translates a Repositories properties to Airtable fields
 
@@ -498,7 +504,7 @@ class RepositoryAirtable:
             "Workspace": [self.workspace.airtable_id],
         }
 
-    def _dict(self) -> Dict[str, Union[str, List[str]]]:
+    def _dict(self) -> Dict[str, Union[Optional[str], List[Optional[str]]]]:
         """
         Outputs an item's internal properties as a dictionary
 
@@ -549,12 +555,12 @@ class StyleAirtable:
         """
         :param item: a (local) Style object or a (remote) Airtable representation of a Style object
         """
-        self.airtable_id = None
-        self.id = None
-        self.name = None
-        self.title = None
-        self.type = None
-        self.workspace = None
+        self.airtable_id: Optional[str] = None
+        self.id: str
+        self.name: str
+        self.title: str
+        self.type: StyleTypeAirtable
+        self.workspace: NamespaceAirtable
 
         if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
@@ -652,17 +658,17 @@ class LayerAirtable:
         """
         :param item: a (local) Layer object or a (remote) Airtable representation of a Layer object
         """
-        self.airtable_id = None
-        self.id = None
-        self.name = None
-        self.title = None
-        self.type = None
-        self.geometry = None
-        self.services = []
-        self.table_view = None
-        self.workspace = None
-        self.store = None
-        self.styles = []
+        self.airtable_id: Optional[str] = None
+        self.id: str
+        self.name: str
+        self.title: str
+        self.type: LayerTypeAirtable
+        self.geometry: LayerGeometryAirtable
+        self.services: List[LayerServiceAirtable] = []
+        self.table_view: str
+        self.workspace: NamespaceAirtable
+        self.store: RepositoryAirtable
+        self.styles: List[StyleAirtable] = []
 
         if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
@@ -815,14 +821,14 @@ class LayerGroupAirtable:
         """
         :param item: a (local) LayerGroup object or a (remote) Airtable representation of a LayerGroup object
         """
-        self.airtable_id = None
-        self.id = None
-        self.name = None
-        self.title = None
-        self.services = []
-        self.workspace = None
-        self.layers = []
-        self.styles = []
+        self.airtable_id: Optional[str] = None
+        self.id: str
+        self.name: str
+        self.title: str
+        self.services: List[LayerGroupServiceAirtable] = []
+        self.workspace: NamespaceAirtable
+        self.layers: List[LayerAirtable] = []
+        self.styles: List[StyleAirtable] = []
 
         if "namespaces_airtable" not in kwargs:
             raise RuntimeError("NamespacesAirtable collection not included as keyword argument.")
@@ -872,7 +878,7 @@ class LayerGroupAirtable:
         else:
             raise TypeError("Item must be a dict or LayerGroup object")
 
-    def airtable_fields(self) -> Dict[str, Union[str, List[str]]]:
+    def airtable_fields(self) -> Dict[str, Union[str, List[Optional[str]]]]:
         """
         Translates a LayerGroup's properties to Airtable fields
 
@@ -900,7 +906,7 @@ class LayerGroupAirtable:
             "Styles": _styles,
         }
 
-    def _dict(self) -> Dict[str, Union[str, List[str]]]:
+    def _dict(self) -> Dict[str, Union[str, List[Optional[str]]]]:
         """
         Outputs an item's internal properties as a dictionary
 
