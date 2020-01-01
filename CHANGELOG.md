@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+* MyPy type checker [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27)
 * Missing docblocks and type lints [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27)
 * Deployment container [#2](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/2)
 * Test coverage [#15](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/15)

@@ -350,6 +350,21 @@ $ docker-compose run app black --check bas_web_map_inventory/
 
 Checks are ran automatically in [Continuous Integration](#continuous-integration).
 
+### Type hinting
+
+Python type hints should be used for this project, with the exception of 
+[missing import](https://mypy.readthedocs.io/en/latest/running_mypy.html#missing-imports) errors (which can be ignored).
+
+[MyPy](https://mypy.readthedocs.io) is used to ensure types agree (where defined), configured in `mypy.ini`.
+
+To check usage manually:
+
+```shell
+$ docker-compose run app mypy bas_web_map_inventory/
+```
+
+Checks are ran automatically in [Continuous Integration](#continuous-integration).
+
 ### Dependencies
 
 Python dependencies should be defined using Pip through the `requirements.txt` file. The Docker image is configured to
