@@ -226,6 +226,6 @@ deploy-prod:
     - "mv provisioning/ansible/inventory.yml /etc/ansible/hosts"
   script:
     - "cd provisioning/ansible"
-    - "ansible-playbook --user geoweb deploy.yml --extra-vars 'target=production package_name=$APP_PACKAGE package_version=0.2.1'"
+    - "ansible-playbook --user geoweb deploy.yml --extra-vars \"target=production package_name=$APP_PACKAGE package_version=0.2.1\""
   environment:
     name: Production
