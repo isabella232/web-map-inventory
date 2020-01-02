@@ -8,8 +8,3 @@ services:
     command: flask
     volumes:
       - .:/usr/src/app
-
-  deploy-latest:
-    build: ./provisioning/docker
-    image: docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:latest
-    command: bash

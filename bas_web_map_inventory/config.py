@@ -46,7 +46,7 @@ class Config:
     # noinspection PyPep8Naming
     @property
     def VERSION(self) -> str:
-        return os.environ.get("APP_RELEASE") or "unknown"
+        return "Unknown"
 
     # noinspection PyPep8Naming
     @property

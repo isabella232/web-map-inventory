@@ -478,44 +478,19 @@ $ docker-compose run app -e FLASK_ENV=testing app pytest --cov=bas_web_map_inven
 
 All commits will trigger a Continuous Integration process using GitLab's CI/CD platform, configured in `.gitlab-ci.yml`.
 
-## Distribution
-
-This service is distributed as a Python package hosted on [PyPi](https://pypi.org/project/bas-web-map-inventory).
-
-Source and binary packages are built automatically through [Continuous Deployment](#continuous-deployment).
-
-To build them manually you will need to define a version in `APP_RELEASE.txt`, then run:
-
-```shell
-$ docker-compose run app ash
-# build package to /build, /dist and /bas-web-map-inventory.egg-info
-$ python setup.py sdist bdist_wheel
-# quit and remove container
-$ exit
-$ docker-compose down
-```
-
-To manually publish a pre-release version to [PyPi Testing](https://test.pypi.org/project/bas-web-map-inventory):
-
-```shell
-$ docker-compose run app ash
-$ python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-# quit and remove container
-$ exit
-$ docker-compose down
-```
-
-To manually publish a release version to [PyPi](https://pypi.org/project/bas-web-map-inventory):
-
-```
-$ docker-compose run app ash
-$ python -m twine upload --repository-url https://pypi.org/legacy/ dist/*
-# quit and remove container
-$ exit
-$ docker-compose down
-```
-
 ## Deployment
+
+### Python package
+
+This project is distributed as a Python package, hosted in [PyPi](https://pypi.org/project/bas-web-map-inventory).
+
+Source and binary packages are built and published automatically using 
+[Poetry](https://python-poetry.org/docs/cli/#publish) in [Continuous Delivery](#continuous-deployment).
+
+
+
+
+
 
 ### Continuous Deployment
 
