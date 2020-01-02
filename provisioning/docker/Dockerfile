@@ -7,12 +7,15 @@ RUN yum -y install python3
 
 FROM base as build
 
+ARG PACKAGE_VERSION
+
 RUN yum -y install python3
 RUN python3 -m venv /usr/local/virtualenvs/bas_web_map_inventory
 ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
 
+COPY *.whl /tmp/
 RUN pip install --upgrade pip
-RUN pip install -i https://test.pypi.org/simple/ --extra-index-url=https://pypi.org/simple/ bas-web-map-inventory==0.1.0.post32.dev0
+RUN pip install --index-url https://test.pypi.org/simple/ --extra-index-url=https://pypi.org/simple/ --find-links=file:///tmp/ $PACKAGE_VERSION
 
 FROM base as deploy
 
