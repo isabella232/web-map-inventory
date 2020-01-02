@@ -410,7 +410,7 @@ A run/debug configuration, *App*, is included in the project.
 
 ## Testing
 
-All files in the `bas_web_map_inventory` module must be covered by tests.
+All code in the `bas_web_map_inventory` module must be covered by tests.
 
 ### PyTest
 
@@ -423,11 +423,9 @@ To run tests manually from the command line:
 $ docker-compose run app -e FLASK_ENV=testing app pytest --random-order
 ```
 
-To run tests manually using PyCharm:
+To run tests manually using PyCharm use the included *App (Integration)* run/debug configuration.
 
-* use the included *App (Integration)* run/debug configuration
-
-Tests are ran automatically in [Continuous Integration](#continuous-integration) and fail if any do not pass.
+Tests are ran automatically in [Continuous Integration](#continuous-integration).
 
 ### Test coverage
 
