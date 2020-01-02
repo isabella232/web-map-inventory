@@ -1,0 +1,6 @@
+all:
+  children:
+    production:
+      hosts:
+        app-host:
+          ansible_host: 157.245.37.169

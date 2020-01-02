@@ -1,0 +1,13 @@
+---
+
+- name: setup python applications
+  hosts: "{{ target }}"
+  remote_user: geoweb
+  tasks:
+    - name: install/update applications
+      pip:
+        name: "{{ package_name }}=={{ package_version }}"
+        virtualenv: "{{ virtualenvs_dir }}/{{ package_name }}"
+        virtualenv_command: /usr/bin/python3.6 -m venv
+        virtualenv_site_packages: no
+        state: forcereinstall

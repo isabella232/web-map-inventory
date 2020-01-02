@@ -2,6 +2,7 @@
   <dictionary name="felix">
     <words>
       <w>airtable</w>
+      <w>ansible</w>
       <w>bathymetric</w>
       <w>geoserver</w>
       <w>geospatial</w>
