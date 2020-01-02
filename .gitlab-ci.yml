@@ -171,9 +171,9 @@ build-prod:
   script:
     - 'cd provisioning/docker'
     - 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin'
-    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:stable -t $CI_REGISTRY_IMAGE/deploy:$PACKAGE_VERSION --build-arg PACKAGE_VERSION=$PACKAGE_VERSION'
+    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:stable -t $CI_REGISTRY_IMAGE/deploy:$VERSION --build-arg PACKAGE_VERSION=$PACKAGE_VERSION'
     - 'docker push $CI_REGISTRY_IMAGE/deploy:stable'
-    - 'docker push $CI_REGISTRY_IMAGE/deploy:$PACKAGE_VERSION'
+    - 'docker push $CI_REGISTRY_IMAGE/deploy:$VERSION'
   services:
     - docker:dind
   tags:
