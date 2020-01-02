@@ -30,7 +30,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-* Switching from Flake8 to Black for PEP8 compliance/formatting  [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27) 
+* Switching from Pip (for dependencies) and setuptools (for packaging) to Poetry [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27) 
+* Switching from Flake8 to Black for PEP8 compliance/formatting [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27) 
 * Docker image changed to run as a non-privileged user 
   [#11](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/11)
 
