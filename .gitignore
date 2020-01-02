@@ -4,7 +4,6 @@ __pycache__
 # environment / configuration files
 .env
 .flaskenv
-APP_RELEASE.txt
 /data/data.json
 /data/sources.json
 /tests/data/data-ok.json
@@ -12,10 +11,9 @@ APP_RELEASE.txt
 /provisioning/docker/sources.json
 
 # packaging files
-build
 dist
-*.egg-info
 
 # test runner files
+.mypy_cache
 .coverage
 htmlcov

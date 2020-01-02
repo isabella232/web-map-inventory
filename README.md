@@ -11,30 +11,25 @@ See the [Data model](#data-model) section for more information about what this i
 
 ## Usage
 
-### Tasks (usage)
+### Tasks
 
 These tasks run in a container. See the [Setup](#setup) section for setup instructions.
 
-**In a local development environment:**
+If running locally:
 
 ```shell
-$ docker-compose run app flask [task]
-```
-
-**In a staging or production environment**:
-
-```shell
-$ podman run --rm=true --tty --interactive --user=root --volume [path to runtime directory]:/home/geoweb/apps/web-map-inventory/data/:rw docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:latest bash
+$ docker run --rm=true --tty --interactive --volume [path to runtime directory]:/home/geoweb/apps/web-map-inventory/data/:rw docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:stable bash
 $ web-map-inventory [task]
 ```
 
-Where:
+(Where `[path to runtime directory]` is the path to a runtime created during [Setup](#setup)), 
 
-* `[path to runtime directory]` is the absolute path to a runtime created during [Setup](#setup), typically 
-  `~/.config/web-map-inventory/`
-* `[task]` is the name and arguments of a task
+If using the BAS central worksations use this instead:
 
-Where: `[task]` is the name and arguments of a task.
+```shell
+$ podman run --rm=true --tty --interactive --user=root --volume ~/.config/web-map-inventory/:/home/geoweb/apps/web-map-inventory/data/:rw docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:stable bash
+$ web-map-inventory [task]
+```
 
 #### `data fetch`
 
@@ -83,12 +78,15 @@ Creates, updates or removes items in Airtable to match local items.
 
 Removes all data from Airtable.
 
-### Data sources
+### Managing data sources
 
-Each data source is represented as an object in the `server` list in `data/sources.json`. The structure of this
-object depends on the server/source type, defined in this section.
+Each data source is represented as an object in the `server` list in `data/sources.json` [1]. The structure of each 
+source depends on its type. For more general information, see the [Data sources](#data-sources) section.
 
-#### Adding a data source
+[1] This file is either in the runtime path created during [Setup](#setup) or `~/.config/web-map-inventory/` on the BAS 
+central servers).
+
+#### Adding new data sources
 
 **Note:** See [Supported data sources](#supported-data-sources) for currently supported data sources.
 
@@ -133,25 +131,6 @@ Example:
 Flask application using the [airtable-python-wrapper](https://airtable-python-wrapper.readthedocs.io) library to
 interact with the Airtable API.
 
-### Project container
-
-This project runs as an OCI/Docker container. A Docker Compose file, `./docker-compose.yml` defines multiple  
-[images/tags](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/container_registry) hosted in the private BAS Docker 
-Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)):
-
-* `:latest`:
-    * defines a Python development environment, with all dependencies listed in `./requirements.txt` installed
-    * does not include application source code, which is instead mounted inside the container at runtime
-    * is compatible with IDEs such as PyCharm that can use a container as a remote interpreter
-    * is rebuilt manually whenever dependencies change
-
-* `/deploy:latest`:
-    * is a self-contained container with Python installed as an OS package
-    * contains the latest PyPi release of this application as a Pip package
-    * includes some support files, such as a [XML Catalogue](#xml-catalogue), and a Flask CLI wrapper for performance 
-      and ease of use
-    * is rebuilt automatically through [Continuous Deployment](#continuous-deployment)
-
 ### Airtable
 
 Data is synced to the
@@ -182,7 +161,8 @@ It can be visualised as:
 Data sources are *servers* in the project [Data model](#data-model) and define connection details for APIs and services
 each server type provides for fetching information about components they contain (e.g. listing *layers*).
 
-A data sources file, `data/sources.json`, is used for recording these details.
+A data sources file, `data/sources.json`, is used for recording these details. An example is available in 
+`data/sources.example.json`. See the [Adding a data source](#adding-new-data-sources) section for more information.
 
 A JSON Schema, `bas_web_map_inventory/resources/json_schemas/data-sources-schema.json`, validates this file.
 
@@ -198,8 +178,7 @@ Configuration options are set within `bas_web_map_inventory/config.py`.
 All [Options](#configuration-options) are defined in a `Config` base class, with per-environment sub-classes overriding
 and extending these options as needed. The active configuration is set using the `FLASK_ENV` environment variable.
 
-Where options are configurable, values are read from environment variables
-[Environment variables](#environment-variables).
+Most options can be [Set using environment variables or files](#setting-configuration-options).
 
 #### Configuration options
 
@@ -212,14 +191,14 @@ Where options are configurable, values are read from environment variables
 | `AIRTABLE_BASE_ID`  | Yes      | All          | String           | `.env`      | Valid [AirTable Base ID](https://airtable.com/api)                                                          | -                                                                          | `appxxxxxxxxxxxxxx`                                          | ID of the AirTable Base to populate/use                                                                         | -                          |
 
 Options are set as strings and then cast to the data type listed above. See
-[Environment variables](#environment-variables) for information about an options 'Source'.
+[Environment variables](#setting-configuration-options) for information about an options 'Source'.
 
 Flask also has a number of
 [builtin configuration options](https://flask.palletsprojects.com/en/1.1.x/config/#builtin-configuration-values).
 
-#### Environment variables
+#### Setting configuration options
 
-Variable configuration options should be set using environment variables taken from a combination of sources:
+Variable configuration options can be set using environment variables or environment files:
 
 | Source                   | Priority | Purpose                     | Notes                                   |
 | ------------------------ | -------- | --------------------------- | --------------------------------------- |
@@ -247,8 +226,8 @@ Logs for this service are written to *stdout* and a log file, `/var/log/app/app.
 File based logging can be manually controlled by setting the `APP_ENABLE_FILE_LOGGING` and `LOG_FILE_PATH` variables in
 `.flaskenv`.
 
-**Note:** If `LOG_FILE_PATH` is changed, the user in the relevant [Project container](#project-container) must be 
-granted suitable permissions to write to it.
+**Note:** If `LOG_FILE_PATH` is changed, the user in the user the container rans as must be granted suitable write 
+permissions.
 
 ### XML Catalogue
   
@@ -257,119 +236,130 @@ schemas). This drastically speeds up XML parsing and removes a dependency on rem
 
 XML files in the catalogue are typically stored in `bas_web_map_inventory/resources/xml_schemas/`.
 
-Different catalogues are used for different variants of the [Project container](#project-container) due to differences
-in where the application is located:
+Different catalogue files are used for different container variants due to differences in the applications location:
 
 * `:latest`: `./support/xml-schemas/catalogue.xml`
-* `/deploy:latest`: `provisioning/docker/catalog.xml`
+* `/deploy`: `provisioning/docker/catalog.xml`
 
-In either case, the catalogue is available within the container at the conventional path, `/etc/xml/catalog`) and will 
+In either case, the catalogue is available within the container at the conventional path, `/etc/xml/catalog`, and will 
 be used automatically by most XML libraries and tools (such as `lxml` and `xmllint`).
 
 ## Setup
 
-### Development
+The application for this project runs as Docker container. It can be setup locally or on the BAS central worksations
+using Podman. You will need access to the private BAS Docker Registry (part of 
+[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)), or the ability to build images container images locally
+
+**Note:** Podman support in BAS is currently experimental, contact the IT Service Desk for more information. Unless 
+noted, `docker` commands listed here can be replaced with `podman`.
+
+```shell
+$ docker login docker-registry.data.bas.ac.uk
+$ docker pull docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:stable
+```
+
+**Note:** [Other image tags](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/container_registry) are available if 
+you want to run pre-release versions, or a specific previous version.
+
+You will need to create a directory to contain required [Configuration files](#configuration) and data output:
+
+```shell
+$ mkdir -p ~/.config/web-map-inventory
+```
+
+See the [Data sources](#managing-data-sources) and [Usage](#usage) sections for how to use and run the application.
+
+## Development
+
+### Development container
 
 ```shell
 $ git clone https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory
 $ cd map-layer-index
 ```
 
-The `:latest` tag/image of the [Project container](#project-container) [1] is intended for developing this project. It
-can be ran using Docker and Docker Compose:
+The `:latest` Docker tag/image is used for developing this project. It can be ran using Docker and Docker Compose:
 
 ```shell
 $ docker login docker-registry.data.bas.ac.uk
 $ docker-compose pull app
 ```
 
-[1] You will need access to the private BAS Docker Registry (part of 
-[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)) to pull this image. If you don't, you can build the relevant 
-image/tag locally instead.
-
-### Staging/Production
-
-The `/deploy:latest` tag/image of the [Project container](#project-container) [1] is intended for running this project 
-in staging or production. It can be ran using Podman on the BAS central worksations. 
-
-**Note:** Podman support in BAS is currently experimental, it is only available on certain workstations and you will 
-need to ask the IT Service Desk to enable your user account to use it. 
+Then create/configure required [Configuration files](#configuration):
 
 ```shell
-$ podman login docker-registry.data.bas.ac.uk
-$ podman pull docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:latest
-```
+$ cp .env.example .env
+$ cp .flaskenv.example .flaskenv
+$ cp data/sources.example.json data/sources.json
+``` 
 
-You will also need to create a directory to contain runtime files (such as the data sources file):
+To run/test application commands:
 
 ```shell
-$ mkdir -p ~/.config/web-map-inventory
+$ docker-compose run app flask [task]
 ```
 
 [1] You will need access to the private BAS Docker Registry (part of 
 [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)) to pull this image. If you don't, you can build the relevant 
 image/tag locally instead.
-
-### Configuration setup
-
-**Note:** This step applies to both development and staging/production environments.
-
-Two [Environment files](#environment-variables), `.env` and `.flaskenv` are used for setting
-[Configuration options](#configuration-options). These files should be created by copying their examples, `.env.example`
-`.flaskenv.example`, and updating them as needed.
-
-A [Data sources file](#data-sources), `data/sources.json`, is used for configure where/what to fetch data from.
-This file should be created by copying `data/sources.example.json` and updating it as needed.
-
-## Development
-
-This project is developed as a Flask application.
-
-Ensure `bas_web_map_inventory/config.py` and related environment files are kept up-to-date if any
-[configuration options](#configuration-options) are added or changed.
-
-Ensure all 1st party code has [test coverage](#test-coverage) with suitable [unit/integration tests](#testing).
 
 ### Code Style
 
 PEP-8 style and formatting guidelines must be used for this project, with the exception of the 80 character line limit.
 
-[Flake8](http://flake8.pycqa.org/) is used to ensure compliance, configured in `.flake8`.
+[Black](https://github.com/psf/black) is used to ensure compliance, configured in `pyproject.toml`.
 
-To run checks manually:
+To apply formatting manually:
 
 ```shell
-$ docker-compose run app flake8 .
+$ docker-compose run app black bas_web_map_inventory/
+```
+
+To check compliance manually:
+
+```shell
+$ docker-compose run app black --check bas_web_map_inventory/
+```
+
+Checks are ran automatically in [Continuous Integration](#continuous-integration).
+
+### Type hinting
+
+Python type hints should be used for this project, with the exception of 
+[missing import](https://mypy.readthedocs.io/en/latest/running_mypy.html#missing-imports) errors (which can be ignored).
+
+[MyPy](https://mypy.readthedocs.io) is used to ensure types agree (where defined), configured in `mypy.ini`.
+
+To check usage manually:
+
+```shell
+$ docker-compose run app mypy bas_web_map_inventory/
 ```
 
 Checks are ran automatically in [Continuous Integration](#continuous-integration).
 
 ### Dependencies
 
-Python dependencies should be defined using Pip through the `requirements.txt` file. The Docker image is configured to
-install these dependencies into the application image for consistency across different environments.
+Python dependencies for this project are managed with [Poetry](https://python-poetry.org) in `pyproject.toml`.
 
-**Note:** Dependencies should be pinned to specific versions, then periodically reviewed and updated as needed.
+The development container image installs both runtime and development dependencies. Deployment images only install 
+runtime dependencies.
 
-To add a new dependency:
+Non-code files, such as static files, can also be included in the [Python package](#python-package) using the 
+`include` key in `pyproject.toml`.
+
+To add a new (development) dependency:
 
 ```shell
 $ docker-compose run app ash
-$ pip install [dependency]==
-# this will display a list of available versions, add the latest to `requirements.txt` and if a run-time dependency `setup.py`
-$ exit
-$ docker-compose down
-$ docker-compose build
+$ poetry add [dependency] (--dev)
 ```
 
-If you have access to the [BAS GitLab instance](https://gitlab.data.bas.ac.uk), push the rebuilt Docker image to the
-BAS Docker Registry:
+Then rebuild the development container and push to GitLab (GitLab will rebuild other images automatically as needed):
 
 ```shell
-# login if this is the first time you've used this registry
-$ docker login docker-registry.data.bas.ac.uk
-
-$ docker-compose push
+$ docker-compose build app
+$ docker-compose push app
 ```
 
 ### Static security scanning
@@ -457,63 +447,38 @@ $ docker-compose run app -e FLASK_ENV=testing app pytest --cov=bas_web_map_inven
 
 All commits will trigger a Continuous Integration process using GitLab's CI/CD platform, configured in `.gitlab-ci.yml`.
 
-## Distribution
-
-This service is distributed as a Python package hosted on [PyPi](https://pypi.org/project/bas-web-map-inventory).
-
-Source and binary packages are built automatically through [Continuous Deployment](#continuous-deployment).
-
-To build them manually you will need to define a version in `APP_RELEASE.txt`, then run:
-
-```shell
-$ docker-compose run app ash
-# build package to /build, /dist and /bas-web-map-inventory.egg-info
-$ python setup.py sdist bdist_wheel
-# quit and remove container
-$ exit
-$ docker-compose down
-```
-
-To manually publish a pre-release version to [PyPi Testing](https://test.pypi.org/project/bas-web-map-inventory):
-
-```shell
-$ docker-compose run app ash
-$ python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-# quit and remove container
-$ exit
-$ docker-compose down
-```
-
-To manually publish a release version to [PyPi](https://pypi.org/project/bas-web-map-inventory):
-
-```
-$ docker-compose run app ash
-$ python -m twine upload --repository-url https://pypi.org/legacy/ dist/*
-# quit and remove container
-$ exit
-$ docker-compose down
-```
-
 ## Deployment
+
+### Python package
+
+This project is distributed as a Python package, hosted in [PyPi](https://pypi.org/project/bas-web-map-inventory).
+
+Source and binary packages are built and published automatically using 
+[Poetry](https://python-poetry.org/docs/cli/#publish) in [Continuous Delivery](#continuous-deployment).
+
+Package versions are determined automatically using the `support/python-packaging/parse_version.py` script.
+
+### Docker image
+
+This project is distributed as a Docker/OCI image, hosted in the private BAS Docker Registry (part of 
+[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
+
+[Continuous Delivery](#continuous-deployment) will automatically build a `/deploy:latest` image for commits to the 
+*master* branch, as well as `/deploy:release-stable` and `/deploy:release-[release]` images for tagged commits.
+
+**Note:** This image cannot be built outside of GitLab, as it relies on artifacts passed between build stages.
 
 ### Continuous Deployment
 
 All commits will trigger a Continuous Deployment process using GitLab's CI/CD platform, configured in `.gitlab-ci.yml`.
 
-...
-
 ## Release procedure
-
-### At release
 
 For all releases:
 
 1. create a release branch
-2. if needed, build & push the Docker image
-3. close release in `CHANGELOG.md`
-4. push changes, merge the release branch into `master` and tag with version
-
-The application will be built and pushed to PyPi using [Continuous Deployment](#continuous-deployment).
+2. close release in `CHANGELOG.md`
+3. push changes, merge the release branch into `master` and tag with version
 
 ## Feedback
 
@@ -529,7 +494,7 @@ This project uses issue tracking, see the
 
 ## License
 
-© UK Research and Innovation (UKRI), 2019, British Antarctic Survey.
+© UK Research and Innovation (UKRI), 2019 - 2020, British Antarctic Survey.
 
 You may use and re-use this software and associated documentation files free of charge in any format or medium, under
 the terms of the Open Government Licence v3.0.

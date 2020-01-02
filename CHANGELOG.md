@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-01-02
+
 ### Added
 
+* MyPy type checker [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27)
+* Missing docblocks and type lints [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27)
 * Deployment container [#2](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/2)
 * Test coverage [#15](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/15)
 * WMS validation [#13](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/13)
@@ -28,6 +32,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+* Switching from Pip (for dependencies) and setuptools (for packaging) to Poetry [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27) 
+* Switching from Flake8 to Black for PEP8 compliance/formatting [#27](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/27) 
 * Docker image changed to run as a non-privileged user 
   [#11](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/11)
 

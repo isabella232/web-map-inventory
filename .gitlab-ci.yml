@@ -17,11 +17,11 @@
 # > DOT_ENV (protected, file): "[contents of .env]"
 # > DOT_FLASKENV (protected, file): "[contents of .flaskenv]"
 #
-# - PyPi (production)
-# > PYPI_PASSWORD: "[Sensitive]"
+# - PyPi (production) - create tokens at https://pypi.org/manage/account/
+# > PYPI_TOKEN: "[Sensitive]"
 #
-# - PyPi (staging)
-# > PYPI_TEST_PASSWORD: "[Sensitive]"
+# - PyPi (staging) - create tokens at https://test.pypi.org/manage/account/
+# > PYPI_TEST_TOKEN: "[Sensitive]"
 #
 # - Sentry
 # > SENTRY_AUTH_TOKEN: "[Sensetive]"
@@ -31,9 +31,7 @@
 # == Global settings ==
 
 stages:
-  - 💥 setup
   - 🧪 test
-  - 📦 package
   - 🚚 publish
   - 🐳 build
   - 🚀 release
@@ -45,8 +43,7 @@ variables:
   DOCKER_TLS_VERIFY: 1
   GITLAB_REGISTRY: docker-registry.data.bas.ac.uk
   APP_NAME: magic-map-layers-airflow
-  PYPI_USERNAME: british-antarctic-survey
-  PYPI_TEST_USERNAME: british-antarctic-survey
+  APP_PACKAGE: bas-web-map-inventory
   SENTRY_ORG: antarctica
   SENTRY_PROJECT: web-map-inventory
 
@@ -55,16 +52,6 @@ image:
   entrypoint: [""]
 
 # == Jobs ==
-
-setup-app:
-  stage: 💥 setup
-  script:
-    - "python support/python-packaging/parse_version.py $(git describe --tags) > APP_RELEASE.txt"
-  artifacts:
-    name: "$CI_BUILD_TOKEN-release"
-    paths:
-      - APP_RELEASE.txt
-    expire_in: 1 month
 
 test-app:
   stage: 🧪 test
@@ -97,37 +84,51 @@ coverage-app:
       - htmlcov
     expire_in: 1 month
 
+typehints-app:
+  stage: 🧪 test
+  script:
+    - "mypy --junit-xml typehint-results.xml bas_web_map_inventory/"
+  artifacts:
+    reports:
+      junit: typehint-results.xml
+
 pep8-app:
   stage: 🧪 test
   script:
-    - "flake8 ."
+    - "black --check bas_web_map_inventory/"
 
 bandit-app:
   stage: 🧪 test
   script:
     - "bandit -r ."
 
-package-app:
-  stage: 📦 package
+publish-app-stage:
+  stage: 🚚 publish
+  before_script:
+    - "poetry config pypi-token.pypi-testing $PYPI_TEST_TOKEN --local"
+    - "python support/python-packaging/parse_version.py $(git describe --tags) --pyproject"
   script:
-    - "python setup.py sdist bdist_wheel"
+    - "poetry publish --build --repository pypi-testing --no-interaction"
   artifacts:
     name: "$CI_BUILD_TOKEN-build"
     paths:
       - dist
     expire_in: 1 month
-
-publish-app-stage:
-  stage: 🚚 publish
-  script:
-    - "python -m twine upload --repository-url https://test.pypi.org/legacy/ --username $PYPI_TEST_USERNAME --password $PYPI_TEST_PASSWORD --disable-progress-bar --verbose dist/*"
   only:
     - master
 
 publish-app-prod:
   stage: 🚚 publish
+  before_script:
+    - "poetry config pypi-token.pypi $PYPI_TOKEN --local"
+    - "python support/python-packaging/parse_version.py $(git describe --tags) --pyproject"
   script:
-    - "python -m twine upload --username $PYPI_USERNAME --password $PYPI_PASSWORD --disable-progress-bar --verbose dist/*"
+    - "poetry publish --build --repository pypi --no-interaction"
+  artifacts:
+    name: "$CI_BUILD_TOKEN-build"
+    paths:
+      - dist
+    expire_in: 1 month
   only:
     - tags
 
@@ -139,18 +140,22 @@ build-stage:
   before_script:
     - 'cp $DOT_ENV provisioning/docker/.env'
     - 'cp $DOT_FLASKENV provisioning/docker/.flaskenv'
+    - 'apk update && apk add python3 git'
+    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
+    - 'export PACKAGE_VERSION=$APP_PACKAGE==$VERSION'
+    - 'cp dist/*.whl provisioning/docker/'
   script:
     - 'cd provisioning/docker'
     - 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin'
-    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:latest'
+    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:latest --build-arg PACKAGE_VERSION=$PACKAGE_VERSION'
     - 'docker push $CI_REGISTRY_IMAGE/deploy:latest'
   services:
     - docker:dind
   tags:
     - dnd
-# skip for now
-#  only:
-#    - master
+  only:
+    - master
+
 build-prod:
   stage: 🐳 build
   image:
@@ -159,11 +164,16 @@ build-prod:
   before_script:
     - 'cp $DOT_ENV provisioning/docker/.env'
     - 'cp $DOT_FLASKENV provisioning/docker/.flaskenv'
+    - 'apk update && apk add python3 git'
+    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
+    - 'export PACKAGE_VERSION=$APP_PACKAGE==$VERSION'
+    - 'cp dist/*.whl provisioning/docker/'
   script:
     - 'cd provisioning/docker'
     - 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin'
-    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:$CI_COMMIT_TAG'
-    - 'docker push $CI_REGISTRY_IMAGE/deploy:$CI_COMMIT_TAG'
+    - 'docker build . -t $CI_REGISTRY_IMAGE/deploy:stable -t $CI_REGISTRY_IMAGE/deploy:$PACKAGE_VERSION --build-arg PACKAGE_VERSION=$PACKAGE_VERSION'
+    - 'docker push $CI_REGISTRY_IMAGE/deploy:stable'
+    - 'docker push $CI_REGISTRY_IMAGE/deploy:$PACKAGE_VERSION'
   services:
     - docker:dind
   tags:
@@ -176,9 +186,12 @@ sentry-stage:
   image:
     name: getsentry/sentry-cli
     entrypoint: [""]
+  before_script:
+    - 'apk update && apk add python3 git'
+    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
   script:
-    - "sentry-cli releases new --finalize $(cat APP_RELEASE.txt)"
-    - "sentry-cli releases deploys $(cat APP_RELEASE.txt) new -e staging"
+    - "sentry-cli releases new --finalize $VERSION"
+    - "sentry-cli releases deploys $VERSION new -e staging"
   only:
     - master
 
@@ -187,8 +200,11 @@ sentry-prod:
   image:
     name: getsentry/sentry-cli
     entrypoint: [""]
+  before_script:
+    - 'apk update && apk add python3 git'
+    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
   script:
-    - "sentry-cli releases new --finalize $(cat APP_RELEASE.txt)"
-    - "sentry-cli releases deploys $(cat APP_RELEASE.txt) new -e production"
+    - "sentry-cli releases new --finalize $VERSION"
+    - "sentry-cli releases deploys $VERSION new -e production"
   only:
     - tags
