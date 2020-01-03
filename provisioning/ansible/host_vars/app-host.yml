@@ -14,4 +14,4 @@ xml_catalog_items:
   - name: http://www.w3.org/2001/xml.xsd
     uri: file:///home/geoweb/.virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xml.xsd
   - name: http://www.w3.org/1999/xlink.xsd
-    uri: file:///home/geoweb/.virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xml.xsd
+    uri: file:///home/geoweb/.virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xlink.xsd

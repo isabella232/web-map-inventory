@@ -2,5 +2,5 @@
 <!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
   <uri name="http://www.w3.org/2001/xml.xsd" uri="file:///usr/local/virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xml.xsd"/>
-  <uri name="http://www.w3.org/1999/xlink.xsd" uri="file:///usr/local/virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xml_schemas/xlink.xsd"/>
+  <uri name="http://www.w3.org/1999/xlink.xsd" uri="file:///usr/local/virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xlink.xsd"/>
 </catalog>
