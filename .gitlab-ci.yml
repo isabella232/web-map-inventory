@@ -229,6 +229,8 @@ deploy-stage:
   script:
     - "cd provisioning/ansible"
     - "ansible-playbook --user geoweb deploy.yml --extra-vars \"target=staging package_name=$APP_PACKAGE package_version=$VERSION\""
+  only:
+    - master
   environment:
     name: Staging
 
