@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Ansible deployment support [#35](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
 
+### Changed
+
+* Improving deployment container usage [#38](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/38)
+
 ## [0.2.1] - 2020-01-02
 
 ### Fixed
