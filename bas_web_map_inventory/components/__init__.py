@@ -328,7 +328,7 @@ class Style:
             "type": self.type.value,
             "relationships": {"namespaces": None},
         }
-        if self.relationships["namespaces"] is not None:
+        if "namespaces" in self.relationships and self.relationships["namespaces"] is not None:
             # noinspection PyTypeChecker
             _style["relationships"]["namespaces"] = self.relationships["namespaces"].id
 
@@ -460,8 +460,9 @@ class Layer:
             _layer["geometry"] = self.geometry_type.value
         for service in self.services:
             _layer["services"].append(service.value)
-        for style in self.relationships["styles"]:
-            _layer["relationships"]["styles"].append(style.id)
+        if "styles" in self.relationships:
+            for style in self.relationships["styles"]:
+                _layer["relationships"]["styles"].append(style.id)
 
         return _layer
 
@@ -555,13 +556,15 @@ class LayerGroup:
         for service in self.services:
             _layer_group["services"].append(service.value)
 
-        if self.relationships["namespaces"] is not None:
+        if "namespaces" in self.relationships and self.relationships["namespaces"] is not None:
             # noinspection PyTypeChecker
             _layer_group["relationships"]["namespaces"] = self.relationships["namespaces"].id
-        for layer in self.relationships["layers"]:
-            _layer_group["relationships"]["layers"].append(layer.id)
-        for style in self.relationships["styles"]:
-            _layer_group["relationships"]["styles"].append(style.id)
+        if "layers" in self.relationships:
+            for layer in self.relationships["layers"]:
+                _layer_group["relationships"]["layers"].append(layer.id)
+        if "styles" in self.relationships:
+            for style in self.relationships["styles"]:
+                _layer_group["relationships"]["styles"].append(style.id)
 
         return _layer_group
 

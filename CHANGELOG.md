@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-* Errors in XML catalogue [39](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/39)
+* Errors in XML catalogue [#39](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/39)
+* Errors exporting related items in components [#44](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/44)
 
 ### Changed
 
