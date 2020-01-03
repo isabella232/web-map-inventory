@@ -222,6 +222,8 @@ deploy-stage:
     - "mkdir -p /root/.ssh"
     - "mv $SSH_PRIVATE_KEY ~/.ssh/id_rsa"
     - "chmod 400 ~/.ssh/id_rsa"
+    - "mkdir -p provisioning/ansible/files"
+    - "cp dist/*.whl provisioning/ansible/files/$APP_PACKAGE.whl"
     - "mv provisioning/ansible/ansible.cfg /etc/ansible/ansible.cfg"
     - "mv provisioning/ansible/inventory.yml /etc/ansible/hosts"
   script:
