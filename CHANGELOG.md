@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-* Initial Ansible deployment support for production environments [#35](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
+* Ansible deployment support [#35](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
 
 ## [0.2.1] - 2020-01-02
 

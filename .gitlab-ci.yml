@@ -46,6 +46,7 @@ variables:
   GITLAB_REGISTRY: docker-registry.data.bas.ac.uk
   APP_NAME: magic-map-layers-airflow
   APP_PACKAGE: bas-web-map-inventory
+  APP_MODULE: bas_web_map_inventory
   SENTRY_ORG: antarctica
   SENTRY_PROJECT: web-map-inventory
 
@@ -223,12 +224,12 @@ deploy-stage:
     - "mv $SSH_PRIVATE_KEY ~/.ssh/id_rsa"
     - "chmod 400 ~/.ssh/id_rsa"
     - "mkdir -p provisioning/ansible/files"
-    - "cp dist/*.whl provisioning/ansible/files/$APP_PACKAGE.whl"
+    - "cp dist/*.whl provisioning/ansible/files/"
     - "mv provisioning/ansible/ansible.cfg /etc/ansible/ansible.cfg"
     - "mv provisioning/ansible/inventory.yml /etc/ansible/hosts"
   script:
     - "cd provisioning/ansible"
-    - "ansible-playbook --user geoweb deploy.yml --extra-vars \"target=staging package_name=$APP_PACKAGE package_version=$VERSION\""
+    - "ansible-playbook --user geoweb deploy.yml --extra-vars \"target=staging module_name=$APP_MODULE package_name=$APP_PACKAGE package_version=$VERSION\""
   only:
     - master
   environment:
