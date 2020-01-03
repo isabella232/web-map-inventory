@@ -211,6 +211,25 @@ sentry-prod:
   only:
     - tags
 
+deploy-stage:
+  stage: 🚀 release
+  image:
+    name: williamyeh/ansible:alpine3
+    entrypoint: [""]
+  before_script:
+    - 'apk update && apk add python3 git'
+    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
+    - "mkdir -p /root/.ssh"
+    - "mv $SSH_PRIVATE_KEY ~/.ssh/id_rsa"
+    - "chmod 400 ~/.ssh/id_rsa"
+    - "mv provisioning/ansible/ansible.cfg /etc/ansible/ansible.cfg"
+    - "mv provisioning/ansible/inventory.yml /etc/ansible/hosts"
+  script:
+    - "cd provisioning/ansible"
+    - "ansible-playbook --user geoweb deploy.yml --extra-vars \"target=staging package_name=$APP_PACKAGE package_version=$VERSION\""
+  environment:
+    name: Staging
+
 deploy-prod:
   stage: 🚀 release
   image:

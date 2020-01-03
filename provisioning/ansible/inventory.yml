@@ -1,6 +1,10 @@
 all:
   children:
+    staging:
+      hosts:
+        app-host:
+          ansible_host: 134.209.179.129
     production:
       hosts:
         app-host:
-          ansible_host: 157.245.37.169
+          ansible_host: bsl-flaskcli-dev
