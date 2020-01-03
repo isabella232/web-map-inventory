@@ -25,13 +25,15 @@ RUN yum -y install python3
 
 RUN adduser geoweb
 USER geoweb
-WORKDIR /home/geoweb
 
 COPY catalog.xml /etc/xml/catalog
 COPY --chown=geoweb:geoweb --from=build /usr/local/virtualenvs/bas_web_map_inventory /usr/local/virtualenvs/bas_web_map_inventory
-COPY --chown=geoweb:geoweb .flaskenv manage.py /home/geoweb/apps/web-map-inventory/
-COPY --chown=geoweb:geoweb .env /home/geoweb/apps/web-map-inventory/
-COPY --chown=geoweb:geoweb entrypoint.sh /home/geoweb/apps/bin/web-map-inventory
-ENV PATH="/home/geoweb/apps/bin:$PATH";
+COPY --chown=geoweb:geoweb manage.py /home/geoweb/
+ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
+ENV FLASK_APP=/home/geoweb/manage.py
+ENV FLASK_ENV=production
+ENV LOG_FILE_PATH=/tmp/app.log
+ENV APP_ENABLE_FILE_LOGGING=false
 
-ENTRYPOINT []
+WORKDIR /home/geoweb/.config/web-map-inventory
+ENTRYPOINT ["flask"]
