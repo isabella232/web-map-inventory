@@ -3,8 +3,8 @@ all:
     staging:
       hosts:
         app-host:
-          ansible_host: 134.209.179.129
+          ansible_host: bsl-flaskcli-dev.nerc-bas.ac.uk
     production:
       hosts:
         app-host:
-          ansible_host: bsl-flaskcli-dev
+          ansible_host: bsl-flaskcli-dev.nerc-bas.ac.uk
