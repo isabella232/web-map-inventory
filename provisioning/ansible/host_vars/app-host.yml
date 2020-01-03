@@ -1,0 +1,17 @@
+---
+
+virtualenvs_dir: "{{ ansible_env.HOME }}/.virtualenvs"
+entrypoints_dir: "{{ ansible_env.HOME }}/bin"
+configs_dir: "{{ ansible_env.HOME }}/.config"
+logs_dir: "{{ ansible_env.HOME }}/logs"
+
+apps:
+  - name: web-map-inventory
+    package_name: bas_web_map_inventory
+    environment: production
+
+xml_catalog_items:
+  - name: http://www.w3.org/2001/xml.xsd
+    uri: file:///home/geoweb/.virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xml.xsd
+  - name: http://www.w3.org/1999/xlink.xsd
+    uri: file:///home/geoweb/.virtualenvs/bas_web_map_inventory/lib/python3.6/site-packages/bas_web_map_inventory/resources/xml_schemas/xml.xsd

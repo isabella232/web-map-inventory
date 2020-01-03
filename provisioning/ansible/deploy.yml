@@ -1,0 +1,24 @@
+---
+
+- name: setup python applications
+  hosts: "{{ target }}"
+  remote_user: geoweb
+  tasks:
+    - name: copy python package
+      copy:
+        src: "{{ package_name }}.whl"
+        dest: /temp/
+      when: target == "staging"
+    - name: install/update applications
+      pip:
+        name: "{{ package_name }}=={{ package_version }}"
+        virtualenv: "{{ virtualenvs_dir }}/{{ package_name }}"
+        virtualenv_command: /usr/bin/python3.6 -m venv
+        virtualenv_site_packages: no
+        extra_args: "--find-links=file:///tmp"
+        state: forcereinstall
+    - name: cleanup python package
+      file:
+        path: "/tmp/{{ package_name }}.whl"
+        state: absent
+      when: target == "staging"

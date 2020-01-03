@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# {{ ansible_managed }}
+
+set -e
+
+export PATH="{{ virtualenvs_dir }}/{{ item.name }}/bin:$PATH";
+export FLASK_APP="{{ configs_dir }}/{{ item.name }}/manage.py";
+export FLASK_ENV="{{ item.environment }}";
+export LOG_FILE_PATH="{{ logs_dir }}/{{ item.name }}.log";
+
+# Must use an absolute path
+(cd "{{ configs_dir }}/{{ item.name }}" && exec flask "$@");

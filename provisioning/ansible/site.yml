@@ -1,0 +1,75 @@
+---
+
+# The tasks in this first play would normally be performed by the IT provisioning workflow
+
+- name: setup python application hosts
+  hosts: "{{ target }}"
+  remote_user: root
+  tasks:
+    - name: setup IUS repository
+      yum:
+        name:
+          - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+          - https://repo.ius.io/ius-release-el7.rpm
+        state: present
+    - name: install Python
+      yum:
+        name:
+          - python36
+        state: present
+    - name: create user account
+      user:
+        name: geoweb
+        comment: BAS MAGIC
+    - name: configure authorised keys for user
+      authorized_key:
+        user: geoweb
+        state: present
+        # Note: this is not ideal as the repo server is not served over HTTPS
+        key: http://bsl-repoa.nerc-bas.ac.uk/magic/v1/projects/authorised-keys/latest/authorized_keys
+
+
+# These plays are a minimal attempt for deploying multiple applications. It could easily be replaced with something else.
+
+- name: setup python applications (privileged)
+  hosts: app-host
+  remote_user: root
+  tasks:
+    - name: create XML config directory
+      file:
+        path: /etc/xml/catalog
+        state: directory
+    - name: generate XML catalog
+      template:
+        src: templates/xml-catalog.xml.j2
+        dest: /etc/xml/catalog
+
+- name: setup python applications
+  hosts: app-host
+  remote_user: geoweb
+  tasks:
+    - name: create application directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - "{{ virtualenvs_dir }}"
+        - "{{ entrypoints_dir }}"
+        - "{{ configs_dir }}"
+        - "{{ logs_dir }}"
+    - name: create application directories
+      file:
+        path: "{{ configs_dir }}/{{ item.name }}"
+        state: directory
+      loop: "{{ apps }}"
+    - name: generate application entrypoints
+      template:
+        src: templates/entrypoint.sh.j2
+        dest: "{{ entrypoints_dir }}/{{ item.name }}"
+        mode: 0755
+      loop: "{{ apps }}"
+    - name: generate application launch scripts
+      template:
+        src: templates/manage.py.j2
+        dest: "{{ configs_dir }}/{{ item.name }}/manage.py"
+      loop: "{{ apps }}"

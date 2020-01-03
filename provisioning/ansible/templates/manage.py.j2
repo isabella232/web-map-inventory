@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+
+from {{ item.package_name }} import create_app
+
+app = create_app()

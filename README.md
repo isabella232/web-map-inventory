@@ -246,9 +246,16 @@ be used automatically by most XML libraries and tools (such as `lxml` and `xmlli
 
 ## Setup
 
-The application for this project runs as Docker container. It can be setup locally or on the BAS central worksations
-using Podman. You will need access to the private BAS Docker Registry (part of 
-[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)), or the ability to build images container images locally
+The application for this project runs as either a Docker container or deployed as a Python package in a virtual machine.
+
+Once setup, see the [Data sources](#managing-data-sources) and [Usage](#usage) sections for how to use and run the 
+application.
+
+### Setup as a container
+
+When setup as a container, the project can run locally or on the BAS central worksations using Podman. You will need 
+access to the private BAS Docker Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)), or to 
+build container images locally.
 
 **Note:** Podman support in BAS is currently experimental, contact the IT Service Desk for more information. Unless 
 noted, `docker` commands listed here can be replaced with `podman`.
@@ -261,24 +268,45 @@ $ docker pull docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:stab
 **Note:** [Other image tags](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/container_registry) are available if 
 you want to run pre-release versions, or a specific previous version.
 
-You will need to create a directory to contain required [Configuration files](#configuration) and data output:
+Before you can run the container, you will need to create a runtime directory, and populate it with required required 
+[Configuration files](#configuration) and data output files that will live outside of the container:
 
 ```shell
 $ mkdir -p ~/.config/web-map-inventory
 ```
 
-See the [Data sources](#managing-data-sources) and [Usage](#usage) sections for how to use and run the application.
+### Setup using Ansible
 
 ## Development
+When setup using Ansible, it is assumed the target virtual machine will be used for running other Python applications
+isolated by virtual environments.
+
+**Note:** This Ansible configuration is intentionally minimal and simplistic so that it can be easily replaced or 
+absorbed into a larger setup.
+
+Virtual machines are defined in Ansible's inventory file, grouped by environment (staging and production). To setup an
+environment, you will need access to the root account on each of its virtual machines:
 
 ### Development container
+```shell
+$ cd provisioning/ansible
+$ docker-compose run ansible
+$ ansible-playbook site.yml --extra-vars 'target=[staging/production]'
+```
+
+Where the `target` variable sets which environment's hosts the playbook will target.
+
+Once setup, you will need to populate the runtime directory, `/home/geoweb/.config/web-map-inventory/`,  with required 
+[Configuration files](#configuration) and data output files and to deploy an application version.
+
 
 ```shell
 $ git clone https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory
 $ cd map-layer-index
 ```
 
-The `:latest` Docker tag/image is used for developing this project. It can be ran using Docker and Docker Compose:
+
+The `:latest` container image is used for developing this project. It can run locally using Docker and Docker Compose:
 
 ```shell
 $ docker login docker-registry.data.bas.ac.uk
@@ -465,6 +493,20 @@ This project is distributed as a Docker/OCI image, hosted in the private BAS Doc
 *master* branch, as well as `/deploy:release-stable` and `/deploy:release-[release]` images for tagged commits.
 
 **Note:** This image cannot be built outside of GitLab, as it relies on artifacts passed between build stages.
+
+### Ansible managed hosts
+
+Typically, [Continuous Deployment](#continuous-deployment) will deploy a suitable version of the project 
+[Python package](#python-package) within each environment automatically. To do so manually:
+
+```shell
+$ cd provisioning/ansible
+$ docker-compose run ansible
+$ ansible-playbook deploy.yml --extra-vars 'target=[staging/production] package_name=bas-web-map-inventory package_version=[version]'
+```
+
+Where the `target` variable sets which environment's hosts the playbook will target and `package_version` sets which
+version to install.
 
 ### Continuous Deployment
 
