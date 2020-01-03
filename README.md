@@ -15,19 +15,10 @@ See the [Data model](#data-model) section for more information about what this i
 
 These tasks run in a container. See the [Setup](#setup) section for setup instructions.
 
-If running locally:
+If running on the BAS central worksations:
 
 ```shell
-$ docker run --rm=true --tty --interactive --volume [path to runtime directory]:/home/geoweb/apps/web-map-inventory/data/:rw docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:stable bash
-$ web-map-inventory [task]
-```
-
-(Where `[path to runtime directory]` is the path to a runtime created during [Setup](#setup)), 
-
-If using the BAS central worksations use this instead:
-
-```shell
-$ podman run --rm=true --tty --interactive --user=root --volume ~/.config/web-map-inventory/:/home/geoweb/apps/web-map-inventory/data/:rw docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:stable bash
+$ ssh geoweb@bslws01.nerc-bas.ac.uk
 $ web-map-inventory [task]
 ```
 
@@ -274,6 +265,29 @@ Before you can run the container, you will need to create a runtime directory, a
 ```shell
 $ mkdir -p ~/.config/web-map-inventory
 ```
+
+#### Optional wrapper script
+
+If using podman, a wrapper script, `support/container-wrapper/podman-wrapper.sh`, is available to make running the 
+container easier for end-users. 
+
+To use, copy this script to a location and enable it to be executed:
+
+```shell
+$ mkdir ~/bin
+# copy `support/container-wrapper/podman-wrapper.sh` as `~/bin/web-map-inventory`
+$ chmod +x ~/bin/web-map-inventory
+```
+
+Then ensure `~/bin` is part of the user's path (use `echo $PATH` to check), if it isn't edit the user's shell to include
+it (these instructions assume the bash shell and the absolute path to the user's home directory is `/home/foo`):
+
+```shell
+$ vi ~/.bash_rc
+# add `export PATH="/home/foo/bin:$PATH" then save the file and reload the user's shell
+```
+
+You should now be able to run `web-map-inventory` to run the container.
 
 ### Setup using Ansible
 
