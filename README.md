@@ -291,7 +291,6 @@ You should now be able to run `web-map-inventory` to run the container.
 
 ### Setup using Ansible
 
-## Development
 When setup using Ansible, it is assumed the target virtual machine will be used for running other Python applications
 isolated by virtual environments.
 
@@ -301,7 +300,6 @@ absorbed into a larger setup.
 Virtual machines are defined in Ansible's inventory file, grouped by environment (staging and production). To setup an
 environment, you will need access to the root account on each of its virtual machines:
 
-### Development container
 ```shell
 $ cd provisioning/ansible
 $ docker-compose run ansible
@@ -313,12 +311,14 @@ Where the `target` variable sets which environment's hosts the playbook will tar
 Once setup, you will need to populate the runtime directory, `/home/geoweb/.config/web-map-inventory/`,  with required 
 [Configuration files](#configuration) and data output files and to deploy an application version.
 
+## Development
 
 ```shell
 $ git clone https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory
 $ cd map-layer-index
 ```
 
+### Development environment
 
 The `:latest` container image is used for developing this project. It can run locally using Docker and Docker Compose:
 
@@ -450,14 +450,11 @@ for more information).
 
 A run/debug configuration, *App*, is included in the project.
 
-## Testing
+### Testing
 
-All code in the `bas_web_map_inventory` module must be covered by tests.
-
-### PyTest
-
-This project uses [PyTest](https://docs.pytest.org/en/latest/) for unit/integration testing. Tests are defined in
-`tests/` and should be ran in a random order using [pytest-random-order](https://pypi.org/project/pytest-random-order/).
+All code in the `bas_web_map_inventory` module must be covered by tests, defined in `tests/`. This project uses 
+[PyTest](https://docs.pytest.org/en/latest/) which should be ran in a random order using 
+[pytest-random-order](https://pypi.org/project/pytest-random-order/).
 
 To run tests manually from the command line:
 
@@ -465,11 +462,11 @@ To run tests manually from the command line:
 $ docker-compose run app -e FLASK_ENV=testing app pytest --random-order
 ```
 
-To run tests manually using PyCharm use the included *App (Integration)* run/debug configuration.
+To run tests manually using PyCharm, use the included *App (Integration)* run/debug configuration.
 
 Tests are ran automatically in [Continuous Integration](#continuous-integration).
 
-### Test coverage
+#### Test coverage
 
 [pytest-cov](https://pypi.org/project/pytest-cov/) is used to measure test coverage.
 
@@ -483,7 +480,7 @@ $ docker-compose run app -e FLASK_ENV=testing app pytest --cov=bas_web_map_inven
 
 [Continuous Integration](#continuous-integration) will check coverage automatically and fail if less than 100%.
 
-### Continuous Integration
+#### Continuous Integration
 
 All commits will trigger a Continuous Integration process using GitLab's CI/CD platform, configured in `.gitlab-ci.yml`.
 
@@ -500,8 +497,8 @@ Package versions are determined automatically using the `support/python-packagin
 
 ### Docker image
 
-This project is distributed as a Docker/OCI image, hosted in the private BAS Docker Registry (part of 
-[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
+The project [Python package](#python-package) is available as a Docker/OCI image, hosted in the private BAS Docker 
+Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
 
 [Continuous Delivery](#continuous-deployment) will automatically build a `/deploy:latest` image for commits to the 
 *master* branch, as well as `/deploy:release-stable` and `/deploy:release-[release]` images for tagged commits.

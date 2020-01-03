@@ -18,10 +18,10 @@
 # > DOT_FLASKENV (protected, file): "[contents of .flaskenv]"
 #
 # - PyPi (production) - create tokens at https://pypi.org/manage/account/
-# > PYPI_TOKEN: "[Sensitive]"
+# > PYPI_TOKEN (protected): "[Sensitive]"
 #
 # - PyPi (staging) - create tokens at https://test.pypi.org/manage/account/
-# > PYPI_TEST_TOKEN: "[Sensitive]"
+# > PYPI_TEST_TOKEN (protected): "[Sensitive]"
 #
 # - Sentry
 # > SENTRY_AUTH_TOKEN: "[Sensetive]"
@@ -184,34 +184,6 @@ build-prod:
   only:
     - tags
 
-sentry-stage:
-  stage: 🚀 release
-  image:
-    name: getsentry/sentry-cli
-    entrypoint: [""]
-  before_script:
-    - 'apk update && apk add python3 git'
-    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
-  script:
-    - "sentry-cli releases new --finalize $VERSION"
-    - "sentry-cli releases deploys $VERSION new -e staging"
-  only:
-    - master
-
-sentry-prod:
-  stage: 🚀 release
-  image:
-    name: getsentry/sentry-cli
-    entrypoint: [""]
-  before_script:
-    - 'apk update && apk add python3 git'
-    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
-  script:
-    - "sentry-cli releases new --finalize $VERSION"
-    - "sentry-cli releases deploys $VERSION new -e production"
-  only:
-    - tags
-
 deploy-stage:
   stage: 🚀 release
   image:
@@ -256,3 +228,31 @@ deploy-prod:
   when: manual
   environment:
     name: Production
+
+sentry-stage:
+  stage: 🚀 release
+  image:
+    name: getsentry/sentry-cli
+    entrypoint: [""]
+  before_script:
+    - 'apk update && apk add python3 git'
+    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
+  script:
+    - "sentry-cli releases new --finalize $VERSION"
+    - "sentry-cli releases deploys $VERSION new -e staging"
+  only:
+    - master
+
+sentry-prod:
+  stage: 🚀 release
+  image:
+    name: getsentry/sentry-cli
+    entrypoint: [""]
+  before_script:
+    - 'apk update && apk add python3 git'
+    - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
+  script:
+    - "sentry-cli releases new --finalize $VERSION"
+    - "sentry-cli releases deploys $VERSION new -e production"
+  only:
+    - tags
