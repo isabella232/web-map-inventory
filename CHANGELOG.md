@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+* Aligning development and deployment Dockerfiles [#38](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/38)
 * Improving deployment container [#38](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/38)
 
 ## [0.2.1] - 2020-01-02

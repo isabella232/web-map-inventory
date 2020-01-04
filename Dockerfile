@@ -1,29 +1,45 @@
-FROM python:3.6-alpine
+FROM python:3.6-alpine as base
 
 LABEL maintainer = "Felix Fennell <felnne@bas.ac.uk>"
 
-WORKDIR /usr/src/app
-ENV PYTHONPATH /usr/src/app
-ENV POETRY_VIRTUALENVS_CREATE false
+ENV APPPATH=/usr/src/app/
+ENV PYTHONPATH=$APPPATH
 
-# Setup project dependencies
+RUN mkdir $APPPATH
+WORKDIR $APPPATH
+
+RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils coreutils git && \
+    apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community --repository http://dl-cdn.alpinelinux.org/alpine/edge/main proj-dev proj-util
+
+
+FROM base as build
+
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing --repository http://dl-cdn.alpinelinux.org/alpine/edge/main build-base
+RUN python3 -m venv /usr/local/virtualenvs/bas_web_map_inventory
+ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
+
+# pre-install known wheels to save time
+ADD http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/pyproj-2.4.2.post1-cp36-cp36m-linux_x86_64.whl http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/lxml-4.4.2-cp36-cp36m-linux_x86_64.whl /tmp/wheelhouse/
+RUN pip install --no-index --find-links=file:///tmp/wheelhouse lxml==4.4.2 pyproj==2.4.2.post1
+
+COPY pyproject.toml poetry.toml poetry.lock $APPPATH
+RUN pip install --no-cache-dir poetry==1.0.0
+RUN poetry update --no-interaction --no-ansi
+RUN poetry install --no-root --no-interaction --no-ansi
+
+
+FROM base as run
+
+ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
+ENV FLASK_APP=/usr/src/app/manage.py
+ENV FLASK_ENV=development
+ENV LOG_FILE_PATH=/tmp/app.log
+ENV APP_ENABLE_FILE_LOGGING=false
+
 COPY support/xml-schemas/catalogue.xml /etc/xml/catalog
-COPY poetry.lock pyproject.toml /usr/src/app/
-RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils coreutils && \
-    apk add --no-cache --virtual .build-deps --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing --repository http://dl-cdn.alpinelinux.org/alpine/edge/main build-base && \
-    apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community --repository http://dl-cdn.alpinelinux.org/alpine/edge/main proj-dev proj-util git && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir poetry==1.0.0 && \
-    poetry update --no-interaction --no-ansi && \
-    poetry install --no-root --no-interaction --no-ansi && \
-    apk --purge del .build-deps
+COPY --from=build /usr/local/virtualenvs/bas_web_map_inventory/ /usr/local/virtualenvs/bas_web_map_inventory/
 
-# Setup runtime
-RUN adduser -D app && \
-    mkdir -p /var/log/app && \
-    chown app:root /usr/src/app /var/log/app
-
-ENV FLASK_ENV development
-
-USER app
+RUN adduser -D geoweb
+RUN chown geoweb:root $APPPATH
+USER geoweb
 ENTRYPOINT []

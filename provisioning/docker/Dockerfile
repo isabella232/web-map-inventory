@@ -10,11 +10,13 @@ FROM base as build
 
 ARG PACKAGE_VERSION
 
-COPY wheelhouse/ /tmp/wheelhouse/
-ADD http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/pyproj-2.4.2.post1-cp36-cp36m-linux_x86_64.whl http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/lxml-4.4.2-cp36-cp36m-linux_x86_64.whl /tmp/wheelhouse/
 RUN python3 -m venv /usr/local/virtualenvs/bas_web_map_inventory
 ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
+
+COPY wheelhouse/ /tmp/wheelhouse/
+ADD http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/pyproj-2.4.2.post1-cp36-cp36m-linux_x86_64.whl http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/lxml-4.4.2-cp36-cp36m-linux_x86_64.whl /tmp/wheelhouse/
 RUN pip install --index-url https://test.pypi.org/simple/ --extra-index-url=https://pypi.org/simple/ --find-links=file:///tmp/wheelhouse $PACKAGE_VERSION
+
 
 FROM base as run
 
@@ -25,9 +27,10 @@ ENV LOG_FILE_PATH=/tmp/app.log
 ENV APP_ENABLE_FILE_LOGGING=false
 
 RUN adduser -D geoweb
+
+COPY --from=build /usr/local/virtualenvs/bas_web_map_inventory /usr/local/virtualenvs/bas_web_map_inventory
 COPY catalog.xml /etc/xml/catalog
 COPY --chown=geoweb:geoweb manage.py $FLASK_APP
-COPY --from=build /usr/local/virtualenvs/bas_web_map_inventory /usr/local/virtualenvs/bas_web_map_inventory
 
 USER geoweb
 WORKDIR /home/geoweb/.config/web-map-inventory
