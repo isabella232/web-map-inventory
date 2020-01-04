@@ -141,12 +141,13 @@ build-stage:
     name: docker:19.03-dind
     entrypoint: [""]
   before_script:
-    - 'cp $DOT_ENV provisioning/docker/.env'
-    - 'cp $DOT_FLASKENV provisioning/docker/.flaskenv'
-    - 'apk update && apk add python3 git'
+    - "apk update && apk add python3 git"
     - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
-    - 'export PACKAGE_VERSION=$APP_PACKAGE==$VERSION'
-    - 'cp dist/*.whl provisioning/docker/'
+    - "export PACKAGE_VERSION=$APP_PACKAGE==$VERSION"
+    - "cp $DOT_ENV provisioning/docker/.env"
+    - "cp $DOT_FLASKENV provisioning/docker/.flaskenv"
+    - "mkdir -p provisioning/docker/wheelhouse"
+    - "cp dist/*.whl provisioning/docker/wheelhouse"
   script:
     - 'cd provisioning/docker'
     - 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin'
@@ -165,12 +166,13 @@ build-prod:
     name: docker:19.03-dind
     entrypoint: [""]
   before_script:
-    - 'cp $DOT_ENV provisioning/docker/.env'
-    - 'cp $DOT_FLASKENV provisioning/docker/.flaskenv'
-    - 'apk update && apk add python3 git'
+    - "apk update && apk add python3 git"
     - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
-    - 'export PACKAGE_VERSION=$APP_PACKAGE==$VERSION'
-    - 'cp dist/*.whl provisioning/docker/'
+    - "export PACKAGE_VERSION=$APP_PACKAGE==$VERSION"
+    - "cp $DOT_ENV provisioning/docker/.env"
+    - "cp $DOT_FLASKENV provisioning/docker/.flaskenv"
+    - "mkdir -p provisioning/docker/wheelhouse"
+    - "cp dist/*.whl provisioning/docker/wheelhouse"
   script:
     - 'cd provisioning/docker'
     - 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin'
