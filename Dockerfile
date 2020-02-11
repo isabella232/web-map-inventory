@@ -14,32 +14,39 @@ RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils coreuti
 
 FROM base as build
 
+ENV APPVENV=/usr/local/virtualenvs/bas_web_map_inventory
+
 RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing --repository http://dl-cdn.alpinelinux.org/alpine/edge/main build-base
-RUN python3 -m venv /usr/local/virtualenvs/bas_web_map_inventory
-ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
+RUN python3 -m venv $APPVENV
+ENV PATH="$APPVENV/bin:$PATH"
 
 # pre-install known wheels to save time
 ADD http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/pyproj-2.4.2.post1-cp36-cp36m-linux_x86_64.whl http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/lxml-4.4.2-cp36-cp36m-linux_x86_64.whl /tmp/wheelhouse/
 RUN pip install --no-index --find-links=file:///tmp/wheelhouse lxml==4.4.2 pyproj==2.4.2.post1
 
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir poetry==1.0.0
+
 COPY pyproject.toml poetry.toml poetry.lock $APPPATH
-RUN pip install --no-cache-dir poetry==1.0.0
 RUN poetry update --no-interaction --no-ansi
 RUN poetry install --no-root --no-interaction --no-ansi
 
 
 FROM base as run
 
-ENV PATH="/usr/local/virtualenvs/bas_web_map_inventory/bin:$PATH"
+ENV APPVENV=/usr/local/virtualenvs/bas_web_map_inventory
+ENV PATH="$APPVENV/bin:$PATH"
 ENV FLASK_APP=/usr/src/app/manage.py
 ENV FLASK_ENV=development
 ENV LOG_FILE_PATH=/tmp/app.log
 ENV APP_ENABLE_FILE_LOGGING=false
 
 COPY support/xml-schemas/catalogue.xml /etc/xml/catalog
-COPY --from=build /usr/local/virtualenvs/bas_web_map_inventory/ /usr/local/virtualenvs/bas_web_map_inventory/
+COPY --from=build $APPVENV/ $APPVENV/
 
 RUN adduser -D geoweb
-RUN chown geoweb:root $APPPATH
+RUN chown geoweb:root $APPPATH && \
+    chown geoweb:root -R $APPVENV
 USER geoweb
+
 ENTRYPOINT []
