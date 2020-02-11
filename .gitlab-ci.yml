@@ -35,7 +35,7 @@
 stages:
   - 🧪 test
   - 🚚 publish
-  - 🐳 build
+  - 🏗 build
   - 🚀 release
 
 variables:
@@ -135,8 +135,21 @@ publish-app-prod:
   only:
     - tags
 
+build-dev:
+  stage: 🏗 build
+  script:
+    - 'poetry build'
+  artifacts:
+    name: "$CI_BUILD_TOKEN-build"
+    paths:
+      - dist
+    expire_in: 1 week
+  except:
+    - master
+    - tags
+
 build-stage:
-  stage: 🐳 build
+  stage: 🏗 build
   image:
     name: docker:19.03-dind
     entrypoint: [""]
@@ -161,7 +174,7 @@ build-stage:
     - master
 
 build-prod:
-  stage: 🐳 build
+  stage: 🏗 build
   image:
     name: docker:19.03-dind
     entrypoint: [""]
