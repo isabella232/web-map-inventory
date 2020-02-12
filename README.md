@@ -500,12 +500,8 @@ Package versions are determined automatically using the `support/python-packagin
 The project [Python package](#python-package) is available as a Docker/OCI image, hosted in the private BAS Docker 
 Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
 
-[Continuous Delivery](#continuous-deployment) will automatically build a `/deploy:latest` image for commits to the 
-*master* branch, as well as `/deploy:release-stable` and `/deploy:release-[release]` images for tagged commits.
-
-**Note:** This image cannot be built outside of GitLab, as it relies on artifacts passed between build stages.
-
 ### Ansible managed hosts
+[Continuous Delivery](#continuous-deployment) will automatically:
 
 Typically, [Continuous Deployment](#continuous-deployment) will deploy a suitable version of the project 
 [Python package](#python-package) within each environment automatically. To do so manually:
@@ -515,6 +511,9 @@ $ cd provisioning/ansible
 $ docker-compose run ansible
 $ ansible-playbook deploy.yml --extra-vars 'target=[staging/production] package_name=bas-web-map-inventory package_version=[version]'
 ```
+* build a `/deploy:latest` image for commits to the *master* branch
+* build a `/deploy:release-stable` and `/deploy:release-[release]` image for tags
+* deploy new images to the BAS central workstations (by running `podman pull [image]` on the workstations)
 
 Where the `target` variable sets which environment's hosts the playbook will target and `package_version` sets which
 version to install.

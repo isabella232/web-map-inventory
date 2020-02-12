@@ -27,7 +27,7 @@
 # > SENTRY_AUTH_TOKEN: "[Sensetive]"
 # > SENTRY_DSN: "[Sensetive]"
 #
-# - Ansible
+# - Deployment
 # > SSH_PRIVATE_KEY (protected, file): "[contents of BAS MAGIC Shared Deployment Identity private key]"
 
 # == Global settings ==
@@ -49,6 +49,8 @@ variables:
   APP_MODULE: bas_web_map_inventory
   SENTRY_ORG: antarctica
   SENTRY_PROJECT: web-map-inventory
+  DEPLOY_USER: geoweb
+  DEPLOY_HOST: bslws01.nerc-bas.ac.uk
 
 image:
   name: docker-registry.data.bas.ac.uk/magic/web-map-inventory:latest
@@ -198,6 +200,42 @@ build-prod:
     - dnd
   only:
     - tags
+
+release-stage:
+    stage: 🚀 release
+    image:
+      name: alpine:latest
+      entrypoint: [""]
+    before_script:
+      - 'apk update && apk add openssh-client'
+      - "mkdir -p /root/.ssh"
+      - "mv $SSH_PRIVATE_KEY ~/.ssh/id_rsa"
+      - "chmod 400 ~/.ssh/id_rsa"
+      - "ssh-keyscan $DEPLOY_HOST > ~/.ssh/known_hosts"
+    script:
+      - "ssh $DEPLOY_USER@$DEPLOY_HOST podman pull $CI_REGISTRY_IMAGE/deploy:latest"
+    only:
+     - master
+    environment:
+      name: Staging
+
+release-prod:
+  stage: 🚀 release
+  image:
+    name: alpine:latest
+    entrypoint: [""]
+  before_script:
+    - 'apk update && apk add openssh-client'
+    - "mkdir -p /root/.ssh"
+    - "mv $SSH_PRIVATE_KEY ~/.ssh/id_rsa"
+    - "chmod 400 ~/.ssh/id_rsa"
+    - "ssh-keyscan $DEPLOY_HOST > ~/.ssh/known_hosts"
+  script:
+    - "ssh $DEPLOY_USER@$DEPLOY_HOST podman pull $CI_REGISTRY_IMAGE/deploy:stable"
+  only:
+   - tags
+  environment:
+    name: Production
 
 #deploy-stage:
 #  stage: 🚀 release
