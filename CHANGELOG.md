@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Removed [BREAKING!]
+
+* Proof of concept Ansible deployment support [#55](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
+
 ## [0.2.2] - 2020-02-12
 
 ### Added

@@ -289,27 +289,6 @@ $ vi ~/.bash_rc
 
 You should now be able to run `web-map-inventory` to run the container.
 
-### Setup using Ansible
-
-When setup using Ansible, it is assumed the target virtual machine will be used for running other Python applications
-isolated by virtual environments.
-
-**Note:** This Ansible configuration is intentionally minimal and simplistic so that it can be easily replaced or 
-absorbed into a larger setup.
-
-Virtual machines are defined in Ansible's inventory file, grouped by environment (staging and production). To setup an
-environment, you will need access to the root account on each of its virtual machines:
-
-```shell
-$ cd provisioning/ansible
-$ docker-compose run ansible
-$ ansible-playbook site.yml --extra-vars 'target=[staging/production]'
-```
-
-Where the `target` variable sets which environment's hosts the playbook will target.
-
-Once setup, you will need to populate the runtime directory, `/home/geoweb/.config/web-map-inventory/`,  with required 
-[Configuration files](#configuration) and data output files and to deploy an application version.
 
 ## Development
 
@@ -500,23 +479,12 @@ Package versions are determined automatically using the `support/python-packagin
 The project [Python package](#python-package) is available as a Docker/OCI image, hosted in the private BAS Docker
 Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
 
-### Ansible managed hosts
 [Continuous Delivery](#continuous-deployment) will automatically:
 
-Typically, [Continuous Deployment](#continuous-deployment) will deploy a suitable version of the project 
-[Python package](#python-package) within each environment automatically. To do so manually:
-
-```shell
-$ cd provisioning/ansible
-$ docker-compose run ansible
-$ ansible-playbook deploy.yml --extra-vars 'target=[staging/production] package_name=bas-web-map-inventory package_version=[version]'
-```
 * build a `/deploy:latest` image for commits to the *master* branch
 * build a `/deploy:release-stable` and `/deploy:release-[release]` image for tags
 * deploy new images to the BAS central workstations (by running `podman pull [image]` on the workstations)
 
-Where the `target` variable sets which environment's hosts the playbook will target and `package_version` sets which
-version to install.
 
 ### Continuous Deployment
 
