@@ -15,7 +15,7 @@ See the [Data model](#data-model) section for more information about what this i
 
 These tasks run in a container. See the [Setup](#setup) section for setup instructions.
 
-If running on the BAS central worksations:
+If running on the BAS central workstations:
 
 ```shell
 $ ssh geoweb@bslws01.nerc-bas.ac.uk
@@ -41,7 +41,7 @@ lead to resources being removed and re-added unnecessarily but will always remai
 
 #### `data validate`
 
-Validates protocols offered by servers defined in a data sources file (by default `data/sources.json`). 
+Validates protocols offered by servers defined in a data sources file (by default `data/sources.json`).
 
 Options:
 
@@ -71,10 +71,10 @@ Removes all data from Airtable.
 
 ### Managing data sources
 
-Each data source is represented as an object in the `server` list in `data/sources.json` [1]. The structure of each 
+Each data source is represented as an object in the `server` list in `data/sources.json` [1]. The structure of each
 source depends on its type. For more general information, see the [Data sources](#data-sources) section.
 
-[1] This file is either in the runtime path created during [Setup](#setup) or `~/.config/web-map-inventory/` on the BAS 
+[1] This file is either in the runtime path created during [Setup](#setup) or `~/.config/web-map-inventory/` on the BAS
 central servers).
 
 #### Adding new data sources
@@ -152,7 +152,7 @@ It can be visualised as:
 Data sources are *servers* in the project [Data model](#data-model) and define connection details for APIs and services
 each server type provides for fetching information about components they contain (e.g. listing *layers*).
 
-A data sources file, `data/sources.json`, is used for recording these details. An example is available in 
+A data sources file, `data/sources.json`, is used for recording these details. An example is available in
 `data/sources.example.json`. See the [Adding a data source](#adding-new-data-sources) section for more information.
 
 A JSON Schema, `bas_web_map_inventory/resources/json_schemas/data-sources-schema.json`, validates this file.
@@ -217,12 +217,12 @@ Logs for this service are written to *stdout* and a log file, `/var/log/app/app.
 File based logging can be manually controlled by setting the `APP_ENABLE_FILE_LOGGING` and `LOG_FILE_PATH` variables in
 `.flaskenv`.
 
-**Note:** If `LOG_FILE_PATH` is changed, the user in the user the container rans as must be granted suitable write 
+**Note:** If `LOG_FILE_PATH` is changed, the user in the user the container rans as must be granted suitable write
 permissions.
 
 ### XML Catalogue
-  
-An [XML Catalog](https://en.wikipedia.org/wiki/XML_catalog) is used to cache XML files locally (typically XSD's for 
+
+An [XML Catalog](https://en.wikipedia.org/wiki/XML_catalog) is used to cache XML files locally (typically XSD's for
 schemas). This drastically speeds up XML parsing and removes a dependency on remote endpoints.
 
 XML files in the catalogue are typically stored in `bas_web_map_inventory/resources/xml_schemas/`.
@@ -232,35 +232,35 @@ Different catalogue files are used for different container variants due to diffe
 * `:latest`: `./support/xml-schemas/catalogue.xml`
 * `/deploy`: `provisioning/docker/catalog.xml`
 
-In either case, the catalogue is available within the container at the conventional path, `/etc/xml/catalog`, and will 
+In either case, the catalogue is available within the container at the conventional path, `/etc/xml/catalog`, and will
 be used automatically by most XML libraries and tools (such as `lxml` and `xmllint`).
 
 ## Setup
 
 The application for this project runs as either a Docker container or deployed as a Python package in a virtual machine.
 
-Once setup, see the [Data sources](#managing-data-sources) and [Usage](#usage) sections for how to use and run the 
+Once setup, see the [Data sources](#managing-data-sources) and [Usage](#usage) sections for how to use and run the
 application.
 
 ### Setup as a container
 
-When setup as a container, the project can run locally or on the BAS central worksations using Podman. You will need 
-access to the private BAS Docker Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)), or to 
-build container images locally.
+When setup as a container, the project can run locally or on the BAS central workstations using Podman. You will need
+access to the private BAS Docker Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
 
-**Note:** Podman support in BAS is currently experimental, contact the IT Service Desk for more information. Unless 
-noted, `docker` commands listed here can be replaced with `podman`.
+**Note:** Podman support needs to be enabled on a per-account basis. Unless noted, `docker` commands listed here can be
+replaced with `podman`.
 
 ```shell
 $ docker login docker-registry.data.bas.ac.uk
 $ docker pull docker-registry.data.bas.ac.uk/magic/web-map-inventory/deploy:stable
 ```
 
-**Note:** [Other image tags](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/container_registry) are available if 
-you want to run pre-release versions, or a specific previous version.
+**Note:** [Other image tags](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/container_registry) are available if
+you want to run pre-release versions, or a specific, previous, version.
 
-Before you can run the container, you will need to create a runtime directory, and populate it with required required 
-[Configuration files](#configuration) and data output files that will live outside of the container:
+Before you can run the container, you will need to create a runtime directory that will live outside of the container.
+You will need to create the required [Configuration files](#configuration). Any generated output will also be saved
+here.
 
 ```shell
 $ mkdir -p ~/.config/web-map-inventory
@@ -268,10 +268,10 @@ $ mkdir -p ~/.config/web-map-inventory
 
 #### Optional wrapper script
 
-If using podman, a wrapper script, `support/container-wrapper/podman-wrapper.sh`, is available to make running the 
-container easier for end-users. 
+If using podman, a wrapper script, `support/container-wrapper/podman-wrapper.sh`, is available to make running the
+container easier.
 
-To use, copy this script to a location and enable it to be executed:
+To use, copy this script enable it to be executed:
 
 ```shell
 $ mkdir ~/bin
@@ -333,7 +333,7 @@ Then create/configure required [Configuration files](#configuration):
 $ cp .env.example .env
 $ cp .flaskenv.example .flaskenv
 $ cp data/sources.example.json data/sources.json
-``` 
+```
 
 To run/test application commands:
 
@@ -341,8 +341,8 @@ To run/test application commands:
 $ docker-compose run app flask [task]
 ```
 
-[1] You will need access to the private BAS Docker Registry (part of 
-[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)) to pull this image. If you don't, you can build the relevant 
+[1] You will need access to the private BAS Docker Registry (part of
+[gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)) to pull this image. If you don't, you can build the relevant
 image/tag locally instead.
 
 ### Code Style
@@ -367,7 +367,7 @@ Checks are ran automatically in [Continuous Integration](#continuous-integration
 
 ### Type hinting
 
-Python type hints should be used for this project, with the exception of 
+Python type hints should be used for this project, with the exception of
 [missing import](https://mypy.readthedocs.io/en/latest/running_mypy.html#missing-imports) errors (which can be ignored).
 
 [MyPy](https://mypy.readthedocs.io) is used to ensure types agree (where defined), configured in `mypy.ini`.
@@ -384,10 +384,10 @@ Checks are ran automatically in [Continuous Integration](#continuous-integration
 
 Python dependencies for this project are managed with [Poetry](https://python-poetry.org) in `pyproject.toml`.
 
-The development container image installs both runtime and development dependencies. Deployment images only install 
+The development container image installs both runtime and development dependencies. Deployment images only install
 runtime dependencies.
 
-Non-code files, such as static files, can also be included in the [Python package](#python-package) using the 
+Non-code files, such as static files, can also be included in the [Python package](#python-package) using the
 `include` key in `pyproject.toml`.
 
 To add a new (development) dependency:
@@ -452,8 +452,8 @@ A run/debug configuration, *App*, is included in the project.
 
 ### Testing
 
-All code in the `bas_web_map_inventory` module must be covered by tests, defined in `tests/`. This project uses 
-[PyTest](https://docs.pytest.org/en/latest/) which should be ran in a random order using 
+All code in the `bas_web_map_inventory` module must be covered by tests, defined in `tests/`. This project uses
+[PyTest](https://docs.pytest.org/en/latest/) which should be ran in a random order using
 [pytest-random-order](https://pypi.org/project/pytest-random-order/).
 
 To run tests manually from the command line:
@@ -490,14 +490,14 @@ All commits will trigger a Continuous Integration process using GitLab's CI/CD p
 
 This project is distributed as a Python package, hosted in [PyPi](https://pypi.org/project/bas-web-map-inventory).
 
-Source and binary packages are built and published automatically using 
+Source and binary packages are built and published automatically using
 [Poetry](https://python-poetry.org/docs/cli/#publish) in [Continuous Delivery](#continuous-deployment).
 
 Package versions are determined automatically using the `support/python-packaging/parse_version.py` script.
 
 ### Docker image
 
-The project [Python package](#python-package) is available as a Docker/OCI image, hosted in the private BAS Docker 
+The project [Python package](#python-package) is available as a Docker/OCI image, hosted in the private BAS Docker
 Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
 
 ### Ansible managed hosts
