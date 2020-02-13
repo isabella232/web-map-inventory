@@ -11,9 +11,7 @@ See the [Data model](#data-model) section for more information about what this i
 
 ## Usage
 
-### Tasks
-
-These tasks run in a container. See the [Setup](#setup) section for setup instructions.
+This project runs in a container. See the [Setup](#setup) section for setup instructions.
 
 If running on the BAS central workstations:
 
@@ -21,6 +19,12 @@ If running on the BAS central workstations:
 $ ssh geoweb@bslws01.nerc-bas.ac.uk
 $ web-map-inventory [task]
 ```
+
+Configuration, logs and data output are stored in `/users/geoweb/.config/web-map-inventory/`.
+
+If any errors occur they will be reported to Sentry and relevant individials alerted by email.
+
+### Tasks
 
 #### `data fetch`
 
@@ -237,18 +241,13 @@ be used automatically by most XML libraries and tools (such as `lxml` and `xmlli
 
 ## Setup
 
-The application for this project runs as either a Docker container or deployed as a Python package in a virtual machine.
+The application for this project runs as a Docker container.
 
 Once setup, see the [Data sources](#managing-data-sources) and [Usage](#usage) sections for how to use and run the
 application.
 
-### Setup as a container
-
-When setup as a container, the project can run locally or on the BAS central workstations using Podman. You will need
-access to the private BAS Docker Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
-
-**Note:** Podman support needs to be enabled on a per-account basis. Unless noted, `docker` commands listed here can be
-replaced with `podman`.
+**Note:** This project can run locally or on the BAS central workstations using Podman. You will need
+access to the private BAS Docker Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)) and for IT to enable Podman in your user account. Unless noted, `docker` commands listed here can be replaced with `podman`.
 
 ```shell
 $ docker login docker-registry.data.bas.ac.uk
@@ -266,12 +265,12 @@ here.
 $ mkdir -p ~/.config/web-map-inventory
 ```
 
-#### Optional wrapper script
+### Optional wrapper script
 
 If using podman, a wrapper script, `support/container-wrapper/podman-wrapper.sh`, is available to make running the
 container easier.
 
-To use, copy this script enable it to be executed:
+To use, copy this script and enable it to be executed:
 
 ```shell
 $ mkdir ~/bin
@@ -288,7 +287,6 @@ $ vi ~/.bash_rc
 ```
 
 You should now be able to run `web-map-inventory` to run the container.
-
 
 ## Development
 
@@ -483,8 +481,7 @@ Registry (part of [gitlab.data.bas.ac.uk](https://gitlab.data.bas.ac.uk)).
 
 * build a `/deploy:latest` image for commits to the *master* branch
 * build a `/deploy:release-stable` and `/deploy:release-[release]` image for tags
-* deploy new images to the BAS central workstations (by running `podman pull [image]` on the workstations)
-
+* deploy new images to the BAS central workstations (by running `podman pull [image]` from the workstations)
 
 ### Continuous Deployment
 
