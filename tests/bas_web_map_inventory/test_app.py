@@ -61,3 +61,9 @@ def test_app_enable_sentry():
 def test_cli_help(app_runner):
     result = app_runner.invoke(args=['--help'])
     assert 'Show this message and exit.' in result.output
+
+
+@pytest.mark.usefixtures('app_runner')
+def test_cli_version(app_runner):
+    result = app_runner.invoke(args=['version'])
+    assert 'Version: N/A' in result.output

@@ -13,6 +13,7 @@ from flask.cli import AppGroup
 from werkzeug.utils import import_string
 
 from bas_web_map_inventory.cli import (
+    version as version_cmd,
     fetch as data_fetch_cmd,
     validate as data_validate_cmd,
     status as airtable_status_cmd,
@@ -64,6 +65,7 @@ def create_app() -> Flask:
 
     app.logger.info(f"{app.config['NAME']} ({app.config['VERSION']}) [{app.config['ENV']}]")
 
+    app.cli.add_command(version_cmd, "version")
     data_cli_group = AppGroup("data", help="Interact with data sources.")
     app.cli.add_command(data_cli_group)
     data_cli_group.add_command(data_fetch_cmd, "fetch")

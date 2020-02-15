@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+* `version` CLI command for reporting installed version [#24](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
+
 ### Removed [BREAKING!]
 
 * Proof of concept Ansible deployment support [#55](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)

@@ -24,7 +24,11 @@ Configuration, logs and data output are stored in `/users/geoweb/.config/web-map
 
 If any errors occur they will be reported to Sentry and relevant individials alerted by email.
 
-### Tasks
+### Commands
+
+#### `version`
+
+Reports the current application version.
 
 #### `data fetch`
 
