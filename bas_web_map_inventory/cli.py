@@ -317,6 +317,13 @@ def _make_geoserver_server(server_config: Dict[str, str]) -> GeoServer:
 
 
 @command()
+@with_appcontext
+def version():
+    """returns application version"""
+    print(f"Version: {app.config['VERSION']}")
+
+
+@command()
 @option("-s", "--data-sources-file-path", default="data/sources.json", show_default=True, type=ClickPath(exists=True))
 @option("-d", "--data-output-file-path", default="data/data.json", show_default=True, type=ClickPath())
 @with_appcontext
