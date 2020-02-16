@@ -38,7 +38,7 @@ ENV APPVENV=/usr/local/virtualenvs/bas_web_map_inventory
 ENV PATH="$APPVENV/bin:$PATH"
 ENV FLASK_APP=/usr/src/app/manage.py
 ENV FLASK_ENV=development
-ENV LOG_FILE_PATH=/tmp/app.log
+ENV APP_LOG_FILE_PATH=/tmp/app.log
 ENV APP_ENABLE_FILE_LOGGING=false
 
 COPY support/xml-schemas/catalogue.xml /etc/xml/catalog
