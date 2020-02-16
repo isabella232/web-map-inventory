@@ -420,6 +420,19 @@ from flask import current_app
 current_app.logger.info('Log message')
 ```
 
+### File paths
+
+Use Python's [`pathlib`](https://docs.python.org/3.6/library/pathlib.html) library for managing file paths.
+
+Where displaying a file path to the user ensure it is always absolute to aid in debugging:
+
+```python
+from pathlib import Path
+
+foo_path = Path("foo.txt")
+print(f"foo_path is: {str(foo_path.absolute())}")
+```
+
 ### XML Catalogue additions
 
 If new functionality is added that depends on XML files, such as XSDs, it is *strongly* recommended to add them to the
