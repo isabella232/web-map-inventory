@@ -6,7 +6,7 @@ from pathlib import Path
 
 from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities as _validate_ogc_capabilities
 # noinspection PyProtectedMember
-from bas_web_map_inventory.cli import _make_geoserver_server
+from bas_web_map_inventory.cli import _make_geoserver_server, _load_data_sources_interactive, _load_data
 
 from tests.bas_web_map_inventory.conftest.geoserver import test_geoserver_catalogue_data
 
@@ -75,6 +75,42 @@ def prompt_invalid_protocol(questions: List):
     for question in questions:
         if question.name == 'protocol':
             return {'protocol': 'invalid'}
+
+
+def test__load_data_sources_interactive_valid():
+    sources = _load_data_sources_interactive(data_sources_file_path=Path('tests/data/sources.json'))
+    assert isinstance(sources, list)
+
+
+@pytest.mark.parametrize(
+    argnames=['file_path', 'error_value'],
+    argvalues=[
+        ('tests/data/sources-invalid-json.json', f"{Path('tests/data/sources-invalid-json.json').absolute()} is invalid JSON"),
+        ('tests/data/sources-invalid-schema.json', f"{Path('tests/data/sources-invalid-schema.json').absolute()} does not validate against JSON schema")
+    ]
+)
+def test__load_data_sources_interactive_invalid(file_path: str, error_value: str):
+    with pytest.raises(ValueError) as e:
+        _load_data_sources_interactive(data_sources_file_path=Path(file_path))
+        assert e.value == error_value
+
+
+@pytest.mark.usefixtures('app')
+def test__load_data_valid(app):
+    _load_data(data_file_path=Path('tests/data/data.json'))
+
+
+@pytest.mark.usefixtures('app')
+@pytest.mark.parametrize(
+    argnames=['file_path', 'error_value'],
+    argvalues=[
+        ('tests/data/data-invalid-json.json', f"{Path('tests/data/data-invalid-json.json').absolute()} is invalid JSON")
+    ]
+)
+def test__load_data_invalid(app, file_path: str, error_value: str):
+    with pytest.raises(ValueError) as e:
+        _load_data(data_file_path=Path(file_path))
+        assert e.value == error_value
 
 
 @pytest.mark.usefixtures('app', 'app_runner')
