@@ -55,7 +55,7 @@ class Config:
             "dsn": self.SENTRY_DSN,
             "integrations": [FlaskIntegration()],
             "environment": self.ENV,
-            "release": self.VERSION,
+            "release": f"bas-web-map-inventory@{self.VERSION}",
         }
 
 
