@@ -149,8 +149,12 @@ publish-schemas-prod:
   image:
     name: governmentpaas/awscli:latest
     entrypoint: [""]
+  before_script:
+    - "mkdir schemas-dist"
+    - "cp bas_web_map_inventory/resources/json_schemas/data-resources-schema.json schemas-dist/data-resources-schema-v1.json"
+    - "cp bas_web_map_inventory/resources/json_schemas/data-resources-schema.json schemas-dist/data-sources-schema-v1.json"
   script:
-    - "aws s3 sync --exclude \"*\" --include \"*.json\" --delete bas_web_map_inventory/resources/json_schemas/ s3://$S3_SCHEMA_BUCKET_PROD/bas-web-map-inventory-configuration-schemas/"
+    - "aws s3 sync --delete bas_web_map_inventory/resources/json_schemas/ s3://$S3_SCHEMA_BUCKET_PROD/bas-web-map-inventory-configuration-schemas/"
   only:
     - tags
 
