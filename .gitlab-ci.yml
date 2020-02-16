@@ -23,12 +23,14 @@
 # - PyPi (staging) - create tokens at https://test.pypi.org/manage/account/
 # > PYPI_TEST_TOKEN (protected): "[Sensitive]"
 #
-# - Sentry
-# > SENTRY_AUTH_TOKEN: "[Sensetive]"
-# > SENTRY_DSN: "[Sensetive]"
+# - Sentry - create tokens at https://sentry.io/settings/antarctica/developer-settings/bas-gitlab-4ffa11/
+# > SENTRY_AUTH_TOKEN: "[Sensitive]"
 #
 # - Deployment
 # > SSH_PRIVATE_KEY (protected, file): "[contents of BAS MAGIC Shared Deployment Identity private key]"
+#
+# - GitLab - create token as the 'bot_magic_ci' user
+# > GITLAB_ACCESS_TOKEN: "[Sensitive]"
 
 # == Global settings ==
 
@@ -266,5 +268,24 @@ sentry-prod:
     - "sentry-cli releases new --finalize $SENTRY_VERSION"
     - "sentry-cli releases deploys $SENTRY_VERSION new -e production"
     - "sentry-cli releases set-commits --auto $SENTRY_VERSION"
+  only:
+    - tags
+
+gitlab-prod:
+  stage: 🚀 release
+  image:
+    name: byrnedo/alpine-curl:0.1.8
+    entrypoint: [""]
+  script:
+    - curl --request POST
+      --header 'Content-Type:application/json'
+      --header "PRIVATE-TOKEN:$GITLAB_ACCESS_TOKEN"
+      --data '{"name":"'$CI_COMMIT_TAG'","tag_name":"'$CI_COMMIT_TAG'","description":"...","milestones":["'$CI_COMMIT_TAG'"]}'
+      "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases"
+    - curl --request POST
+      --header "PRIVATE-TOKEN:$GITLAB_ACCESS_TOKEN"
+      --data name="PyPi package"
+      --data url="https://pypi.org/project/bas-web-map-inventory/${CI_COMMIT_TAG:1}"
+      "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases/$CI_COMMIT_TAG/assets/links"
   only:
     - tags
