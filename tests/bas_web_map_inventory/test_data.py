@@ -2,6 +2,7 @@ import pytest
 
 from unittest.mock import patch
 from typing import List, Dict
+from pathlib import Path
 
 from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities as _validate_ogc_capabilities
 # noinspection PyProtectedMember
@@ -92,7 +93,7 @@ def test_data_validate_command_valid_single_source_wms(app, app_runner):
             ]
         )
         assert result.exit_code == 0
-        assert 'data sources in tests/data/sources.json have valid syntax' in result.output
+        assert f"data sources in {str(Path('tests/data/sources.json').absolute())} have valid syntax" in result.output
         assert 'validation successful 🥳' in result.output
 
 
@@ -112,7 +113,7 @@ def test_data_validate_command_invalid_single_source_wms(app, app_runner):
             ]
         )
         assert result.exit_code == 0
-        assert 'data sources in tests/data/sources.json have valid syntax' in result.output
+        assert f"data sources in {str(Path('tests/data/sources.json').absolute())} have valid syntax" in result.output
         assert 'validation failure 😞' in result.output
 
 
@@ -130,7 +131,7 @@ def test_data_validate_command_valid_single_source_all_data_sources(app, app_run
             ]
         )
         assert result.exit_code == 0
-        assert 'data sources in tests/data/sources.json have valid syntax' in result.output
+        assert f"data sources in {str(Path('tests/data/sources.json').absolute())} have valid syntax" in result.output
         assert 'validation successful 🥳' in result.output
 
 
@@ -148,7 +149,7 @@ def test_data_validate_command_valid_single_source_single_data_sources(app, app_
             ]
         )
         assert result.exit_code == 0
-        assert 'data sources in tests/data/sources.json have valid syntax' in result.output
+        assert f"data sources in {str(Path('tests/data/sources.json').absolute())} have valid syntax" in result.output
         assert 'validation successful 🥳' in result.output
 
 
@@ -216,7 +217,7 @@ def test_data_fetch_command(app, app_runner, geoserver_catalogue, wms_client, wf
         assert len(app.config['data']['styles']) >= 1
         assert len(app.config['data']['layers']) >= 1
         assert len(app.config['data']['layer_groups']) >= 1
-        assert 'data sources in tests/data/sources.json have valid syntax' in result.output
+        assert f"data sources in {str(Path('tests/data/sources.json').absolute())} have valid syntax" in result.output
         assert 'Fetch complete' in result.output
 
 
@@ -234,6 +235,6 @@ def test_data_fetch_command_invalid_wms(app, app_runner, geoserver_catalogue, wm
         result = app_runner.invoke(
             args=['data', 'fetch', '-s', 'tests/data/sources.json', '-d', 'tests/data/data-invalid-wms.json'])
         assert result.exit_code == 0
-        assert 'data sources in tests/data/sources.json have valid syntax' in result.output
+        assert f"data sources in {str(Path('tests/data/sources.json').absolute())} have valid syntax" in result.output
         assert '* WMS endpoint invalid, server [test-server-1] skipped' in result.output
         assert 'Fetch complete' in result.output

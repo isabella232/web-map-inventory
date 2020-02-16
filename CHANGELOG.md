@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+* File paths will be shown in their absolute form (rather than relative) to aid with debugging [#25](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/25)
 * Improved integration between Sentry and GitLab [#57](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/57)
 
 ## [0.2.2] - 2020-02-12

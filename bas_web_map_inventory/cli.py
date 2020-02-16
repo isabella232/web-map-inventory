@@ -72,7 +72,7 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
         data_sources_schema = json.loads(data_sources_schema_data)
         jsonschema_validate(instance=data_sources, schema=data_sources_schema)
         echo(
-            f"* data sources in {click_style(str(data_sources_file_path), fg='blue')} have "
+            f"* data sources in {click_style(str(data_sources_file_path.absolute()), fg='blue')} have "
             f"{click_style('valid', fg='green')} syntax"
         )
 
@@ -89,7 +89,7 @@ def _load_data(data_file_path: Path) -> None:
     :param data_file_path:
     :return:
     """
-    app.logger.info("Loading data...")
+    app.logger.info(f"Loading data from {str(data_file_path.absolute())} ...")
 
     with open(Path(data_file_path), "r") as data_file:
         _data = data_file.read()
@@ -480,7 +480,7 @@ def fetch(data_sources_file_path: str, data_output_file_path: str):
     echo(f"* fetched {click_style(str(len(layer_groups)), fg='blue')} layer groups (total)")
 
     echo(f"")
-    echo(f"Saving fetched data to {click_style(data_output_file_path, fg='blue')}")
+    echo(f"Saving fetched data to {click_style(str(Path(data_output_file_path).absolute()), fg='blue')}")
     _data = {
         "servers": servers.to_list(),
         "namespaces": namespaces.to_list(),
