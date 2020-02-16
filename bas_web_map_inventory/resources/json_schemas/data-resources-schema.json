@@ -1,0 +1,505 @@
+{
+  "$id": "https://metadata-standards.data.bas.ac.uk/bas-web-map-inventory-configuration-schemas/data-resources-schema-v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BAS Web Map Inventory - Data resources configuration schema",
+  "description": "Data resources schema used by the BAS Web Map Inventory and other related services",
+  "definitions": {
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "wms",
+          "wfs"
+        ]
+      }
+    },
+    "geometry": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "point"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "server": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "hostname",
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "geoserver"
+          ]
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "namespace": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "relationships"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "relationships": {
+          "type": "object",
+          "required": [
+            "servers"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "servers": {
+              "type": "string"
+            }
+          }
+        }
+        }
+      },
+    "repository": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "type",
+        "relationships"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "relationships": {
+          "type": "object",
+          "required": [
+            "namespaces"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "namespaces": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "type",
+        "relationships"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "relationships": {
+          "type": "object",
+          "required": [
+            "namespaces"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "namespaces": {
+              "type": ["string", "null"]
+            }
+          }
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "type",
+        "relationships"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "services": {
+          "$ref": "#/definitions/services"
+        },
+        "relationships": {
+          "type": "object",
+          "required": [
+            "namespaces",
+            "repositories",
+            "styles"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "namespaces": {
+              "type": "string"
+            },
+            "repositories": {
+              "type": "string"
+            },
+            "styles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "layer-group": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "relationships"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "services": {
+          "$ref": "#/definitions/services"
+        },
+        "geometry": {
+          "$ref": "#/definitions/geometry"
+        },
+        "relationships": {
+          "type": "object",
+          "required": [
+            "namespaces",
+            "layers",
+            "styles"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "namespaces": {
+              "type": "string"
+            },
+            "layers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "styles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "postgis-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "hostname",
+            "database",
+            "schema"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["postgis"]
+            },
+            "hostname": {
+            "type": "string"
+          },
+            "database": {
+            "type": "string"
+          },
+            "schema": {
+            "type": "string"
+          }
+          }
+        }
+      ]
+    },
+    "jp2ecw-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["jp2ecw"]
+            }
+          }
+        }
+      ]
+    },
+    "imagemosaic-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["imagemosaic"]
+            }
+          }
+        }
+      ]
+    },
+    "geotiff-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["geotiff"]
+            }
+          }
+        }
+      ]
+    },
+    "ecw-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["ecw"]
+            }
+          }
+        }
+      ]
+    },
+    "worldimage-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["worldimage"]
+            }
+          }
+        }
+      ]
+    },
+    "sld-style": {
+      "type": "object",
+      "allOf": [
+        {"$ref":  "#/definitions/style"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["sld"]
+            }
+          }
+        }
+      ]
+    },
+    "layers-vector": {
+      "type": "object",
+      "allOf": [
+        {"$ref":  "#/definitions/layer"},
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "geometry"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["vector"]
+            },
+            "geometry": {
+              "$ref": "#/definitions/geometry"
+            },
+            "table_view": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "layers-raster": {
+      "type": "object",
+      "allOf": [
+        {"$ref":  "#/definitions/layer"},
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "geometry"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "raster"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "servers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/server"
+      }
+    },
+    "namespaces": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/namespace"
+      }
+    },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/definitions/postgis-repository"},
+          {"$ref": "#/definitions/jp2ecw-repository"},
+          {"$ref": "#/definitions/imagemosaic-repository"},
+          {"$ref": "#/definitions/geotiff-repository"},
+          {"$ref": "#/definitions/ecw-repository"},
+          {"$ref": "#/definitions/worldimage-repository"}
+        ]
+      }
+    },
+    "styles": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/definitions/sld-style"}
+        ]
+      }
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/definitions/layers-vector"},
+          {"$ref": "#/definitions/layers-raster"}
+        ]
+      }
+    },
+    "layer-groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/layer-group"
+      }
+    }
+  }
+}

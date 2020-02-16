@@ -83,6 +83,7 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
                 f"* data sources in {click_style(str(data_sources_file_path.absolute()), fg='blue')} have "
                 f"{click_style('valid', fg='green')} syntax"
             )
+
             return data_sources["servers"]
         except ValidationError:
             echo(
@@ -94,10 +95,10 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
 
 def _load_data(data_file_path: Path) -> None:
     """
-    Shared method for loading and validating data from a configuration file
+    Shared method for loading and validating data from a resources file
 
     This data consists of components (layers, repositories, etc.) previously fetched from data sources. See the project
-    README and referenced JSON Schema for how data items should be defined [#20].
+    README and JSON Schema `resources/json_schemas/data-resources-schema.json` for how components should be defined.
 
     :param data_file_path:
     :return:
@@ -114,6 +115,25 @@ def _load_data(data_file_path: Path) -> None:
             f"{click_style('invalid JSON', fg='red')} and cannot be validated"
         )
         raise ValueError(f"{str(data_file_path.absolute())} is invalid JSON")
+
+    with resource_path(
+        "bas_web_map_inventory.resources.json_schemas", "data-resources-schema.json"
+    ) as data_resources_schema_file_path:
+        with open(data_resources_schema_file_path, "r") as data_resources_schema_file:
+            data_resources_schema_data = data_resources_schema_file.read()
+        try:
+            data_resources_schema = json.loads(data_resources_schema_data)
+            jsonschema_validate(instance=data, schema=data_resources_schema)
+            echo(
+                f"* data resources in {click_style(str(data_file_path.absolute()), fg='blue')} have "
+                f"{click_style('valid', fg='green')} syntax"
+            )
+        except ValidationError:
+            echo(
+                f"* data sources in {click_style(str(data_file_path.absolute()), fg='blue')} have "
+                f"{click_style('invalid', fg='red')} syntax"
+            )
+            raise ValueError(f"{str(data_file_path.absolute())} does not validate against JSON schema")
 
     servers = Servers()
     for server in data["servers"]:
