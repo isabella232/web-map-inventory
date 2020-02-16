@@ -12,7 +12,7 @@ from flask.cli import with_appcontext
 
 # noinspection PyPackageRequirements
 from click import command, option, echo, confirm, style as click_style, Path as ClickPath, Choice
-from jsonschema import validate as jsonschema_validate
+from jsonschema import validate as jsonschema_validate, ValidationError
 
 # noinspection PyPackageRequirements
 import ulid
@@ -62,21 +62,34 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
     echo(f"Loading sources from {click_style(str(data_sources_file_path), fg='blue')}")
     with open(Path(data_sources_file_path), "r") as data_sources_file:
         data_sources_data = data_sources_file.read()
-    data_sources = json.loads(data_sources_data)
+    try:
+        data_sources = json.loads(data_sources_data)
+    except ValueError:
+        echo(
+            f"* data sources in {click_style(str(data_sources_file_path.absolute()), fg='blue')} contains "
+            f"{click_style('invalid JSON', fg='red')} and cannot be validated"
+        )
+        raise ValueError(f"{str(data_sources_file_path.absolute())} is invalid JSON")
 
     with resource_path(
         "bas_web_map_inventory.resources.json_schemas", "data-sources-schema.json"
     ) as data_sources_schema_file_path:
         with open(data_sources_schema_file_path, "r") as data_sources_schema_file:
             data_sources_schema_data = data_sources_schema_file.read()
-        data_sources_schema = json.loads(data_sources_schema_data)
-        jsonschema_validate(instance=data_sources, schema=data_sources_schema)
-        echo(
-            f"* data sources in {click_style(str(data_sources_file_path.absolute()), fg='blue')} have "
-            f"{click_style('valid', fg='green')} syntax"
-        )
-
-    return data_sources["servers"]
+        try:
+            data_sources_schema = json.loads(data_sources_schema_data)
+            jsonschema_validate(instance=data_sources, schema=data_sources_schema)
+            echo(
+                f"* data sources in {click_style(str(data_sources_file_path.absolute()), fg='blue')} have "
+                f"{click_style('valid', fg='green')} syntax"
+            )
+            return data_sources["servers"]
+        except ValidationError:
+            echo(
+                f"* data sources in {click_style(str(data_sources_file_path.absolute()), fg='blue')} have "
+                f"{click_style('invalid', fg='red')} syntax"
+            )
+            raise ValueError(f"{str(data_sources_file_path.absolute())} does not validate against JSON schema")
 
 
 def _load_data(data_file_path: Path) -> None:
@@ -93,7 +106,14 @@ def _load_data(data_file_path: Path) -> None:
 
     with open(Path(data_file_path), "r") as data_file:
         _data = data_file.read()
-    data = json.loads(_data)
+    try:
+        data = json.loads(_data)
+    except ValueError:
+        echo(
+            f"* data in {click_style(str(data_file_path.absolute()), fg='blue')} contains "
+            f"{click_style('invalid JSON', fg='red')} and cannot be validated"
+        )
+        raise ValueError(f"{str(data_file_path.absolute())} is invalid JSON")
 
     servers = Servers()
     for server in data["servers"]:
