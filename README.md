@@ -151,9 +151,11 @@ This data model consists of:
 * **Layer Groups**: Represent a logical grouping of one or more layers that should be treated as a single, indivisible
   unit
 
-It can be visualised as:
+![Data model visualisation](https://raw.githubusercontent.com/antarctica/web-map-inventory/master/assets/img/data-model.png)
 
-![data model visualisation](https://raw.githubusercontent.com/antarctica/web-map-inventory/master/assets/img/data-model.png)
+A [JSON Schema](bas_web_map_inventory/resources/json_schemas/data-schema.json) describes this schema. It is used 
+internally for validating data prior to use but is also published for use by others if needed as:
+[data-schema-v1.json](https://metadata-standards.data.bas.ac.uk/bas-web-map-inventory-configuration-schemas/data-resources-schema-v1.json).
 
 ### Data sources
 
@@ -433,6 +435,10 @@ from pathlib import Path
 foo_path = Path("foo.txt")
 print(f"foo_path is: {str(foo_path.absolute())}")
 ```
+
+### JSON Schemas
+
+JSON Schema's can be developed using [jsonschemavalidator.net](https://www.jsonschemavalidator.net).
 
 ### XML Catalogue additions
 

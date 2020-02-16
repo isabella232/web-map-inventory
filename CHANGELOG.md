@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Integration between Black and PyCharm [#56](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/56)
 * GitLab release will be associated with milestones and PyPi packages through Continuous Deployment [#58](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/58)
 * JSON files will be checked they are valid JSON before use [#23](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/23)
+* JSON Schema for validating data resource files [#20](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/20)
 
 ### Changed
 

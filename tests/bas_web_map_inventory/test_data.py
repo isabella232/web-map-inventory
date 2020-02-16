@@ -104,7 +104,8 @@ def test__load_data_valid(app):
 @pytest.mark.parametrize(
     argnames=['file_path', 'error_value'],
     argvalues=[
-        ('tests/data/data-invalid-json.json', f"{Path('tests/data/data-invalid-json.json').absolute()} is invalid JSON")
+        ('tests/data/data-invalid-json.json', f"{Path('tests/data/data-invalid-json.json').absolute()} is invalid JSON"),
+        ('tests/data/data-invalid-schema.json', f"{Path('tests/data/data-invalid-schema.json').absolute()} does not validate against JSON schema")
     ]
 )
 def test__load_data_invalid(app, file_path: str, error_value: str):
