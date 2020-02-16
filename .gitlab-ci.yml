@@ -246,8 +246,9 @@ sentry-stage:
     - 'apk update && apk add python3 git'
     - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
   script:
-    - "sentry-cli releases new --finalize $VERSION"
+    - "sentry-cli releases new --finalize bas-web-map-inventory@$VERSION"
     - "sentry-cli releases deploys $VERSION new -e staging"
+    - "sentry-cli releases set-commits --auto bas-web-map-inventory@$VERSION"
   only:
     - master
 
@@ -260,7 +261,8 @@ sentry-prod:
     - 'apk update && apk add python3 git'
     - "python3 support/python-packaging/parse_version.py $(git describe --tags) > _version && export VERSION=$(cat _version)"
   script:
-    - "sentry-cli releases new --finalize $VERSION"
+    - "sentry-cli releases new --finalize bas-web-map-inventory@$VERSION"
     - "sentry-cli releases deploys $VERSION new -e production"
+    - "sentry-cli releases set-commits --auto bas-web-map-inventory@$VERSION"
   only:
     - tags

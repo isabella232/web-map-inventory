@@ -7,14 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-### Added
-
-* `version` CLI command for reporting installed version [#24](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
-* integration between Black and PyCharm [#56](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/56)
-
 ### Removed [BREAKING!]
 
 * Proof of concept Ansible deployment support [#55](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
+
+### Added
+
+* `version` CLI command for reporting installed version [#24](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
+* Integration between Black and PyCharm [#56](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/56)
+
+### Changed
+
+* Improved integration between Sentry and GitLab [#57](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/57)
 
 ## [0.2.2] - 2020-02-12
 
