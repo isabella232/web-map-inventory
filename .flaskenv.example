@@ -10,7 +10,7 @@ FLASK_APP=manage.py
 # APP_ENABLE_SENTRY=True
 
 # Settings
-# LOG_FILE_PATH=/var/log/app/app.log
+# APP_LOG_FILE_PATH=/var/log/app/app.log
 
 ## Sentry DSN - Get from https://sentry.io - this value is not a secret
 SENTRY_DSN=https://c69a62ee2262460f9bc79c4048ba764f@sentry.io/1832548

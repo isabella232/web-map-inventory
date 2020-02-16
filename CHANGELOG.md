@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed [BREAKING!]
 
-* Proof of concept Ansible deployment support [#55](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
+* Proof of concept Ansible deployment support [#35](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
+
+### Changed [BREAKING!]
+
+* Application log file path variable changed from `LOG_FILE_PATH` to `APP_LOG_FILE_PATH` [#36](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/36)
 
 ### Added
 
