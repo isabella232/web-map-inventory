@@ -23,6 +23,10 @@
 # - PyPi (staging) - create tokens at https://test.pypi.org/manage/account/
 # > PYPI_TEST_TOKEN (protected): "[Sensitive]"
 #
+# - AWS IAM id/secret keys for 'bas-gitlab-ci-bas-web-map-inventory' user
+# > AWS_ACCESS_KEY_ID: "[Sensitive]"
+# > AWS_SECRET_ACCESS_KEY: "[Sensitive]"
+#
 # - Sentry - create tokens at https://sentry.io/settings/antarctica/developer-settings/bas-gitlab-4ffa11/
 # > SENTRY_AUTH_TOKEN: "[Sensitive]"
 #
@@ -53,6 +57,7 @@ variables:
   SENTRY_PROJECT: web-map-inventory
   DEPLOY_USER: geoweb
   DEPLOY_HOST: bslws01.nerc-bas.ac.uk
+  S3_SCHEMA_BUCKET_PROD: metadata-standards.data.bas.ac.uk
 
 image:
   name: docker-registry.data.bas.ac.uk/magic/web-map-inventory:latest
@@ -136,6 +141,16 @@ publish-app-prod:
     paths:
       - dist
     expire_in: 1 month
+  only:
+    - tags
+
+publish-schemas-prod:
+  stage: 🚚 publish
+  image:
+    name: governmentpaas/awscli:latest
+    entrypoint: [""]
+  script:
+    - "aws s3 sync --exclude \"*\" --include \"*.json\" --delete bas_web_map_inventory/resources/json_schemas/ s3://$S3_SCHEMA_BUCKET_PROD/bas-web-map-inventory-configuration-schemas/"
   only:
     - tags
 
