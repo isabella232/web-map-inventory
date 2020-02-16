@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Package files" pattern="file[cosmos-airtable]:bas_web_map_inventory//*" />
+</component>
