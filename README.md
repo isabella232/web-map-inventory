@@ -523,7 +523,7 @@ To prevent noise, `.coveragerc` is used to omit empty `__init__.py` files from r
 To measure coverage manually:
 
 ```shell
-$ docker-compose run app -e FLASK_ENV=testing app pytest --cov=bas_web_map_inventory --cov-fail-under=100 --cov-report=html .
+$ docker-compose run -e FLASK_ENV=testing app pytest --cov=bas_web_map_inventory --cov-fail-under=100 --cov-report=html .
 ```
 
 [Continuous Integration](#continuous-integration) will check coverage automatically and fail if less than 100%.
