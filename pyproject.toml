@@ -43,7 +43,6 @@ ulid-py = "^0.0.12"
 [tool.poetry.dev-dependencies]
 bandit = "^1.6.2"
 black = "^19.10b0"
-mypy = "^0.761"
 pytest = "^5.3.2"
 pytest-cov = "^2.8.1"
 pytest-flask = "^0.15.0"
