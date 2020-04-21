@@ -11,11 +11,11 @@ from flask import current_app as app
 from flask.cli import with_appcontext
 
 # noinspection PyPackageRequirements
-from click import command, option, echo, confirm, style as click_style, Path as ClickPath, Choice
 from jsonschema import validate as jsonschema_validate, ValidationError
 
 # noinspection PyPackageRequirements
 import ulid
+from click import command, option, echo, confirm, style as click_style, Path as ClickPath, Choice, Abort
 
 # noinspection PyPackageRequirements
 from airtable import Airtable as _Airtable
