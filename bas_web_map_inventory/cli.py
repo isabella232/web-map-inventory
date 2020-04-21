@@ -562,7 +562,7 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
             selected_data_sources.append(source)
 
     if validation_protocol is None:
-        choices = [str(OGCProtocol.WMS)]
+        choices = [(OGCProtocol.WMS.name, OGCProtocol.WMS.value)]
         choice = inquirer.prompt([inquirer.List("protocol", message="Select protocol", choices=choices)])
         validation_protocol = choice["protocol"]
     try:

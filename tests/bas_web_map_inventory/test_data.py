@@ -68,7 +68,7 @@ def prompt_single_data_source(questions: List):
         if question.name == 'source':
             return {'source': '[01DRS53XAG5E85MJNYTA6WPTBM] - test-server-1'}
         elif question.name == 'protocol':
-            return {'protocol': OGCProtocol.WMS}
+            return {'protocol': OGCProtocol.WMS.value}
 
 
 def prompt_invalid_protocol(questions: List):

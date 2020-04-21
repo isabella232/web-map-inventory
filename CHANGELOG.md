@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * JSON Schema for validating data resource files [#20](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/20)
 * Publishing JSON Schemas for data sources and data resources [#22](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/22)
 
+### Fixed
+
+* OGC interactive protocol selection in data validate CLI command
+
 ### Changed
 
 * File paths will be shown in their absolute form (rather than relative) to aid with debugging [#25](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/25)
