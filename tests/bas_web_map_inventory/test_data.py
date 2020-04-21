@@ -68,13 +68,18 @@ def prompt_single_data_source(questions: List):
         if question.name == 'source':
             return {'source': '[01DRS53XAG5E85MJNYTA6WPTBM] - test-server-1'}
         elif question.name == 'protocol':
-            return {'protocol': OGCProtocol.WMS}
+            return {'protocol': OGCProtocol.WMS.value}
 
 
 def prompt_invalid_protocol(questions: List):
     for question in questions:
         if question.name == 'protocol':
             return {'protocol': 'invalid'}
+
+
+# noinspection PyUnusedLocal
+def prompt_aborted(questions: List):
+    return None
 
 
 def test__load_data_sources_interactive_valid():
@@ -155,7 +160,7 @@ def test_data_validate_command_invalid_single_source_wms(app, app_runner):
 
 
 @pytest.mark.usefixtures('app', 'app_runner')
-def test_data_validate_command_valid_single_source_all_data_sources(app, app_runner):
+def test_data_validate_command_valid_single_source_interactive_data_source_all(app, app_runner):
     with patch('bas_web_map_inventory.cli.inquirer.prompt', side_effect=prompt_all_data_sources), \
             patch('bas_web_map_inventory.cli.validate_ogc_capabilities', side_effect=validate_ogc_capabilities_valid):
 
@@ -173,7 +178,7 @@ def test_data_validate_command_valid_single_source_all_data_sources(app, app_run
 
 
 @pytest.mark.usefixtures('app', 'app_runner')
-def test_data_validate_command_valid_single_source_single_data_sources(app, app_runner):
+def test_data_validate_command_valid_single_source_interactive_data_source_single(app, app_runner):
     with patch('bas_web_map_inventory.cli.inquirer.prompt', side_effect=prompt_single_data_source), \
             patch('bas_web_map_inventory.cli.validate_ogc_capabilities', side_effect=validate_ogc_capabilities_valid):
 
@@ -191,7 +196,23 @@ def test_data_validate_command_valid_single_source_single_data_sources(app, app_
 
 
 @pytest.mark.usefixtures('app', 'app_runner')
-def test_data_validate_command_valid_single_source_invalid_protocol(app, app_runner):
+def test_data_validate_command_valid_single_source_interactive_data_source_aborted(app, app_runner):
+    with patch('bas_web_map_inventory.cli.inquirer.prompt', side_effect=prompt_aborted):
+
+        result = app_runner.invoke(
+            args=[
+                'data',
+                'validate',
+                '-s',
+                'tests/data/sources.json'
+            ]
+        )
+        assert result.exit_code == 1
+        assert f"Aborted!" in result.output
+
+
+@pytest.mark.usefixtures('app', 'app_runner')
+def test_data_validate_command_valid_single_source_interactive_protocol_invalid(app, app_runner):
     with patch('bas_web_map_inventory.cli.inquirer.prompt', side_effect=prompt_invalid_protocol):
         result = app_runner.invoke(
             args=[
@@ -206,6 +227,23 @@ def test_data_validate_command_valid_single_source_invalid_protocol(app, app_run
         assert result.exit_code == 1
         assert isinstance(result.exception, ValueError)
         assert str(result.exception) == 'Protocol [invalid] not found'
+
+
+@pytest.mark.usefixtures('app', 'app_runner')
+def test_data_validate_command_valid_single_source_interactive_protocol_aborted(app, app_runner):
+    with patch('bas_web_map_inventory.cli.inquirer.prompt', side_effect=prompt_aborted):
+        result = app_runner.invoke(
+            args=[
+                'data',
+                'validate',
+                '-s',
+                'tests/data/sources.json',
+                '-i',
+                '01DRS53XAG5E85MJNYTA6WPTBM'
+            ]
+        )
+        assert result.exit_code == 1
+        assert f"Aborted!" in result.output
 
 
 @pytest.mark.usefixtures('app', 'app_runner')
