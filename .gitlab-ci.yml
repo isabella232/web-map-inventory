@@ -96,13 +96,13 @@ coverage-app:
       - htmlcov
     expire_in: 1 month
 
-typehints-app:
-  stage: 🧪 test
-  script:
-    - "mypy --junit-xml typehint-results.xml bas_web_map_inventory/"
-  artifacts:
-    reports:
-      junit: typehint-results.xml
+#typehints-app:
+#  stage: 🧪 test
+#  script:
+#    - "mypy --junit-xml typehint-results.xml bas_web_map_inventory/"
+#  artifacts:
+#    reports:
+#      junit: typehint-results.xml
 
 pep8-app:
   stage: 🧪 test
