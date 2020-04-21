@@ -55,7 +55,7 @@ class Config:
             "dsn": self.SENTRY_DSN,
             "integrations": [FlaskIntegration()],
             "environment": self.ENV,
-            "release": f"bas-web-map-inventory@{self.VERSION}",
+            "release": f"{self.NAME}@{self.VERSION}",
         }
 
 
@@ -82,6 +82,8 @@ class DevelopmentConfig(Config):  # pragma: no cover
 
     Note: This method is excluded from test coverage as its meaning would be undermined.
     """
+
+    DEBUG = True
 
     @property
     def SENTRY_CONFIG(self) -> Dict:

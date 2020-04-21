@@ -1,20 +1,18 @@
 import json
 
+# noinspection PyPackageRequirements
+import ulid
 import inquirer
 
 from pathlib import Path
 from typing import Dict, List
-
 from importlib_resources import path as resource_path
 
 from flask import current_app as app
 from flask.cli import with_appcontext
-
-# noinspection PyPackageRequirements
 from jsonschema import validate as jsonschema_validate, ValidationError
 
 # noinspection PyPackageRequirements
-import ulid
 from click import command, option, echo, confirm, style as click_style, Path as ClickPath, Choice, Abort
 
 # noinspection PyPackageRequirements

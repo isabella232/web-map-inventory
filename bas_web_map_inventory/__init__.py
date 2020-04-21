@@ -8,7 +8,6 @@ from typing import Dict, Any
 
 from flask import Flask, logging as flask_logging
 from flask.cli import AppGroup
-
 # noinspection PyPackageRequirements
 from werkzeug.utils import import_string
 
