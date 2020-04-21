@@ -546,14 +546,15 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
     echo("")
 
     if data_source_identifier is None:
+        data_source_identifier = "all"
         choices = ["All data sources"]
         for source in data_sources:
             choices.append(f"[{source['id']}] - {source['label']}")
         questions = [inquirer.List("source", message="Select data source", choices=choices)]
         choice = inquirer.prompt(questions=questions)
-        if choice["source"] == "All data sources":
-            data_source_identifier = "all"
-        else:
+        if choice is None:
+            raise Abort()
+        if choice["source"] != "All data sources":
             data_source_identifier = choice["source"].split("[")[1].split("]")[0]
 
     selected_data_sources = []
@@ -564,6 +565,8 @@ def validate(data_sources_file_path: str, data_source_identifier: str = None, va
     if validation_protocol is None:
         choices = [(OGCProtocol.WMS.name, OGCProtocol.WMS.value)]
         choice = inquirer.prompt([inquirer.List("protocol", message="Select protocol", choices=choices)])
+        if choice is None:
+            raise Abort()
         validation_protocol = choice["protocol"]
     try:
         _validation_protocol: OGCProtocol = OGCProtocol(validation_protocol)

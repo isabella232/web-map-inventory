@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+* Aborting gracefully when an inquirer prompt is cancelled
 * OGC interactive protocol selection in data validate CLI command
 
 ### Changed
