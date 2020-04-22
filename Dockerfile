@@ -40,7 +40,7 @@ ENV FLASK_ENV=development
 ENV APP_LOG_FILE_PATH=/tmp/app.log
 ENV APP_ENABLE_FILE_LOGGING=false
 
-COPY support/xml-schemas/catalogue.xml /etc/xml/catalog
+COPY support/xml-schemas/cataloge.xml /etc/xml/catalog
 COPY --from=build $APPVENV/ $APPVENV/
 
 RUN adduser -D geoweb

@@ -396,6 +396,27 @@ $ docker-compose run app black --check bas_web_map_inventory/
 
 Checks are ran automatically in [Continuous Integration](#continuous-integration).
 
+### Python version
+
+When upgrading to a new version of Python, ensure the following are also checked and updated where needed:
+
+* `Dockerfile`:
+    * base stage image (e.g. `FROM python:3.X-alpine as base` to `FROM python:3.Y-alpine as base`)
+    * pre-compiled wheels (e.g. `https://.../linux_x86_64/cp3Xm/lxml-4.5.0-cp3X-cp3X-linux_x86_64.whl` to
+     `http://.../linux_x86_64/cp3Ym/lxml-4.5.0-cp3Y-cp3Y-linux_x86_64.whl`)
+* `provisioning/docker/Dockerfile`:
+    * base stage image (e.g. `FROM python:3.X-alpine as base` to `FROM python:3.Y-alpine as base`)
+    * pre-compiled wheels (e.g. `http://.../linux_x86_64/cp3Xm/lxml-4.5.0-cp3X-cp3X-linux_x86_64.whl` to
+     `http://.../linux_x86_64/cp3Ym/lxml-4.5.0-cp3Y-cp3Y-linux_x86_64.whl`)
+* `provisioning/docker/catalog.xml`:
+    * update the path to the Python package (e.g. `file://.../lib/python3.X/site-packages/...` to 
+      `file://.../lib/python3.Y/site-packages/...`)
+* `pyproject.toml`
+    * `[tool.poetry.dependencies]`
+        * `python` (e.g. `python = "^3.X"` to `python = "^3.Y"`)
+    * `[tool.black]`
+        * `target-version` (e.g. `target-version = ['py3X']` to `target-version = ['py3Y']`)
+
 ### Dependencies
 
 Python dependencies for this project are managed with [Poetry](https://python-poetry.org) in `pyproject.toml`.
