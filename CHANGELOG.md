@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.0] - 2020-02-12
+
 ### Removed [BREAKING!]
 
 * Proof of concept Ansible deployment support [#35](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/35)
@@ -23,11 +25,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * JSON files will be checked they are valid JSON before use [#23](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/23)
 * JSON Schema for validating data resource files [#20](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/20)
 * Publishing JSON Schemas for data sources and data resources [#22](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/22)
+* Python 3.8 support [#21](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/21)
 
 ### Fixed
 
-* Aborting gracefully when an inquirer prompt is cancelled
-* OGC interactive protocol selection in data validate CLI command
+* Aborting gracefully when an inquirer prompt is cancelled [#60](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/60)
+* OGC interactive protocol selection in data validate CLI command [#61](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/61)
 
 ### Changed
 
