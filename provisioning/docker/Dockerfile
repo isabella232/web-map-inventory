@@ -10,7 +10,7 @@ FROM base as build
 ARG PACKAGE_VERSION
 ENV APPVENV=/usr/local/virtualenvs/bas_web_map_inventory
 
-RUN python3 -m venv $APPENV
+RUN python3 -m venv $APPVENV
 ENV PATH="$APPVENV/bin:$PATH"
 
 COPY wheelhouse/ /tmp/wheelhouse/
