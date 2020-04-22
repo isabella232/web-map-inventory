@@ -59,9 +59,9 @@ from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities, 
             True,
             [
                 "line:131: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': [facet 'minInclusive'] The value '-190' is less than the minimum value allowed ('-180').",
-                "line:131: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
+                # "line:131: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
                 "line:134: element southBoundLatitude: Schemas validity error : Element '{http://www.opengis.net/wms}southBoundLatitude': [facet 'minInclusive'] The value '-190' is less than the minimum value allowed ('-90').",
-                "line:134: element southBoundLatitude: Schemas validity error : Element '{http://www.opengis.net/wms}southBoundLatitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}latitudeType'."
+                # "line:134: element southBoundLatitude: Schemas validity error : Element '{http://www.opengis.net/wms}southBoundLatitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}latitudeType'."
             ]
         ),
         (
@@ -76,13 +76,13 @@ from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities, 
             True,
             [
                 "line:110: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': [facet 'minInclusive'] The value '-190' is less than the minimum value allowed ('-180').",
-                "line:110: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
+                # "line:110: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
                 "line:112: element eastBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}eastBoundLongitude': [facet 'minInclusive'] The value '-190' is less than the minimum value allowed ('-180').",
-                "line:112: element eastBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}eastBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
+                # "line:112: element eastBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}eastBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
                 "line:131: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': [facet 'minInclusive'] The value '-190' is less than the minimum value allowed ('-180').",
-                "line:131: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
+                # "line:131: element westBoundLongitude: Schemas validity error : Element '{http://www.opengis.net/wms}westBoundLongitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}longitudeType'.",
                 "line:134: element southBoundLatitude: Schemas validity error : Element '{http://www.opengis.net/wms}southBoundLatitude': [facet 'minInclusive'] The value '-190' is less than the minimum value allowed ('-90').",
-                "line:134: element southBoundLatitude: Schemas validity error : Element '{http://www.opengis.net/wms}southBoundLatitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}latitudeType'."
+                # "line:134: element southBoundLatitude: Schemas validity error : Element '{http://www.opengis.net/wms}southBoundLatitude': '-190' is not a valid value of the atomic type '{http://www.opengis.net/wms}latitudeType'."
             ]
         ),
     ]

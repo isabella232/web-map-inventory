@@ -26,19 +26,20 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.8"
 airtable-python-wrapper = "^0.12.0"
 Flask = "^1.1.1"
 geoserver-restconfig = "1.0.2"
-importlib_resources = "^1.0.2"
 inquirer = "^2.6.3"
 jsonschema = "^3.2.0"
-lxml = "4.4.2"
+lxml = "4.5.0"
 OWSlib = "^0.19.0"
 python-dotenv = "^0.10.3"
 sentry-sdk = {version = "^0.13.5", extras = ["flask"]}
 str2bool = "^1.1"
 ulid-py = "^0.0.12"
+# OWSlib dependencies - to pin version of indirect dependencies
+pyproj = "2.6.0"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.6.2"
@@ -51,7 +52,7 @@ tomlkit = "^0.5.8"
 
 [tool.black]
 line-length = 120
-target-version = ['py36']
+target-version = ['py38']
 include = '\.pyi?$'
 exclude = ''
 

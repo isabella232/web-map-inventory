@@ -6,8 +6,7 @@ import subprocess  # nosec
 from enum import Enum
 from tempfile import NamedTemporaryFile
 from typing import List
-
-from importlib_resources import path as resource_path
+from importlib import resources
 
 # Exempting Bandit security issue (Using lxml.etree.parse to parse untrusted XML data)
 #
@@ -70,7 +69,7 @@ def validate_ogc_capabilities(
     else:
         raise ValueError("Invalid or unsupported OGC protocol")
 
-    with resource_path("bas_web_map_inventory.resources.xml_schemas", schema_file) as schema_file_path:
+    with resources.path("bas_web_map_inventory.resources.xml_schemas", schema_file) as schema_file_path:
         schema = etree.parse(str(schema_file_path)).getroot()
     validator = etree.XMLSchema(schema)
 
@@ -92,7 +91,7 @@ def validate_ogc_capabilities(
             capabilities_instance_file.write(etree.tostring(capabilities_instance, pretty_print=True))
 
             try:
-                with resource_path("bas_web_map_inventory.resources.xml_schemas", schema_file) as schema_file_path:
+                with resources.path("bas_web_map_inventory.resources.xml_schemas", schema_file) as schema_file_path:
                     # Exempting Bandit security issue (subprocess call with shell=True identified)
                     #
                     # The file passed to this method is taken from the URL given, which will be for a data source we
@@ -103,8 +102,7 @@ def validate_ogc_capabilities(
                         [f"xmllint --noout --schema {str(schema_file_path)} {capabilities_instance_file.name}"],
                         shell=True,
                         check=True,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
+                        capture_output=True,
                     )
 
                     # Return empty errors list

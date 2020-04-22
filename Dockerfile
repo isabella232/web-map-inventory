@@ -1,4 +1,4 @@
-FROM python:3.6-alpine as base
+FROM python:3.8-alpine as base
 
 LABEL maintainer = "Felix Fennell <felnne@bas.ac.uk>"
 
@@ -8,21 +8,20 @@ ENV PYTHONPATH=$APPPATH
 RUN mkdir $APPPATH
 WORKDIR $APPPATH
 
-RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils coreutils git && \
-    apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community --repository http://dl-cdn.alpinelinux.org/alpine/edge/main proj-dev proj-util
+RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils coreutils git proj-dev proj-util
 
 
 FROM base as build
 
 ENV APPVENV=/usr/local/virtualenvs/bas_web_map_inventory
 
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing --repository http://dl-cdn.alpinelinux.org/alpine/edge/main build-base
+RUN apk add build-base
 RUN python3 -m venv $APPVENV
 ENV PATH="$APPVENV/bin:$PATH"
 
 # pre-install known wheels to save time
-ADD http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/pyproj-2.4.2.post1-cp36-cp36m-linux_x86_64.whl http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp36m/lxml-4.4.2-cp36-cp36m-linux_x86_64.whl /tmp/wheelhouse/
-RUN pip install --no-index --find-links=file:///tmp/wheelhouse lxml==4.4.2 pyproj==2.4.2.post1
+ADD http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp38m/lxml-4.5.0-cp38-cp38-linux_x86_64.whl http://bsl-repoa.nerc-bas.ac.uk/magic/v1/libraries/python/wheels/linux_x86_64/cp38m/pyproj-2.6.0-cp38-cp38-linux_x86_64.whl /tmp/wheelhouse/
+RUN pip install --no-index --find-links=file:///tmp/wheelhouse lxml==4.5.0 pyproj==2.6.0
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir poetry==1.0.0

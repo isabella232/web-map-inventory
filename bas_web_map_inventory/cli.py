@@ -6,7 +6,7 @@ import inquirer
 
 from pathlib import Path
 from typing import Dict, List
-from importlib_resources import path as resource_path
+from importlib import resources
 
 from flask import current_app as app
 from flask.cli import with_appcontext
@@ -69,7 +69,7 @@ def _load_data_sources_interactive(data_sources_file_path: Path) -> List[Dict[st
         )
         raise ValueError(f"{str(data_sources_file_path.absolute())} is invalid JSON")
 
-    with resource_path(
+    with resources.path(
         "bas_web_map_inventory.resources.json_schemas", "data-sources-schema.json"
     ) as data_sources_schema_file_path:
         with open(data_sources_schema_file_path, "r") as data_sources_schema_file:
@@ -114,7 +114,7 @@ def _load_data(data_file_path: Path) -> None:
         )
         raise ValueError(f"{str(data_file_path.absolute())} is invalid JSON")
 
-    with resource_path(
+    with resources.path(
         "bas_web_map_inventory.resources.json_schemas", "data-resources-schema.json"
     ) as data_resources_schema_file_path:
         with open(data_resources_schema_file_path, "r") as data_resources_schema_file:
