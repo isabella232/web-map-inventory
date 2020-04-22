@@ -36,7 +36,7 @@ class Config:
         self.APP_ENABLE_SENTRY = str2bool(os.environ.get("APP_ENABLE_SENTRY")) or True
 
         self.LOG_FORMAT = "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s"
-        self.LOG_FILE_PATH = Path(os.environ.get("LOG_FILE_PATH") or "/var/log/app/app.log")
+        self.LOG_FILE_PATH = Path(os.environ.get("APP_LOG_FILE_PATH") or "/var/log/app/app.log")
 
         self.SENTRY_DSN = os.environ.get("SENTRY_DSN") or None
 
