@@ -471,10 +471,13 @@ class RepositoryAirtable:
             self.title = item["fields"]["Title"]
             self.type = RepositoryTypeAirtable(item["fields"]["Type"])
 
+            self.host = None
             if "Host" in item["fields"]:
                 self.host = item["fields"]["Host"]
+            self.database = None
             if "Database" in item["fields"]:
                 self.database = item["fields"]["Database"]
+            self.schema = None
             if "Schema" in item["fields"]:
                 self.schema = item["fields"]["Schema"]
 
@@ -572,7 +575,9 @@ class StyleAirtable:
             self.name = item.label
             self.title = item.title
             self.type = StyleTypeAirtable[item.type.name]
-            if item.relationships["namespaces"] is not None:
+
+            self.workspace = None
+            if "namespaces" in item.relationships and item.relationships["namespaces"] is not None:
                 self.workspace = kwargs["namespaces_airtable"].get_by_id(item.relationships["namespaces"].id)
         elif isinstance(item, dict):
             self.airtable_id = item["id"]
@@ -581,6 +586,7 @@ class StyleAirtable:
             self.title = item["fields"]["Title"]
             self.type = StyleTypeAirtable(item["fields"]["Type"])
 
+            self.workspace = None
             if "Workspace" in item["fields"]:
                 try:
                     self.workspace = kwargs["namespaces_airtable"].get_by_airtable_id(item["fields"]["Workspace"][0])
@@ -684,12 +690,17 @@ class LayerAirtable:
             self.name = item.label
             self.title = item.title
             self.type = LayerTypeAirtable[item.type.name]
+
+            self.geometry = None
             if item.geometry_type is not None:
                 self.geometry = LayerGeometryAirtable[item.geometry_type.name]
+            self.services = []
             for service in item.services:
                 self.services.append(LayerServiceAirtable[service.name])
+            self.table_view = None
             if item.table_view is not None:
                 self.table_view = item.table_view
+
             self.workspace = kwargs["namespaces_airtable"].get_by_id(item.relationships["namespaces"].id)
             self.store = kwargs["repositories_airtable"].get_by_id(item.relationships["repositories"].id)
             for style_id in item.relationships["styles"]:
@@ -701,11 +712,14 @@ class LayerAirtable:
             self.title = item["fields"]["Title"]
             self.type = LayerTypeAirtable(item["fields"]["Type"])
 
+            self.geometry = None
             if "Geometry" in item["fields"]:
                 self.geometry = LayerGeometryAirtable(item["fields"]["Geometry"])
+            self.services = []
             if "Services" in item["fields"]:
                 for service in item["fields"]["Services"]:
                     self.services.append(LayerServiceAirtable(service))
+            self.table_view = None
             if "Table/View" in item["fields"]:
                 self.table_view = item["fields"]["Table/View"]
 
