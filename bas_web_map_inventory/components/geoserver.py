@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Dict, Tuple, Optional, Union
 
 # noinspection PyPackageRequirements
@@ -5,8 +6,23 @@ from geoserver.catalog import Catalog as Catalogue
 from owslib.wfs import WebFeatureService
 from owslib.wms import WebMapService
 
-from bas_web_map_inventory.components import Server, ServerType, LayerService, LayerGeometry
+from bas_web_map_inventory.components import RepositoryType, Server, ServerType, LayerService, LayerGeometry
 from bas_web_map_inventory.utils import build_base_data_source_endpoint
+
+
+class GeoServerRepositoryType(Enum):
+    """
+    Represents the technology/product a GeoServer repository uses.
+    """
+
+    POSTGIS = "postgis"
+    GEOTIFF = "geotiff"
+    ECW = "ecw"
+    JPEG2000 = "jp2ecw"
+    IMAGEMOSAIC = "imagemosaic"
+    WORLDIMAGE = "worldimage"
+    SHAPEFILE = "shapefile"
+    SHAPEFILESDIR = "directory of spatial files (shapefiles)"
 
 
 class GeoServer(Server):
@@ -116,6 +132,9 @@ class GeoServer(Server):
 
         If a Namespace (workspace) label is specified the Repository must exist within that Namespace.
 
+        GeoServer store types are sometimes unsuitable or non-standard and so need to be mapped to a conventional value.
+        in the RepositoryType enum using the GeoServerRepositoryType enum.
+
         Note: GeoServer stores do not support the concept of a title, a static substitute value is therefore used
         Note: Names (labels) will be returned for related components instead of identifiers or complete objects [#33]
 
@@ -130,7 +149,7 @@ class GeoServer(Server):
         store = {
             "label": _store.name,
             "title": "-",
-            "repository_type": str(_store.type).lower(),
+            "repository_type": RepositoryType[GeoServerRepositoryType(str(_store.type).lower()).name].value,
             "namespace_label": _store.workspace.name,
         }
         if hasattr(_store, "description") and _store.description is not None:
