@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.1] - 2020-04-29
+
 ### Added
 
 * Support for 'shapefile' and 'directory of shapefiles' GeoServer store/repository types [#64](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/64)
