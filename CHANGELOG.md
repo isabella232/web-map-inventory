@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Support for 'shapefile' and 'directory of shapefiles' GeoServer store/repository types [#65](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/65)
 
+### Fixed
+
+* Support for change in Airtable API over empty fields [#67](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/67)
+
 ## [0.3.0] - 2020-02-12
 
 ### Removed [BREAKING!]
