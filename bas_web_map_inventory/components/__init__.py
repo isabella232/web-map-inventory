@@ -18,9 +18,11 @@ class RepositoryType(Enum):
     POSTGIS = "postgis"
     GEOTIFF = "geotiff"
     ECW = "ecw"
-    JPEG2000 = "jp2ecw"
+    JPEG2000 = "jpg2000"
     IMAGEMOSAIC = "imagemosaic"
     WORLDIMAGE = "worldimage"
+    SHAPEFILE = "shapefile"
+    SHAPEFILESDIR = "shapefiles-directory"
 
 
 class StyleType(Enum):

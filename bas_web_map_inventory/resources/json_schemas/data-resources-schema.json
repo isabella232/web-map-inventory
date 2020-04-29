@@ -295,7 +295,7 @@
         }
       ]
     },
-    "jp2ecw-repository": {
+    "jpg2000-repository": {
       "type": "object",
       "allOf": [
         {"$ref": "#/definitions/repository"},
@@ -307,7 +307,7 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["jp2ecw"]
+              "enum": ["jpg2000"]
             }
           }
         }
@@ -385,6 +385,42 @@
         }
       ]
     },
+    "shapefile-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["shapefile"]
+            }
+          }
+        }
+      ]
+    },
+    "shapefiles-directory-repository": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/repository"},
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["shapefiles-directory"]
+            }
+          }
+        }
+      ]
+    },
     "sld-style": {
       "type": "object",
       "allOf": [
@@ -422,7 +458,7 @@
               "$ref": "#/definitions/geometry"
             },
             "table_view": {
-              "type": "string"
+              "type": ["string", "null"]
             }
           }
         }
@@ -470,11 +506,13 @@
       "items": {
         "oneOf": [
           {"$ref": "#/definitions/postgis-repository"},
-          {"$ref": "#/definitions/jp2ecw-repository"},
+          {"$ref": "#/definitions/jpg2000-repository"},
           {"$ref": "#/definitions/imagemosaic-repository"},
           {"$ref": "#/definitions/geotiff-repository"},
           {"$ref": "#/definitions/ecw-repository"},
-          {"$ref": "#/definitions/worldimage-repository"}
+          {"$ref": "#/definitions/worldimage-repository"},
+          {"$ref": "#/definitions/shapefile-repository"},
+          {"$ref": "#/definitions/shapefiles-directory-repository"}
         ]
       }
     },

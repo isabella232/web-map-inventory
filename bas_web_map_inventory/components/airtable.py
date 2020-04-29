@@ -206,6 +206,8 @@ class RepositoryTypeAirtable(Enum):
     JPEG2000 = "JPEG2000"
     IMAGEMOSAIC = "Image Mosaic"
     WORLDIMAGE = "World Image"
+    SHAPEFILE = "Shapefile"
+    SHAPEFILESDIR = "Shapefiles Directory"
 
 
 class StyleTypeAirtable(Enum):
