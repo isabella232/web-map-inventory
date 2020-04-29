@@ -321,11 +321,12 @@ class GeoServer(Server):
                 raise ValueError(f"Geometry type: [{_properties['geometry']}] not mapped to LayerGeometry enum.")
 
         for style_label in _layer_group.styles:
-            style_label = style_label.split(":")
-            if len(style_label) == 2:
-                layer_group["style_labels"].append((style_label[1], style_label[0]))
-            if len(style_label) == 1:
-                layer_group["style_labels"].append((style_label[0], None))
+            if style_label is not None:
+                style_label = style_label.split(":")
+                if len(style_label) == 2:
+                    layer_group["style_labels"].append((style_label[1], style_label[0]))
+                if len(style_label) == 1:
+                    layer_group["style_labels"].append((style_label[0], None))
 
         return layer_group
 
