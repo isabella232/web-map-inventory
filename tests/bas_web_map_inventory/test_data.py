@@ -8,7 +8,7 @@ from bas_web_map_inventory.utils import OGCProtocol, validate_ogc_capabilities a
 # noinspection PyProtectedMember
 from bas_web_map_inventory.cli import _make_geoserver_server, _load_data_sources_interactive, _load_data
 
-from tests.bas_web_map_inventory.conftest.geoserver import test_geoserver_catalogue_data
+from tests.bas_web_map_inventory.conftest.geoserver import test_geoserver_catalogue_data, test_geoserver_wfs_data
 
 
 def make_geoserver_server(server_config: Dict[str, str]):
@@ -17,10 +17,7 @@ def make_geoserver_server(server_config: Dict[str, str]):
     # noinspection PyUnresolvedReferences
     geoserver.client.populate(test_geoserver_catalogue_data)
     # noinspection PyUnresolvedReferences
-    geoserver.wfs.populate(contents={
-        'test-layer-1': {'geometry': 'point'},
-        'test-namespace-1:test-layer-group-1': {'geometry': 'point'}
-    })
+    geoserver.wfs.populate(contents=test_geoserver_wfs_data)
 
     return geoserver
 

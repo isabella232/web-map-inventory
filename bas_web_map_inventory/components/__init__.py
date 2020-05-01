@@ -53,6 +53,8 @@ class LayerGeometry(Enum):
     MULTIPOINT = "multi-point"
     MULTILINESTRING = "multi-linestring"
     MULTIPOLYGON = "multi-polygon"
+    MULTIPOLYGON3D = "3d-multi-polygon"
+    GEOMETRYCOLLECTION = "geometry-collection"
 
 
 class LayerService(Enum):

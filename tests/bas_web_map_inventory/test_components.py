@@ -10,7 +10,8 @@ from bas_web_map_inventory.components.geoserver import GeoServer
 from tests.bas_web_map_inventory.conftest.components import test_server_data, test_server, test_namespace_data, \
     test_namespace, test_repository_data, test_repository, test_style_data, test_style, test_layer_data, test_layer, \
     test_layer_group_data, test_layer_group
-from tests.bas_web_map_inventory.conftest.geoserver import test_geoserver_data, test_geoserver_catalogue_data
+from tests.bas_web_map_inventory.conftest.geoserver import test_geoserver_data, test_geoserver_catalogue_data, \
+    geoserver_geometry_column_names
 
 
 @pytest.mark.parametrize(
@@ -179,14 +180,43 @@ def test_geoserver_component_unknown_geometry(geoserver_catalogue, wms_client, w
 
         with pytest.raises(ValueError) as e:
             item.get_layer(layer_reference='test-layer-1')
-        assert f"Geometry type: [invalid] not mapped to LayerGeometry enum." in str(e.value)
+        assert f"Geometry [invalid] for layer test-layer-1 not mapped to LayerGeometry enum." in str(e.value)
 
         with pytest.raises(ValueError) as e:
             item.get_layer_group(
                 layer_group_reference=test_geoserver_catalogue_data['layer_groups'][0]['name'],
                 namespace_reference=test_geoserver_catalogue_data['layer_groups'][0]['workspace_name']
             )
-        assert f"Geometry type: [invalid] not mapped to LayerGeometry enum." in str(e.value)
+        assert f"Geometry [invalid] not mapped to LayerGeometry enum." in str(e.value)
+
+
+@pytest.mark.parametrize(
+    argnames=['_property'],
+    argvalues=geoserver_geometry_column_names()
+)
+@pytest.mark.usefixtures('geoserver_catalogue', 'wms_client', 'wfs_client')
+def test_geoserver_component_unknown_geometry_property(_property, geoserver_catalogue, wms_client, wfs_client):
+    with patch('bas_web_map_inventory.components.geoserver.Catalogue') as mock_geoserver_catalogue, \
+            patch('bas_web_map_inventory.components.geoserver.WebMapService') as mock_wms_client, \
+            patch('bas_web_map_inventory.components.geoserver.WebFeatureService') as mock_wfs_client:
+        mock_geoserver_catalogue.return_value = geoserver_catalogue
+        mock_wms_client.return_value = wms_client
+        mock_wfs_client.return_value = wfs_client
+
+        item = GeoServer(**test_geoserver_data)
+        # These `populate()` methods are only defined in mock classes
+        # noinspection PyUnresolvedReferences
+        item.client.populate(data=test_geoserver_catalogue_data)
+        # noinspection PyUnresolvedReferences
+        item.wfs.populate(contents={
+            'test-layer-1': {'properties': {_property: 'invalid'}}
+        })
+        assert isinstance(item, GeoServer)
+
+        with pytest.raises(ValueError) as e:
+            item.get_layer(layer_reference='test-layer-1')
+        assert f"Geometry [invalid] for layer test-layer-1 in column '{_property}' not mapped to " \
+               f"LayerGeometry enum." in str(e.value)
 
 
 @pytest.mark.usefixtures('geoserver_catalogue', 'wms_client', 'wfs_client')

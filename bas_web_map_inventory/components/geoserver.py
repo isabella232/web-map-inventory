@@ -6,7 +6,7 @@ from geoserver.catalog import Catalog as Catalogue
 from owslib.wfs import WebFeatureService
 from owslib.wms import WebMapService
 
-from bas_web_map_inventory.components import RepositoryType, Server, ServerType, LayerService, LayerGeometry
+from bas_web_map_inventory.components import RepositoryType, LayerService, LayerGeometry, Server, ServerType
 from bas_web_map_inventory.utils import build_base_data_source_endpoint
 
 
@@ -23,6 +23,49 @@ class GeoServerRepositoryType(Enum):
     WORLDIMAGE = "worldimage"
     SHAPEFILE = "shapefile"
     SHAPEFILESDIR = "directory of spatial files (shapefiles)"
+
+
+class GeoServerLayerGeometry(Enum):
+    """
+    Represents a (vector) layer's geometry in GeoServer.
+    """
+
+    POINT = "Point"
+    LINESTRING = "Linestring"
+    POLYGON = "Polygon"
+    MULTIPOINT = "MultiPoint"
+    MULTILINESTRING = "MultiLinestring"
+    MULTIPOLYGON = "MultiPolygon"
+    MULTIPOLYGON3D = "3D MultiPolygon"
+    GEOMETRYCOLLECTION = "GeometryCollection"
+
+
+class GeoPropertyGeoServerLayerGeom(Enum):
+    """
+    Represents a (vector) layer geometry type in GeoServer based on its underlying geometry column
+
+    This enumeration is used where the standard geometry property is not available, see the geometry_property_names
+    enumeration for more information.
+
+    This enumeration is a subset of properties from, and mapped to, option in the LayerGeometry enumeration.
+    """
+
+    LINESTRING = "CurvePropertyType"
+    MULTILINESTRING = "MultiCurvePropertyType"
+
+
+class GeoServerGeometryColumnNames(Enum):
+    """
+    Represents common/conventional names for the column in a layers source table/view that holds the geometry.
+
+    Usually this detected by GeoServer and exposed as a 'geometry' property in WFS responses, but in cases where it
+    isn't, this list will be used to check the underlying table/view and use that instead. See the
+    GeoPropertyGeoServerLayerGeom enum for how values from these conventional columns are mapped to geometry types.
+    """
+
+    GEOM = "geom"
+    WKBGEOMETRY = "wkb_geometry"
+    THEGEOM = "the_geom"
 
 
 class GeoServer(Server):
@@ -244,17 +287,52 @@ class GeoServer(Server):
             "style_labels": [(_layer.default_style.name, _layer.default_style.workspace)],
         }
 
-        if layer_reference in list(self.wms.contents):
-            # noinspection PyTypeChecker
+        if layer_reference in list(self.wms.contents) or f"{_layer.resource.workspace.name}:{layer_reference}" in list(
+            self.wms.contents
+        ):
             layer["services"].append(LayerService.WMS.value)
-        if layer_reference in list(self.wfs.contents):
-            # noinspection PyTypeChecker
+
+        if layer_reference in list(self.wfs.contents) or f"{_layer.resource.workspace.name}:{layer_reference}" in list(
+            self.wfs.contents
+        ):
             layer["services"].append(LayerService.WFS.value)
+
+            # WFS lookups don't seem to mind if the layer is namespaced or not
             _properties = self.wfs.get_schema(layer_reference)
-            if _properties["geometry"].lower() == "point":
-                layer["geometry_type"] = LayerGeometry.POINT.value
-            else:
-                raise ValueError(f"Geometry type: [{_properties['geometry']}] not mapped to LayerGeometry enum.")
+            if "geometry" in _properties and isinstance(_properties["geometry"], str):
+                try:
+                    layer["geometry_type"] = LayerGeometry[
+                        GeoServerLayerGeometry(str(_properties["geometry"])).name
+                    ].value
+                except ValueError:
+                    # debug
+                    print(_properties)
+
+                    raise ValueError(
+                        f"Geometry [{_properties['geometry']}] for layer {layer_reference} not mapped to "
+                        f"LayerGeometry enum."
+                    )
+            elif "properties" in _properties:
+                for geometry_column_name in GeoServerGeometryColumnNames:
+                    if geometry_column_name.value in _properties["properties"].keys():
+
+                        if geometry_column_name.value == "geom":
+                            print(f"geom: {layer_reference}")
+                        if geometry_column_name.value == "wkb_geometry":
+                            print(f"wkb: {layer_reference}")
+
+                        try:
+                            layer["geometry_type"] = LayerGeometry[
+                                GeoPropertyGeoServerLayerGeom(
+                                    str(_properties["properties"][geometry_column_name.value])
+                                ).name
+                            ].value
+                        except ValueError:
+                            raise ValueError(
+                                f"Geometry [{_properties['properties'][geometry_column_name.value]}] for layer "
+                                f"{layer_reference} in column '{geometry_column_name.value}' not mapped to "
+                                f"LayerGeometry enum."
+                            )
 
         if str(_layer.resource.store.type).lower() == "postgis":
             layer["table_view"] = _layer.resource.native_name
@@ -309,16 +387,16 @@ class GeoServer(Server):
                 layer_group["layer_labels"].append((layer_label[0], None))
 
         if f"{namespace_reference}:{layer_group_reference}" in list(self.wms.contents):
-            # noinspection PyTypeChecker
             layer_group["services"].append(LayerService.WMS.value)
         if f"{namespace_reference}:{layer_group_reference}" in list(self.wfs.contents):
-            # noinspection PyTypeChecker
             layer_group["services"].append(LayerService.WFS.value)
             _properties = self.wfs.get_schema(f"{namespace_reference}:{layer_group_reference}")
-            if _properties["geometry"].lower() == "point":
-                layer_group["geometry_type"] = LayerGeometry.POINT.value
-            else:
-                raise ValueError(f"Geometry type: [{_properties['geometry']}] not mapped to LayerGeometry enum.")
+            try:
+                layer_group["geometry_type"] = LayerGeometry[
+                    GeoServerLayerGeometry(str(_properties["geometry"])).name
+                ].value
+            except ValueError:
+                raise ValueError(f"Geometry [{_properties['geometry']}] not mapped to LayerGeometry enum.")
 
         for style_label in _layer_group.styles:
             if style_label is not None:
