@@ -1,5 +1,6 @@
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, Optional, Tuple
 
+from bas_web_map_inventory.components.geoserver import GeoServerGeometryColumnNames
 from tests.bas_web_map_inventory.conftest.components import test_namespace_data, test_repository_data, \
     test_style_data, test_layer_data, test_layer_group_data
 
@@ -194,10 +195,16 @@ class MockWFSClient:
     def populate(self, contents: Dict[str, Any]):
         self.contents = contents
 
-    def get_schema(self, name: str):
-        return {
-            'geometry': self.contents[name]['geometry']
-        }
+    def get_schema(self, name: str) -> Optional[dict]:
+        if 'geometry' in self.contents[name]:
+            return {'geometry': self.contents[name]['geometry']}
+        # TODO: Change to loop through enumeration, rather than static list
+        elif 'properties' in self.contents[name]:
+            return {'properties': self.contents[name]['properties']}
+        # elif 'properties' in self.contents[name] and 'geom' in self.contents[name]['properties']:
+        #     return {'properties': {'geom': self.contents[name]['properties']['geom']}}
+        # elif 'properties' in self.contents[name] and 'wkb_geometry' in self.contents[name]['properties']:
+        #     return {'properties': {'wkb_geometry': self.contents[name]['properties']['wkb_geometry']}}
 
 
 test_geoserver_data = {
@@ -234,3 +241,17 @@ test_geoserver_catalogue_data = {
         }
     ]
 }
+
+test_geoserver_wfs_data = {
+    'test-layer-1': {'geometry': 'Point'},
+    'test-namespace-1:test-layer-group-1': {'geometry': 'Point'}
+}
+
+
+def geoserver_geometry_column_names() -> List[Tuple[str]]:
+    column_names = []
+
+    for geometry_column_name in GeoServerGeometryColumnNames:
+        column_names.append((geometry_column_name.value,))
+
+    return column_names

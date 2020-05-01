@@ -19,7 +19,14 @@
         {
           "type": "string",
           "enum": [
-            "point"
+            "point",
+            "linestring",
+            "polygon",
+            "multi-point",
+            "multi-linestring",
+            "multi-polygon",
+            "3d-multi-polygon",
+            "geometry-collection"
           ]
         },
         {

@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+* Support for '3D Multi-polygon' geometries
+* Support for 'geometry collection' geometries
+
+### Changed
+
+* Improved geometry detection for vector layers (using 'geom' and 'WKB_geometry' fields in addition to 'geometry')
+
+### Added
+
 * Support for 'shapefile' and 'directory of shapefiles' GeoServer store/repository types [#64](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/64)
 
 ### Fixed
