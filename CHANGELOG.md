@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Support for '3D Multi-polygon' geometries
 * Support for 'geometry collection' geometries
+* Additional JSON guidance
 
 ### Changed
 

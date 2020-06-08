@@ -125,6 +125,25 @@ Example:
 }
 ```
 
+**Note:** Make sure to include a comma between each source (but don't include a trailing comma) - e.g.:
+
+```json
+{
+    "servers": [
+        {
+            "id": "xxx",
+            "label": "existing-server"
+            ...
+        },
+        {
+            "id": "xxx",
+            "label": "new-server"
+            ...
+        }
+    ]
+}
+```
+
 ## Implementation
 
 Flask application using the [airtable-python-wrapper](https://airtable-python-wrapper.readthedocs.io) library to
