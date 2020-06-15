@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 * Removing debug code
+* `libproj` name mismatch, newer versions of libproj aren’t detected properly by the PyProj Python package
 
 ## [0.3.1] - 2020-04-29
 
