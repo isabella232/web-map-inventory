@@ -400,9 +400,9 @@ class GeoServer(Server):
         for style_label in _layer_group.styles:
             if style_label is not None:
                 style_label = style_label.split(":")
-                if len(style_label) == 2:
+                if len(style_label) == 2 and (style_label[1], style_label[0]) not in layer_group["style_labels"]:
                     layer_group["style_labels"].append((style_label[1], style_label[0]))
-                if len(style_label) == 1:
+                if len(style_label) == 1 and (style_label[0], None) not in layer_group["style_labels"]:
                     layer_group["style_labels"].append((style_label[0], None))
 
         return layer_group

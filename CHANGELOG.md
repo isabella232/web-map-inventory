@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Removing debug code
 * `libproj` name mismatch, newer versions of libproj aren’t detected properly by the PyProj Python package
+* Duplicate styles in layer groups which cause Airtable import errors [#74](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/74)
 
 ## [0.3.1] - 2020-04-29
 
