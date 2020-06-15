@@ -97,8 +97,8 @@
             }
           }
         }
-        }
-      },
+      }
+    },
     "repository": {
       "type": "object",
       "required": [
@@ -166,7 +166,10 @@
           "additionalProperties": false,
           "properties": {
             "namespaces": {
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           }
         }
@@ -275,7 +278,9 @@
     "postgis-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -287,17 +292,19 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["postgis"]
+              "enum": [
+                "postgis"
+              ]
             },
             "hostname": {
-            "type": "string"
-          },
+              "type": "string"
+            },
             "database": {
-            "type": "string"
-          },
+              "type": "string"
+            },
             "schema": {
-            "type": "string"
-          }
+              "type": "string"
+            }
           }
         }
       ]
@@ -305,7 +312,9 @@
     "jpg2000-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -314,7 +323,9 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["jpg2000"]
+              "enum": [
+                "jpg2000"
+              ]
             }
           }
         }
@@ -323,7 +334,9 @@
     "imagemosaic-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -332,7 +345,9 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["imagemosaic"]
+              "enum": [
+                "imagemosaic"
+              ]
             }
           }
         }
@@ -341,7 +356,9 @@
     "geotiff-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -350,7 +367,9 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["geotiff"]
+              "enum": [
+                "geotiff"
+              ]
             }
           }
         }
@@ -359,7 +378,9 @@
     "ecw-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -368,7 +389,9 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["ecw"]
+              "enum": [
+                "ecw"
+              ]
             }
           }
         }
@@ -377,7 +400,9 @@
     "worldimage-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -386,7 +411,9 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["worldimage"]
+              "enum": [
+                "worldimage"
+              ]
             }
           }
         }
@@ -395,7 +422,9 @@
     "shapefile-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -404,7 +433,9 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["shapefile"]
+              "enum": [
+                "shapefile"
+              ]
             }
           }
         }
@@ -413,7 +444,25 @@
     "shapefiles-directory-repository": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/repository"},
+        {
+          "$ref": "#/definitions/repository"
+        },
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "shapefiles-directory"
+              ]
+            }
+          }
+        }
+      ]
+    },
     "oracle-repository": {
       "type": "object",
       "allOf": [
@@ -428,7 +477,10 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["shapefiles-directory"]
+              "enum": [
+                "oracle"
+              ]
+            },
             "hostname": {
               "type": "string"
             },
@@ -445,7 +497,9 @@
     "sld-style": {
       "type": "object",
       "allOf": [
-        {"$ref":  "#/definitions/style"},
+        {
+          "$ref": "#/definitions/style"
+        },
         {
           "type": "object",
           "required": [
@@ -454,7 +508,9 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["sld"]
+              "enum": [
+                "sld"
+              ]
             }
           }
         }
@@ -463,7 +519,9 @@
     "layers-vector": {
       "type": "object",
       "allOf": [
-        {"$ref":  "#/definitions/layer"},
+        {
+          "$ref": "#/definitions/layer"
+        },
         {
           "type": "object",
           "required": [
@@ -473,13 +531,18 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["vector"]
+              "enum": [
+                "vector"
+              ]
             },
             "geometry": {
               "$ref": "#/definitions/geometry"
             },
             "table_view": {
-              "type": ["string", "null"]
+              "type": [
+                "string",
+                "null"
+              ]
             }
           }
         }
@@ -488,7 +551,9 @@
     "layers-raster": {
       "type": "object",
       "allOf": [
-        {"$ref":  "#/definitions/layer"},
+        {
+          "$ref": "#/definitions/layer"
+        },
         {
           "type": "object",
           "required": [
@@ -526,14 +591,30 @@
       "type": "array",
       "items": {
         "oneOf": [
-          {"$ref": "#/definitions/postgis-repository"},
-          {"$ref": "#/definitions/jpg2000-repository"},
-          {"$ref": "#/definitions/imagemosaic-repository"},
-          {"$ref": "#/definitions/geotiff-repository"},
-          {"$ref": "#/definitions/ecw-repository"},
-          {"$ref": "#/definitions/worldimage-repository"},
-          {"$ref": "#/definitions/shapefile-repository"},
-          {"$ref": "#/definitions/shapefiles-directory-repository"}
+          {
+            "$ref": "#/definitions/postgis-repository"
+          },
+          {
+            "$ref": "#/definitions/jpg2000-repository"
+          },
+          {
+            "$ref": "#/definitions/imagemosaic-repository"
+          },
+          {
+            "$ref": "#/definitions/geotiff-repository"
+          },
+          {
+            "$ref": "#/definitions/ecw-repository"
+          },
+          {
+            "$ref": "#/definitions/worldimage-repository"
+          },
+          {
+            "$ref": "#/definitions/shapefile-repository"
+          },
+          {
+            "$ref": "#/definitions/shapefiles-directory-repository"
+          },
           {
             "$ref": "#/definitions/oracle-repository"
           }
@@ -544,7 +625,9 @@
       "type": "array",
       "items": {
         "oneOf": [
-          {"$ref": "#/definitions/sld-style"}
+          {
+            "$ref": "#/definitions/sld-style"
+          }
         ]
       }
     },
@@ -552,8 +635,12 @@
       "type": "array",
       "items": {
         "oneOf": [
-          {"$ref": "#/definitions/layers-vector"},
-          {"$ref": "#/definitions/layers-raster"}
+          {
+            "$ref": "#/definitions/layers-vector"
+          },
+          {
+            "$ref": "#/definitions/layers-raster"
+          }
         ]
       }
     },
