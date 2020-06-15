@@ -43,9 +43,4 @@ ENV APP_ENABLE_FILE_LOGGING=false
 COPY support/xml-schemas/cataloge.xml /etc/xml/catalog
 COPY --from=build $APPVENV/ $APPVENV/
 
-RUN adduser -D geoweb
-RUN chown geoweb:root $APPPATH && \
-    chown geoweb:root -R $APPVENV
-USER geoweb
-
 ENTRYPOINT []

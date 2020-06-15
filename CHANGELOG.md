@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 * Reformatting data file schema
+* Removing app user from Dockerfile for compatibility with PyCharm remote interpreter
 
 ### Fixed
 
