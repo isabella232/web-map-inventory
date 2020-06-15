@@ -23,6 +23,7 @@ class GeoServerRepositoryType(Enum):
     WORLDIMAGE = "worldimage"
     SHAPEFILE = "shapefile"
     SHAPEFILESDIR = "directory of spatial files (shapefiles)"
+    ORACLE = "oracle ng"
 
 
 class GeoServerLayerGeometry(Enum):
@@ -197,7 +198,11 @@ class GeoServer(Server):
         }
         if hasattr(_store, "description") and _store.description is not None:
             store["title"] = _store.description
-        if store["repository_type"] == "postgis":
+
+        if (
+            store["repository_type"] == RepositoryType.POSTGIS.value
+            or store["repository_type"] == RepositoryType.ORACLE.value
+        ):
             store["hostname"] = _store.connection_parameters["host"]
             store["database"] = _store.connection_parameters["database"]
             store["schema"] = _store.connection_parameters["schema"]
@@ -305,9 +310,6 @@ class GeoServer(Server):
                         GeoServerLayerGeometry(str(_properties["geometry"])).name
                     ].value
                 except ValueError:
-                    # debug
-                    print(_properties)
-
                     raise ValueError(
                         f"Geometry [{_properties['geometry']}] for layer {layer_reference} not mapped to "
                         f"LayerGeometry enum."
@@ -315,12 +317,6 @@ class GeoServer(Server):
             elif "properties" in _properties:
                 for geometry_column_name in GeoServerGeometryColumnNames:
                     if geometry_column_name.value in _properties["properties"].keys():
-
-                        if geometry_column_name.value == "geom":
-                            print(f"geom: {layer_reference}")
-                        if geometry_column_name.value == "wkb_geometry":
-                            print(f"wkb: {layer_reference}")
-
                         try:
                             layer["geometry_type"] = LayerGeometry[
                                 GeoPropertyGeoServerLayerGeom(
@@ -334,7 +330,10 @@ class GeoServer(Server):
                                 f"LayerGeometry enum."
                             )
 
-        if str(_layer.resource.store.type).lower() == "postgis":
+        if (
+            str(_layer.resource.store.type).lower() == RepositoryType.POSTGIS.value
+            or str(_layer.resource.store.type).lower() == RepositoryType.ORACLE.value
+        ):
             layer["table_view"] = _layer.resource.native_name
 
         return layer

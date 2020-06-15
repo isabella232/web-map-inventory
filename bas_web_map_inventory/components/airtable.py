@@ -208,6 +208,7 @@ class RepositoryTypeAirtable(Enum):
     WORLDIMAGE = "World Image"
     SHAPEFILE = "Shapefile"
     SHAPEFILESDIR = "Shapefiles Directory"
+    ORACLE = "Oracle"
 
 
 class StyleTypeAirtable(Enum):

@@ -7,12 +7,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+* Support for 'Oracle' GeoServer store/repository types [#71](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/71)
+
+### Changed
+
+* Reformatting data file schema
+* Removing app user from Dockerfile for compatibility with PyCharm remote interpreter
+
+### Fixed
+
+* Removing debug code
+* `libproj` name mismatch, newer versions of libproj aren’t detected properly by the PyProj Python package
+
 ## [0.3.1] - 2020-04-29
 
 ### Added
 
 * Support for '3D Multi-polygon' geometries
 * Support for 'geometry collection' geometries
+* Additional JSON guidance
 
 ### Changed
 

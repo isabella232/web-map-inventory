@@ -23,6 +23,7 @@ class RepositoryType(Enum):
     WORLDIMAGE = "worldimage"
     SHAPEFILE = "shapefile"
     SHAPEFILESDIR = "shapefiles-directory"
+    ORACLE = "oracle"
 
 
 class StyleType(Enum):

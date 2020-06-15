@@ -9,7 +9,8 @@ RUN mkdir $APPPATH
 WORKDIR $APPPATH
 
 RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils coreutils git proj-dev proj-util
-
+# Workaround for the PyProj Python package looking for an older version of libproj
+RUN cd /usr/lib && ln -s libproj.so.19 libproj.so.15 && cd $APPPATH
 
 FROM base as build
 
@@ -42,10 +43,5 @@ ENV APP_ENABLE_FILE_LOGGING=false
 
 COPY support/xml-schemas/cataloge.xml /etc/xml/catalog
 COPY --from=build $APPVENV/ $APPVENV/
-
-RUN adduser -D geoweb
-RUN chown geoweb:root $APPPATH && \
-    chown geoweb:root -R $APPVENV
-USER geoweb
 
 ENTRYPOINT []
