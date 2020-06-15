@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Support for 'Oracle' GeoServer store/repository types [#71](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/71)
 
+### Fixed
+
+* Removing debug code
+
 ## [0.3.1] - 2020-04-29
 
 ### Added

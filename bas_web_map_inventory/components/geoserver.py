@@ -317,12 +317,6 @@ class GeoServer(Server):
             elif "properties" in _properties:
                 for geometry_column_name in GeoServerGeometryColumnNames:
                     if geometry_column_name.value in _properties["properties"].keys():
-
-                        if geometry_column_name.value == "geom":
-                            print(f"geom: {layer_reference}")
-                        if geometry_column_name.value == "wkb_geometry":
-                            print(f"wkb: {layer_reference}")
-
                         try:
                             layer["geometry_type"] = LayerGeometry[
                                 GeoPropertyGeoServerLayerGeom(
