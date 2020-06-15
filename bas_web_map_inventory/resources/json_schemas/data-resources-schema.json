@@ -414,6 +414,12 @@
       "type": "object",
       "allOf": [
         {"$ref": "#/definitions/repository"},
+    "oracle-repository": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/repository"
+        },
         {
           "type": "object",
           "required": [
@@ -423,6 +429,14 @@
             "type": {
               "type": "string",
               "enum": ["shapefiles-directory"]
+            "hostname": {
+              "type": "string"
+            },
+            "database": {
+              "type": "string"
+            },
+            "schema": {
+              "type": "string"
             }
           }
         }
@@ -520,6 +534,9 @@
           {"$ref": "#/definitions/worldimage-repository"},
           {"$ref": "#/definitions/shapefile-repository"},
           {"$ref": "#/definitions/shapefiles-directory-repository"}
+          {
+            "$ref": "#/definitions/oracle-repository"
+          }
         ]
       }
     },
