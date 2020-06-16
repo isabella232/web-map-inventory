@@ -3,6 +3,8 @@ FROM python:3.8-alpine as base
 LABEL maintainer = "Felix Fennell <felnne@bas.ac.uk>"
 
 RUN apk add --no-cache libxslt-dev libffi-dev libressl-dev libxml2-utils coreutils git proj-dev proj-util
+# Workaround for the PyProj Python package looking for an older version of libproj
+RUN cd /usr/lib && ln -s libproj.so.19 libproj.so.15 && cd /
 
 
 FROM base as build
