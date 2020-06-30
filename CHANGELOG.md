@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-* * `libproj` version mismatch in development image [#75](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/75)
+* `libproj` version mismatch in development image [#75](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/75)
 
 ## [0.3.2] - 2020-06-15
 
