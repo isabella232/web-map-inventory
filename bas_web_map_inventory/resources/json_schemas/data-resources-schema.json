@@ -516,6 +516,28 @@
         }
       ]
     },
+    "cascaded-wms-repository": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/repository"
+        },
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "cascaded-wms"
+              ]
+            }
+          }
+        }
+      ]
+    },
     "sld-style": {
       "type": "object",
       "allOf": [
@@ -592,6 +614,29 @@
           }
         }
       ]
+    },
+    "layers-cascaded-wms": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/layer"
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "geometry"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "wms"
+              ]
+            }
+          }
+        }
+      ]
     }
   },
   "type": "object",
@@ -642,6 +687,9 @@
           },
           {
             "$ref": "#/definitions/geogig-repository"
+          },
+          {
+            "$ref": "#/definitions/cascaded-wms-repository"
           }
         ]
       }
@@ -665,6 +713,9 @@
           },
           {
             "$ref": "#/definitions/layers-raster"
+          },
+          {
+            "$ref": "#/definitions/layers-cascaded-wms"
           }
         ]
       }
