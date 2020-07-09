@@ -54,6 +54,7 @@ class LayerGeometry(Enum):
     POINT = "point"
     LINESTRING = "linestring"
     POLYGON = "polygon"
+    POLYGON3D = "3d-polygon"
     MULTIPOINT = "multi-point"
     MULTILINESTRING = "multi-linestring"
     MULTIPOLYGON = "multi-polygon"

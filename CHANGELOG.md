@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+* Support for 3D polygon geometry type [#78](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/78)
 * Support for cascaded WMS layers [#77](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/77)
 * Support for 'GeoGig' GeoServer store/repository types [#76](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/76)
 

@@ -22,6 +22,7 @@
             "point",
             "linestring",
             "polygon",
+            "3d-polygon",
             "multi-point",
             "multi-linestring",
             "multi-polygon",
