@@ -209,6 +209,7 @@ class RepositoryTypeAirtable(Enum):
     SHAPEFILE = "Shapefile"
     SHAPEFILESDIR = "Shapefiles Directory"
     ORACLE = "Oracle"
+    GEOGIG = "GeoGig"
 
 
 class StyleTypeAirtable(Enum):

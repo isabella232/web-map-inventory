@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.3.3] - 2020-06-16
 
+### Added
+
+* Support for 'GeoGig' GeoServer store/repository types [#76](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/76)
+
+
 ### Fixed
 
 * `libproj` version mismatch in development image [#75](https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/issues/75)

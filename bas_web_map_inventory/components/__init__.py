@@ -24,6 +24,7 @@ class RepositoryType(Enum):
     SHAPEFILE = "shapefile"
     SHAPEFILESDIR = "shapefiles-directory"
     ORACLE = "oracle"
+    GEOGIG = "geogig"
 
 
 class StyleType(Enum):

@@ -24,6 +24,7 @@ class GeoServerRepositoryType(Enum):
     SHAPEFILE = "shapefile"
     SHAPEFILESDIR = "directory of spatial files (shapefiles)"
     ORACLE = "oracle ng"
+    GEOGIG = "geogig"
 
 
 class GeoServerLayerGeometry(Enum):

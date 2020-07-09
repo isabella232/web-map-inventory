@@ -494,6 +494,28 @@
         }
       ]
     },
+    "geogig-repository": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/repository"
+        },
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "geogig"
+              ]
+            }
+          }
+        }
+      ]
+    },
     "sld-style": {
       "type": "object",
       "allOf": [
@@ -617,6 +639,9 @@
           },
           {
             "$ref": "#/definitions/oracle-repository"
+          },
+          {
+            "$ref": "#/definitions/geogig-repository"
           }
         ]
       }
