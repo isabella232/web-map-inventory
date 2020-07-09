@@ -210,6 +210,7 @@ class RepositoryTypeAirtable(Enum):
     SHAPEFILESDIR = "Shapefiles Directory"
     ORACLE = "Oracle"
     GEOGIG = "GeoGig"
+    CASCADEDWMS = "Cascaded WMS"
 
 
 class StyleTypeAirtable(Enum):
@@ -227,6 +228,7 @@ class LayerTypeAirtable(Enum):
 
     RASTER = "Raster"
     VECTOR = "Vector"
+    CASCADEDWMS = "Cascaded WMS"
 
 
 class LayerGeometryAirtable(Enum):

@@ -25,6 +25,7 @@ class GeoServerRepositoryType(Enum):
     SHAPEFILESDIR = "directory of spatial files (shapefiles)"
     ORACLE = "oracle ng"
     GEOGIG = "geogig"
+    CASCADEDWMS = "wms"
 
 
 class GeoServerLayerGeometry(Enum):

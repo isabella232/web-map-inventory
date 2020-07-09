@@ -25,6 +25,7 @@ class RepositoryType(Enum):
     SHAPEFILESDIR = "shapefiles-directory"
     ORACLE = "oracle"
     GEOGIG = "geogig"
+    CASCADEDWMS = "cascaded-wms"
 
 
 class StyleType(Enum):
@@ -42,6 +43,7 @@ class LayerType(Enum):
 
     RASTER = "raster"
     VECTOR = "vector"
+    CASCADEDWMS = "wms"
 
 
 class LayerGeometry(Enum):
