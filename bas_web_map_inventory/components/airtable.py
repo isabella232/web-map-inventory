@@ -239,6 +239,7 @@ class LayerGeometryAirtable(Enum):
     POINT = "Point"
     LINESTRING = "Linestring"
     POLYGON = "Polygon"
+    POLYGON3D = "3D Polygon"
     MULTIPOINT = "Multi-Point"
     MULTILINESTRING = "Multi-Linestring"
     MULTIPOLYGON = "Multi-Polygon"
