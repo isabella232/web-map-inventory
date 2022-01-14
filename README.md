@@ -1,13 +1,14 @@
 # MAGIC Web Map Inventory
 
-Inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information Centre (MAGIC),
-visualised in Airtable.
+Retired inventory of geospatial layers and web maps provided by the BAS Mapping and Geographic Information Centre
+(MAGIC) visualised in Airtable.
 
-* [view the inventory in Airtable (Internal)](https://airtable.com/tblr6gwKOLQelMXDv/viwp8xVwcRRJnoIo0?blocks=hide)
+**Note:** This project was designed for internal use within MAGIC, but is offered to anyone with similar needs.
 
-See the [Data model](#data-model) section for more information about what this inventory holds.
+## Status
 
-**Note:** This project is designed for internal use within MAGIC, but is offered to anyone with similar needs.
+This project has been retired. It has been kept as a record of things that been tried in the past. See
+https://gitlab.data.bas.ac.uk/MAGIC/web-map-inventory/-/issues/80 for more details.
 
 ## Usage
 
@@ -605,7 +606,7 @@ This project uses issue tracking, see the
 
 ## License
 
-© UK Research and Innovation (UKRI), 2019 - 2020, British Antarctic Survey.
+© UK Research and Innovation (UKRI), 2019 - 2022, British Antarctic Survey.
 
 You may use and re-use this software and associated documentation files free of charge in any format or medium, under
 the terms of the Open Government Licence v3.0.
